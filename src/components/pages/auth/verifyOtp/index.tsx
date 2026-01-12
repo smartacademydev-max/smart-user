@@ -59,7 +59,7 @@ export default function VerifyOTP() {
             if (redirectUrl) {
                 navigate(redirectUrl, { replace: true });
             } else {
-                navigate(PATH.DASHBOARD.ROOT, { replace: true });
+                navigate(PATH.AUTH.INTEREST.ROOT, { replace: true });
             }
         }
     }, [user, redirectUrl, navigate]);

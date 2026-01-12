@@ -29,6 +29,7 @@ export default function SelectPreferedLanguage() {
         dispatch(setLanguage(lang));
         i18n.changeLanguage(lang);
     };
+
     useEffect(() => {
         if (selectedLanguage) {
             navigate(PATH.AUTH.LOGIN.ROOT, { replace: true });
