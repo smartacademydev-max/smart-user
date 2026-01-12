@@ -1,4 +1,5 @@
-import { Box, Button, CircularProgress, Dialog, DialogContent, useTheme } from '@mui/material';
+import { Box, Button, CircularProgress, Dialog, DialogContent, Typography, useTheme } from '@mui/material';
+import { GoogleLogin } from '@react-oauth/google';
 import { DocumentDownload, Maximize2 } from 'iconsax-reactjs';
 import Plyr, { type APITypes, type PlyrProps } from "plyr-react";
 import "plyr-react/plyr.css";
@@ -438,7 +439,29 @@ export default function ReadingDialog() {
                                         ],
                                         hideControls: false,
                                     }}
-                                /> : <Button variant='contained' color="primary" onClick={handleGetPlayableUrl}>Retry</Button>
+                                /> : (<div className="flex flex-col gap-4">
+                                    <div className="text-center">
+                                        <Typography variant="h4" className="mb-2!">
+                                            Unable to load video
+                                        </Typography>
+                                        <Typography variant="subtitle2" fontWeight={400} color="text.middle">
+                                            We couldn’t fetch the playable URL from the server.
+                                            Please try again or sign in with Google.
+                                        </Typography>
+                                    </div>
+
+                                    <div className="flex gap-4 justify-between">
+                                        <GoogleLogin onSuccess={handleGetPlayableUrl} />
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            fullWidth
+                                            onClick={handleGetPlayableUrl}
+                                        >
+                                            Retry
+                                        </Button>
+                                    </div>
+                                </div>)
                             }
                         </div>
                     );
