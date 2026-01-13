@@ -1,7 +1,4 @@
-// Loading.tsx
 import { Box, Typography } from '@mui/material';
-
-
 export default function Loading() {
     return (
         <Box className="min-h-screen w-full flex flex-col items-center justify-between">

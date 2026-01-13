@@ -45,7 +45,7 @@ export default function IntroScreenRoot() {
                     ) : currentItem ? (
                         <div className="onboarding__screen">
                             {currentItem.icon_url && (
-                                <img src={currentItem.icon_url} alt="" className="mb-4 max-w-[217px]" />
+                                <img src={currentItem.icon_url} alt="" className="mb-4 max-w-[217px] mx-auto" />
                             )}
 
                             <div className="text-center">
@@ -67,14 +67,14 @@ export default function IntroScreenRoot() {
                                     {currentItem.items?.map((item) => (
                                         <ListItem
                                             key={item.description}
-                                            className="py-4! px-5! flex justify-start items-center gap-3"
+                                            className="py-4! px-5! flex! flex-row! justify-start items-center! gap-3"
                                             sx={{
                                                 bgcolor: (theme) => theme.palette.gray.gray1,
                                                 borderRadius: "12px",
                                                 border: (theme) => `1px solid ${theme.palette.gray.gray2}`,
                                             }}
                                         >
-                                            {item.icon_url && <img src={item.icon_url} alt="" />}
+                                            {item.icon_url && <img src={item.icon_url} alt="" className="max-w-8 mix-blend-darken" />}
                                             <div className="content">
                                                 <Typography variant="body2">{item.title}</Typography>
                                                 <Typography variant="subtitle2" color="text.middle">
@@ -88,11 +88,11 @@ export default function IntroScreenRoot() {
                                 <div className="flex flex-col gap-3 sm:grid grid-cols-2">
                                     {currentItem.items?.map((item) => (
                                         <div className="col-span-1" key={item.icon_url}>
-                                            <Box className="card px-4 py-5 rounded-xl" sx={{
+                                            <Box className="card h-full px-4 py-5 rounded-xl" sx={{
                                                 bgcolor: "#F8FAFC",
                                                 border: (theme) => theme.palette.textField.border
                                             }}>
-                                                {item.icon_url && <img src={item.icon_url} alt="" className="mb-1" />}
+                                                {item.icon_url && <img src={item.icon_url} alt="" className="mb-1 max-w-8 mix-blend-darken" />}
                                                 <div className="content">
                                                     <Typography variant="h6" className="mb-1!" color="primary">{item.title}</Typography>
                                                     <Typography variant="subtitle1" >
