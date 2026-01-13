@@ -47,7 +47,6 @@ export default function IntroScreenRoot() {
                             {currentItem.icon_url && (
                                 <img src={currentItem.icon_url} alt="" className="mb-4 max-w-[217px] mx-auto" />
                             )}
-
                             <div className="text-center">
                                 {currentItem.title && (
                                     <Typography variant="h4" className="mb-2!">

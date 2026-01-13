@@ -108,7 +108,7 @@ const router = createBrowserRouter([
             path: PATH.DASHBOARD.ROOT, element: <App />
           },
           // COURSE INSIDE LAYOUT
-          {
+        {
             element: <CourseRoot />,
             children: [
               { path: PATH.COURSE_MANAGEMENT.COURSES.ROOT, element: <AllCourses /> },
