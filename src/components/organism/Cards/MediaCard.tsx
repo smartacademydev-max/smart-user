@@ -128,7 +128,7 @@ export default function MediaCard({
             </Box>
 
             <div className="content w-full">
-                <Typography variant='subtitle2' fontWeight={500} className='line-clamp-1'>
+                <Typography variant='subtitle2' fontWeight={500} >
                     {media.file_name}
                 </Typography>
 
