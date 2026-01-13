@@ -349,42 +349,122 @@ export default function ReadingDialog() {
                     //     },
                     // };
 
+                    // const plyrOptions: PlyrProps['options'] = {
+                    //     autoplay: false,
+                    //     controls: [
+                    //         'play-large',
+                    //         'play',
+                    //         'rewind',
+                    //         'progress',
+                    //         'fast-forward',
+                    //         'current-time',
+                    //         'duration',
+                    //         'mute',
+                    //         'volume',
+                    //         'settings',
+                    //     ],
+                    //     keyboard: { focused: true, global: false },
+                    //     clickToPlay: true,
+                    //     disableContextMenu: true,
+                    //     fullscreen: { enabled: true },
+                    //     seekTime: 10,
+                    //     youtube: {
+                    //         noCookie: false,
+                    //         rel: 0,
+                    //         iv_load_policy: 3,
+                    //         cc_load_policy: 0,
+                    //         playsinline: 1,
+                    //         // ❌ REMOVED: sho
+                    //         // winfo (deprecated)
+                    //         // ❌ REMOVED: modestbranding (deprecated)
+                    //         // ❌ REMOVED: controls: 0 (Plyr handles this)
+                    //         // ❌ REMOVED: disablekb (Plyr handles this)
+                    //         // ❌ REMOVED: fs (Plyr handles this)
+                    //         // ❌ REMOVED: autoplay (already set at top level)
+                    //         // ❌ REMOVED: origin (causes bot detection issues)
+                    //         // origin: window.location.origin
+                    //     },
+                    // };
                     const plyrOptions: PlyrProps['options'] = {
                         autoplay: false,
                         controls: [
-                            'play-large',
                             'play',
-                            'rewind',
                             'progress',
-                            'fast-forward',
                             'current-time',
                             'duration',
                             'mute',
                             'volume',
                             'settings',
+                            'fullscreen',
                         ],
-                        keyboard: { focused: true, global: false },
                         clickToPlay: true,
-                        disableContextMenu: true,
+                        disableContextMenu: false, // IMPORTANT
+                        keyboard: { focused: true, global: false },
                         fullscreen: { enabled: true },
-                        seekTime: 10,
                         youtube: {
-                            noCookie: false,
                             rel: 0,
                             iv_load_policy: 3,
                             cc_load_policy: 0,
                             playsinline: 1,
-                            // ❌ REMOVED: sho
-                            // winfo (deprecated)
-                            // ❌ REMOVED: modestbranding (deprecated)
-                            // ❌ REMOVED: controls: 0 (Plyr handles this)
-                            // ❌ REMOVED: disablekb (Plyr handles this)
-                            // ❌ REMOVED: fs (Plyr handles this)
-                            // ❌ REMOVED: autoplay (already set at top level)
-                            // ❌ REMOVED: origin (causes bot detection issues)
-                            // origin: window.location.origin
                         },
                     };
+
+                    const youtubeEmbedUrl = `https://www.youtube-nocookie.com/embed/${mediaId}?rel=0&modestbranding=1&iv_load_policy=3&playsinline=1&controls=1&disablekb=1&branding=1`;
+
+                    return (
+                        <div
+                            ref={containerRef}
+                            style={{
+                                position: "relative",
+                                width: "100%",
+                                paddingTop: "56.25%",
+                                backgroundColor: "#000",
+                                borderRadius: "8px",
+                                overflow: "hidden",
+                            }}
+                        >
+                            <iframe
+                                src={youtubeEmbedUrl}
+                                title="YouTube video player"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                                allowFullScreen
+                                style={{
+                                    position: "absolute",
+                                    top: 0,
+                                    left: 0,
+                                    width: "100%",
+                                    height: "100%",
+                                    border: "none",
+                                }}
+                            />
+                            <div
+                                style={{
+                                    position: "absolute",
+                                    width: "300px",
+                                    height: "40px",
+                                    bottom: 0,
+                                    right: 0,
+                                    pointerEvents: "auto",
+                                    zIndex: 10,
+                                }}
+                            />
+                            <div
+                                style={{
+                                    position: "absolute",
+                                    width: "100%",
+                                    height: "100px",
+                                    top: 0,
+                                    right: 0,
+                                    left: 0,
+                                    pointerEvents: "auto",
+                                    zIndex: 10,
+                                }}
+                            />
+
+                        </div>
+                    );
+
+
                     return (
                         <div className='h-full' ref={containerRef}>
                             <Plyr
