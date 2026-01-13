@@ -409,7 +409,7 @@ export default function ReadingDialog() {
                         },
                     };
 
-                    const youtubeEmbedUrl = `https://www.youtube-nocookie.com/embed/${mediaId}?rel=0&modestbranding=1&iv_load_policy=3&playsinline=1&controls=1&disablekb=1&branding=1`;
+                    const youtubeEmbedUrl = `https://www.youtube-nocookie.com/embed/${mediaId}?rel=0`;
 
                     return (
                         <div
@@ -448,17 +448,18 @@ export default function ReadingDialog() {
                                     zIndex: 10,
                                 }}
                             />
-                            <div
-                                style={{
+                            <Box
+                                sx={{
                                     position: "absolute",
                                     width: "100%",
-                                    height: "100px",
+                                    height: { xs: "40px", lg: "100px" },
                                     top: 0,
                                     right: 0,
                                     left: 0,
                                     pointerEvents: "auto",
                                     zIndex: 10,
                                 }}
+
                             />
 
                         </div>
@@ -560,7 +561,7 @@ export default function ReadingDialog() {
             }}
         >
             <DialogContent sx={{ padding: '24px' }}>
-                <div className='mb-4 flex justify-between items-end'>
+                <div className='mb-4 flex flex-wrap justify-between items-end'>
                     <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 600 }}>
                         {title || 'Media Viewer'}
                     </h2>
