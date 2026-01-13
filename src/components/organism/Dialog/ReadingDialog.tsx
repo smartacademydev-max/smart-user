@@ -409,61 +409,61 @@ export default function ReadingDialog() {
                         },
                     };
 
-                    const youtubeEmbedUrl = `https://www.youtube-nocookie.com/embed/${mediaId}?rel=0`;
+                    // const youtubeEmbedUrl = `https://www.youtube-nocookie.com/embed/${mediaId}?rel=0`;
 
-                    return (
-                        <div
-                            ref={containerRef}
-                            style={{
-                                position: "relative",
-                                width: "100%",
-                                paddingTop: "56.25%",
-                                backgroundColor: "#000",
-                                borderRadius: "8px",
-                                overflow: "hidden",
-                            }}
-                        >
-                            <iframe
-                                src={youtubeEmbedUrl}
-                                title="YouTube video player"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                                allowFullScreen
-                                style={{
-                                    position: "absolute",
-                                    top: 0,
-                                    left: 0,
-                                    width: "100%",
-                                    height: "100%",
-                                    border: "none",
-                                }}
-                            />
-                            <div
-                                style={{
-                                    position: "absolute",
-                                    width: "300px",
-                                    height: "40px",
-                                    bottom: 0,
-                                    right: 0,
-                                    pointerEvents: "auto",
-                                    zIndex: 10,
-                                }}
-                            />
-                            <Box
-                                sx={{
-                                    position: "absolute",
-                                    width: "100%",
-                                    height: { xs: "40px", lg: "100px" },
-                                    top: 0,
-                                    right: 0,
-                                    left: 0,
-                                    pointerEvents: "auto",
-                                    zIndex: 10,
-                                }}
+                    // return (
+                    //     <div
+                    //         ref={containerRef}
+                    //         style={{
+                    //             position: "relative",
+                    //             width: "100%",
+                    //             paddingTop: "56.25%",
+                    //             backgroundColor: "#000",
+                    //             borderRadius: "8px",
+                    //             overflow: "hidden",
+                    //         }}
+                    //     >
+                    //         <iframe
+                    //             src={youtubeEmbedUrl}
+                    //             title="YouTube video player"
+                    //             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                    //             allowFullScreen
+                    //             style={{
+                    //                 position: "absolute",
+                    //                 top: 0,
+                    //                 left: 0,
+                    //                 width: "100%",
+                    //                 height: "100%",
+                    //                 border: "none",
+                    //             }}
+                    //         />
+                    //         <div
+                    //             style={{
+                    //                 position: "absolute",
+                    //                 width: "300px",
+                    //                 height: "40px",
+                    //                 bottom: 0,
+                    //                 right: 0,
+                    //                 pointerEvents: "auto",
+                    //                 zIndex: 10,
+                    //             }}
+                    //         />
+                    //         <Box
+                    //             sx={{
+                    //                 position: "absolute",
+                    //                 width: "100%",
+                    //                 height: { xs: "40px", lg: "100px" },
+                    //                 top: 0,
+                    //                 right: 0,
+                    //                 left: 0,
+                    //                 pointerEvents: "auto",
+                    //                 zIndex: 10,
+                    //             }}
 
-                            />
+                    //         />
 
-                        </div>
-                    );
+                    //     </div>
+                    // );
 
 
                     return (
