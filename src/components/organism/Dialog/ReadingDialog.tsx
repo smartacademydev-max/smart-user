@@ -1,16 +1,14 @@
-import { Box, Button, CircularProgress, Dialog, DialogContent, Typography, useTheme } from '@mui/material';
-import { GoogleLogin } from '@react-oauth/google';
+import { Box, Button, CircularProgress, Dialog, DialogContent, Tooltip, Typography, useTheme } from '@mui/material';
 import { DocumentDownload, Maximize2 } from 'iconsax-reactjs';
 import Plyr, { type APITypes, type PlyrProps } from "plyr-react";
 import "plyr-react/plyr.css";
 import { useEffect, useRef, useState } from 'react';
 import { useGetCourseMediaByTypeQuery } from '../../../services/courseApi';
-import { useGetPlayableUrlMutation } from '../../../services/mediaApi';
-import { resetReadingScreen } from '../../../slice/ReadingScreenSlice';
-import { showToast } from '../../../slice/toastSlice';
+import { resetReadingScreen, setReadingScreen } from '../../../slice/ReadingScreenSlice';
 import { useAppDispatch, useAppSelector } from '../../../store/hook';
 import type { courseTabType, CurriculumMediaType } from '../../../types/course';
 import type { MediaProps } from '../../../types/media';
+import { extractYouTubeVideoId, getYouTubeThumbnail } from '../../../utils/extractYoutubeVideoId';
 import WaterMark from '../../../Watermark';
 
 interface PlyrInstance {
@@ -74,7 +72,7 @@ export default function ReadingDialog() {
 
     const playerRef = useRef<PlyrInstance | null>(null);
     const containerRef = useRef<HTMLDivElement | null>(null);
-    const [_isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(true);
     const [qp, setQp] = useState({
         pageIndex: 1,
         pageSize: 15,
@@ -103,32 +101,6 @@ export default function ReadingDialog() {
         { id: courseId!, type: switchType(type as CurriculumMediaType), qp: qp },
         { skip: !courseId || !open }
     );
-
-    const [getPlayableUrl, { isLoading: loadingVideoUrl }] = useGetPlayableUrlMutation();
-    const [playableUrl, setPlayableUrl] = useState<string | null>(null);
-    const handleGetPlayableUrl = async () => {
-        try {
-            setPlayableUrl(null);
-            const response = await getPlayableUrl({ url: media?.url }).unwrap();
-            // dispatch(showToast({
-            //     message: "Successfully fetched the url",
-            //     severity: "success",
-            // }))
-            setPlayableUrl(response?.data?.url);
-
-        } catch (e: any) {
-            dispatch(showToast({
-                message: e?.data?.message || "Error Getting URL",
-                severity: "error",
-            }))
-        }
-    }
-
-    useEffect(() => {
-        if (media?.id) {
-            handleGetPlayableUrl();
-        }
-    }, [media?.id, media?.url])
 
 
     const mediaList = data?.data?.data || [];
@@ -301,24 +273,37 @@ export default function ReadingDialog() {
         };
     }, []);
 
-    // const handleRelatedVideoClick = (relatedVideo: MediaProps) => {
-    //     const isYoutube = relatedVideo.url.includes('youtube.com') || relatedVideo.url.includes('youtu.be');
-    //     const vidId = isYoutube ? extractYouTubeVideoId(relatedVideo.url) : null;
+    const handleRelatedVideoClick = (relatedVideo: MediaProps) => {
+        const isYoutube = relatedVideo.url.includes('youtube.com') || relatedVideo.url.includes('youtu.be');
+        const vidId = isYoutube ? extractYouTubeVideoId(relatedVideo.url) : null;
 
-    //     dispatch(
-    //         setReadingScreen({
-    //             isYouTube: isYoutube,
-    //             mediaId: vidId || undefined,
-    //             media: relatedVideo,
-    //             title: relatedVideo.file_name
-    //         })
-    //     );
-    // };
+        dispatch(
+            setReadingScreen({
+                isYouTube: isYoutube,
+                mediaId: vidId || undefined,
+                media: relatedVideo,
+                title: relatedVideo.file_name
+            })
+        );
+    };
 
     const renderContent = () => {
         switch (type) {
             case 'temp_video':
                 if (isYouTube && mediaId) {
+                    if (isLoading || !mediaId) {
+                        return (
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                minHeight: '400px',
+                                backgroundColor: '#000',
+                            }}>
+                                <CircularProgress size={60} />
+                            </div>
+                        );
+                    }
 
                     const plyrSource: PlyrProps['source'] = {
                         type: "video",
@@ -329,40 +314,6 @@ export default function ReadingDialog() {
                             },
                         ],
                     };
-
-                    // const plyrOptions: PlyrProps['options'] = {
-                    //     autoplay: false,
-                    //     controls: [
-                    //         'play-large',
-                    //         'play',
-                    //         'rewind',
-                    //         'progress',
-                    //         'fast-forward',
-                    //         'current-time',
-                    //         'duration',
-                    //         'mute',
-                    //         'volume',
-                    //         'settings',
-                    //     ],
-                    //     keyboard: { focused: true, global: false },
-                    //     clickToPlay: true,
-                    //     disableContextMenu: true,
-                    //     fullscreen: { enabled: true },
-                    //     seekTime: 10,
-                    //     youtube: {
-                    //         noCookie: false,
-                    //         rel: 0,
-                    //         showinfo: 0,
-                    //         iv_load_policy: 3,
-                    //         modestbranding: 1,
-                    //         controls: 0,
-                    //         disablekb: 0,
-                    //         fs: 1,
-                    //         cc_load_policy: 0,
-                    //         autoplay: 0,
-                    //         origin: window.location.origin
-                    //     },
-                    // };
 
                     const plyrOptions: PlyrProps['options'] = {
                         autoplay: false,
@@ -389,84 +340,87 @@ export default function ReadingDialog() {
                             iv_load_policy: 3,
                             cc_load_policy: 0,
                             playsinline: 1,
-
+                            // ❌ REMOVED: sho
+                            // winfo (deprecated)
+                            // ❌ REMOVED: modestbranding (deprecated)
+                            // ❌ REMOVED: controls: 0 (Plyr handles this)
+                            // ❌ REMOVED: disablekb (Plyr handles this)
+                            // ❌ REMOVED: fs (Plyr handles this)
+                            // ❌ REMOVED: autoplay (already set at top level)
+                            // ❌ REMOVED: origin (causes bot detection issues)
+                            // origin: window.location.origin
                         },
                     };
-                    return (
-                        <div className='h-full min-h-[400px] flex justify-center items-center' ref={containerRef}>
-                            <div className="hidden">
-                                <Plyr
-                                    ref={playerRef as any}
-                                    source={plyrSource}
-                                    options={plyrOptions}
-                                />
-                            </div>
-                            {/* {responseStatus === 422 ? <div className='w-full' style={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                minHeight: '400px',
-                            }}>
-                                <Button >Retry</Button>
-                            </div> : ""} */}
-                            {loadingVideoUrl ? <div className='w-full' style={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                minHeight: '400px',
-                                backgroundColor: '#000',
-                            }}>
-                                <CircularProgress size={60} />
-                            </div> :
-                                playableUrl ? <Plyr
-                                    source={{
-                                        type: "video",
-                                        sources: [
-                                            {
-                                                src: playableUrl,
-                                                type: "video/mp4",
-                                            },
-                                        ],
-                                    }}
-                                    options={{
-                                        controls: [
-                                            "play",
-                                            "progress",
-                                            "current-time",
-                                            "mute",
-                                            "volume",
-                                            // "fullscreen",
-                                        ],
-                                        hideControls: false,
-                                    }}
-                                /> : (<div className="flex flex-col gap-4">
-                                    <div className="text-center">
-                                        <Typography variant="h4" className="mb-2!">
-                                            Unable to load video
-                                        </Typography>
-                                        <Typography variant="subtitle2" fontWeight={400} color="text.middle">
-                                            We couldn’t fetch the playable URL from the server.
-                                            Please try again or sign in with Google.
-                                        </Typography>
-                                    </div>
 
-                                    <div className="flex gap-4 justify-between">
-                                        <GoogleLogin onSuccess={handleGetPlayableUrl} />
-                                        <Button
-                                            variant="contained"
-                                            color="primary"
-                                            fullWidth
-                                            onClick={handleGetPlayableUrl}
-                                        >
-                                            Retry
-                                        </Button>
-                                    </div>
-                                </div>)
-                            }
+
+                    // const youtubeEmbedUrl = `https://www.youtube-nocookie.com/embed/${mediaId}?rel=0`;
+
+                    // return (
+                    //     <div
+                    //         ref={containerRef}
+                    //         style={{
+                    //             position: "relative",
+                    //             width: "100%",
+                    //             paddingTop: "56.25%",
+                    //             backgroundColor: "#000",
+                    //             borderRadius: "8px",
+                    //             overflow: "hidden",
+                    //         }}
+                    //     >
+                    //         <iframe
+                    //             src={youtubeEmbedUrl}
+                    //             title="YouTube video player"
+                    //             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                    //             allowFullScreen
+                    //             style={{
+                    //                 position: "absolute",
+                    //                 top: 0,
+                    //                 left: 0,
+                    //                 width: "100%",
+                    //                 height: "100%",
+                    //                 border: "none",
+                    //             }}
+                    //         />
+                    //         <div
+                    //             style={{
+                    //                 position: "absolute",
+                    //                 width: "300px",
+                    //                 height: "40px",
+                    //                 bottom: 0,
+                    //                 right: 0,
+                    //                 pointerEvents: "auto",
+                    //                 zIndex: 10,
+                    //             }}
+                    //         />
+                    //         <Box
+                    //             sx={{
+                    //                 position: "absolute",
+                    //                 width: "100%",
+                    //                 height: { xs: "40px", lg: "100px" },
+                    //                 top: 0,
+                    //                 right: 0,
+                    //                 left: 0,
+                    //                 pointerEvents: "auto",
+                    //                 zIndex: 10,
+                    //             }}
+
+                    //         />
+
+                    //     </div>
+                    // );
+
+
+                    return (
+                        <div className='h-full' ref={containerRef}>
+                            <Plyr
+                                ref={playerRef as any}
+                                source={plyrSource}
+                                options={plyrOptions}
+                            />
                         </div>
                     );
                 } else if (mediaUrl) {
-                    return <video controls src={mediaUrl} style={{ width: '100%' }} controlsList="nodownload" />;
+                    return <video controls src={mediaUrl} style={{ width: '100%' }} />;
                 }
                 return <p>No video available</p>;
 
@@ -502,27 +456,27 @@ export default function ReadingDialog() {
         }
     };
 
-    // const getUpcomingMedia = () => {
-    //     if (!media?.id || allMedia.length === 0) return [];
+    const getUpcomingMedia = () => {
+        if (!media?.id || allMedia.length === 0) return [];
 
-    //     const currentIndex = allMedia.findIndex(v => v.id === media?.id);
-    //     if (currentIndex === -1) return allMedia.slice(0, 6);
+        const currentIndex = allMedia.findIndex(v => v.id === media?.id);
+        if (currentIndex === -1) return allMedia.slice(0, 6);
 
-    //     const upcomingItems = allMedia.slice(currentIndex + 1, currentIndex + 7);
+        const upcomingItems = allMedia.slice(currentIndex + 1, currentIndex + 7);
 
-    //     if (upcomingItems.length < 6 && !hasMore) {
-    //         return allMedia.slice(-6);
-    //     }
+        if (upcomingItems.length < 6 && !hasMore) {
+            return allMedia.slice(-6);
+        }
 
-    //     return upcomingItems;
-    // };
+        return upcomingItems;
+    };
 
     if (!open) {
         return null;
     }
 
-    // const upcomingMedia = getUpcomingMedia();
-    // const currentMediaId = media?.id;
+    const upcomingMedia = getUpcomingMedia();
+    const currentMediaId = media?.id;
 
     const handleDownloadNote = async () => {
         if (!mediaUrl) return;
@@ -537,7 +491,6 @@ export default function ReadingDialog() {
         document.body.removeChild(link);
     };
 
-    console.log(playableUrl)
     return (
         <Dialog
             open={open}
@@ -552,7 +505,7 @@ export default function ReadingDialog() {
             }}
         >
             <DialogContent sx={{ padding: '24px' }}>
-                <div className='mb-4 flex justify-between items-end'>
+                <div className='mb-4 flex flex-wrap justify-between items-end'>
                     <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 600 }}>
                         {title || 'Media Viewer'}
                     </h2>
@@ -569,13 +522,13 @@ export default function ReadingDialog() {
                 </div>
 
                 <div className="lg:grid lg:grid-cols-12 gap-4">
-                    <div className="col-span-12 max-h-[500px] overflow-auto">
+                    <div className="col-span-9 max-h-[500px] overflow-auto">
                         <div className="h-full overflow-auto" ref={videoRef}>
                             <WaterMark />
                             {renderContent()}
                         </div>
                     </div>
-                    {/* <div className="hidden lg:block col-span-3">
+                    <div className="hidden lg:block col-span-3">
                         <Typography variant='subtitle1' className='block! mb-3!' sx={{ fontWeight: 600 }}>
                             Up Next
                         </Typography>
@@ -661,7 +614,7 @@ export default function ReadingDialog() {
                                 </Typography>
                             )}
                         </Box>
-                    </div> */}
+                    </div>
                 </div>
 
                 <div className='flex flex-col gap-4 md:flex md:flex-row-reverse mt-4'>

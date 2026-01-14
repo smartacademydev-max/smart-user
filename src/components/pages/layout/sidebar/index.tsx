@@ -128,11 +128,11 @@ export default function ResponsiveDrawer(props: Props) {
                     }
                 }} />
                 <Box
-                    className="content lg:rounded-2xl overflow-y-auto flex flex-col "
+                    className="content lg:rounded-2xl overflow-y-auto flex flex-col overflow-hidden"
                     sx={{
                         background: theme.palette.primary.contrastText,
                         height: {
-                            xs: "calc(100vh - 85px)",
+                            xs: "calc(100vh - 100px)",
                             lg: "calc(100vh - 145px)"
                         },
                         padding: {
