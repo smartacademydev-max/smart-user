@@ -349,65 +349,43 @@ export default function ReadingDialog() {
                     //     },
                     // };
 
-                    // const plyrOptions: PlyrProps['options'] = {
-                    //     autoplay: false,
-                    //     controls: [
-                    //         'play-large',
-                    //         'play',
-                    //         'rewind',
-                    //         'progress',
-                    //         'fast-forward',
-                    //         'current-time',
-                    //         'duration',
-                    //         'mute',
-                    //         'volume',
-                    //         'settings',
-                    //     ],
-                    //     keyboard: { focused: true, global: false },
-                    //     clickToPlay: true,
-                    //     disableContextMenu: true,
-                    //     fullscreen: { enabled: true },
-                    //     seekTime: 10,
-                    //     youtube: {
-                    //         noCookie: false,
-                    //         rel: 0,
-                    //         iv_load_policy: 3,
-                    //         cc_load_policy: 0,
-                    //         playsinline: 1,
-                    //         // ❌ REMOVED: sho
-                    //         // winfo (deprecated)
-                    //         // ❌ REMOVED: modestbranding (deprecated)
-                    //         // ❌ REMOVED: controls: 0 (Plyr handles this)
-                    //         // ❌ REMOVED: disablekb (Plyr handles this)
-                    //         // ❌ REMOVED: fs (Plyr handles this)
-                    //         // ❌ REMOVED: autoplay (already set at top level)
-                    //         // ❌ REMOVED: origin (causes bot detection issues)
-                    //         // origin: window.location.origin
-                    //     },
-                    // };
                     const plyrOptions: PlyrProps['options'] = {
                         autoplay: false,
                         controls: [
+                            'play-large',
                             'play',
+                            'rewind',
                             'progress',
+                            'fast-forward',
                             'current-time',
                             'duration',
                             'mute',
                             'volume',
                             'settings',
-                            'fullscreen',
                         ],
-                        clickToPlay: true,
-                        disableContextMenu: false, // IMPORTANT
                         keyboard: { focused: true, global: false },
+                        clickToPlay: true,
+                        disableContextMenu: true,
                         fullscreen: { enabled: true },
+                        seekTime: 10,
                         youtube: {
+                            noCookie: false,
                             rel: 0,
                             iv_load_policy: 3,
                             cc_load_policy: 0,
                             playsinline: 1,
+                            // ❌ REMOVED: sho
+                            // winfo (deprecated)
+                            // ❌ REMOVED: modestbranding (deprecated)
+                            // ❌ REMOVED: controls: 0 (Plyr handles this)
+                            // ❌ REMOVED: disablekb (Plyr handles this)
+                            // ❌ REMOVED: fs (Plyr handles this)
+                            // ❌ REMOVED: autoplay (already set at top level)
+                            // ❌ REMOVED: origin (causes bot detection issues)
+                            // origin: window.location.origin
                         },
                     };
+
 
                     // const youtubeEmbedUrl = `https://www.youtube-nocookie.com/embed/${mediaId}?rel=0`;
 
