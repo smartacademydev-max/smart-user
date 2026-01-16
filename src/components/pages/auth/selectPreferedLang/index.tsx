@@ -60,7 +60,7 @@ export default function SelectPreferedLanguage() {
                                     onClick={() => handleLanguageSelect(lang.value as "en" | "np")}
                                     control={<Radio color="primary"
                                         checked={isSelected}
-                                    />} className="items-center! flex-row-reverse! justify-between! w-full p-4 rounded-xl"
+                                    />} className="items-center! flex-row-reverse! justify-between! w-full py-2 px-4 rounded-xl"
                                     sx={{
                                         border: `1px solid `,
                                         borderColor: (theme) => isSelected ? theme.palette.primary.main : theme.palette.separator.dark
@@ -68,7 +68,7 @@ export default function SelectPreferedLanguage() {
                                     label={
                                         <div className="flex items-center justify-start gap-3">
                                             <img src={lang.icon} alt="" className="min-w-8" />
-                                            <Typography>{lang.label}</Typography>
+                                            <Typography color="text.dark" variant="body2">{lang.label}</Typography>
                                         </div>
                                     } />
                             )

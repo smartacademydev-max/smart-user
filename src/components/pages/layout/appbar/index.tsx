@@ -67,7 +67,7 @@ export default function CustomAppbar({
                         width: "100%",
                     }}
                 >
-                    <Box className="flex gap-2 lg:gap-4">
+                    <Box className="flex gap-2 items-center lg:gap-4">
                         <NotificationModal />
                         <SettingMenu />
                         <ProfileMenu />

@@ -52,6 +52,7 @@ export default function TabController<T extends string | number>({
                 breakpoint: 1200,
                 settings: {
                     slidesToShow: 6,
+                    focusOnSelect: false,
                 }
             },
             {

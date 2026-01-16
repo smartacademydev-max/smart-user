@@ -102,7 +102,6 @@ export default function ReadingDialog() {
         { skip: !courseId || !open }
     );
 
-
     const mediaList = data?.data?.data || [];
     const totalPages = data?.data?.pagination?.total_pages || 0;
     const currentPage = qp.pageIndex;
@@ -125,7 +124,6 @@ export default function ReadingDialog() {
     useEffect(() => {
         if (open) {
             setQp({ pageIndex: 1, pageSize: 15 });
-            setAllMedia([]);
         }
     }, [open, courseId, type]);
 
@@ -298,6 +296,7 @@ export default function ReadingDialog() {
                                 justifyContent: 'center',
                                 alignItems: 'center',
                                 minHeight: '400px',
+                                height: "100%",
                                 backgroundColor: '#000',
                             }}>
                                 <CircularProgress size={60} />

@@ -65,7 +65,7 @@ export default function SingleCourse() {
         false;
 
     return (
-        <>
+        <div className="h-full overflow-auto pr-4">
             <CourseBanner data={courseBasic?.data && courseBasic.data} isLoading={loadingBasic} havePurchased={havePurchased} />
             <div className="my-8">
                 <TabController
@@ -125,6 +125,6 @@ export default function SingleCourse() {
                 <SinlgeCourseLiveClass havePurchased={havePurchased} data={liveClasses} isLoading={loadingLiveClass} qp={qpLiveClass} setQp={setQpLiveClass} totalPages={liveClasses?.data?.pagination?.total_pages || 0} />
             </Activity>}
             <PurchaseCourseDialog type={courseBasic?.data?.course_type} />
-        </>
+        </div>
     )
 }

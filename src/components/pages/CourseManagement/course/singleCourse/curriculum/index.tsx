@@ -557,7 +557,7 @@ export default function SingleCourseCurriculum({ data, havePurchased }: Props) {
 
     return (
         <div className="pb-4">
-            <div className="lg:grid gap-6 lg:grid-cols-12 hidden ">
+            <div className="2xl:grid gap-6 2xl:grid-cols-12 hidden ">
                 <SubjectSidebar
                     subjects={data || []}
                     openSubjectId={openSubjectId}
@@ -589,7 +589,7 @@ export default function SingleCourseCurriculum({ data, havePurchased }: Props) {
                     )}
                 </div>
             </div>
-            <div className="lg:hidden">
+            <div className="2xl:hidden">
                 <MobileCurriculum havePurchased={havePurchased} data={data} courseId={Number(id)} />
             </div>
         </div>
