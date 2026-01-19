@@ -73,6 +73,7 @@ export default function SelectPreferedLanguage() {
                                     } />
                             )
                         })}
+
                     </div>
                     <Button variant="contained" color="primary" fullWidth onClick={() => navigate(PATH.AUTH.INTRO.ROOT)}>{t("messages.get_started")}</Button>
                 </div>
