@@ -152,7 +152,7 @@ export default function AllNoteList() {
     }
 
     return (
-        <div className="all__note__listing">
+        <div className="all__note__listing  h-full flex flex-col overflow-hidden">
             <div className="mb-6">
                 <TableFilter
                     search={search || ""}
@@ -170,13 +170,10 @@ export default function AllNoteList() {
                     </h2>
                 </div>
             )}
-            <div className="media__listing__wrapper">
+            <div className="media__listing__wrapper h-full overflow-hidden">
                 <Box
                     id="video__listing__wrapper"
-                    sx={{
-                        maxHeight: "calc(100vh - 460px)",
-                        overflow: "auto",
-                    }}
+                    className="h-full overflow-auto"
                 >
                     {isLoadingFirstPage ? (
                         <div className="flex flex-col gap-4 md:grid grid-cols-2 xl:grid-cols-3 lg:gap-6">

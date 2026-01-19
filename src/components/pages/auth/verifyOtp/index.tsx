@@ -59,7 +59,7 @@ export default function VerifyOTP() {
             if (redirectUrl) {
                 navigate(redirectUrl, { replace: true });
             } else {
-                navigate(PATH.DASHBOARD.ROOT, { replace: true });
+                navigate(PATH.AUTH.INTEREST.ROOT, { replace: true });
             }
         }
     }, [user, redirectUrl, navigate]);
@@ -95,21 +95,6 @@ export default function VerifyOTP() {
     const formik = useFormik({
         initialValues: { otp: "" },
         validationSchema,
-        // onSubmit: async (values) => {
-        //     if (!phone) {
-        //         dispatch(showToast({ message: "Phone number not found.", severity: "error" }));
-        //         navigate(PATH.AUTH.LOGIN.ROOT, { replace: true });
-        //         return;
-        //     }
-        //     try {
-        //         const response = await verifyOtp({ phone, otp: values.otp }).unwrap();
-        //         dispatch(showToast({ message: response.message || "OTP verified successfully.", severity: "success" }));
-        //         dispatch(setCredentials({ token: response?.data?.token, user: response?.data?.user }));
-        //         navigate(PATH.DASHBOARD.ROOT);
-        //     } catch (e: any) {
-        //         dispatch(showToast({ message: e?.data?.message || "Invalid OTP. Please try again.", severity: "error" }));
-        //     }
-        // },
         onSubmit: async (values) => {
             if (!phone) {
                 dispatch(showToast({ message: "Phone number not found.", severity: "error" }));
@@ -133,7 +118,7 @@ export default function VerifyOTP() {
                 if (redirectUrl) {
                     navigate(redirectUrl, { replace: true });
                 } else {
-                    navigate(PATH.DASHBOARD.ROOT);
+                    navigate(PATH.AUTH.INTEREST.ROOT);
                 }
             } catch (e: any) {
                 dispatch(showToast({
@@ -256,7 +241,7 @@ export default function VerifyOTP() {
                 </Box>
 
                 {formik.touched.otp && formik.errors.otp && (
-                    <FormHelperText error={true}  sx={{ mb: 2,textAlign:"center"  }}>
+                    <FormHelperText error={true} sx={{ mb: 2, textAlign: "center" }}>
                         {formik.errors.otp}
                     </FormHelperText>
                 )}

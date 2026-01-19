@@ -24,7 +24,21 @@
         "purchase_now": "Purchase Now",
         "free_trial": "Free Trial",
         "free_trial_already_taken": "Free Trial Already Taken",
-        "continue_learning": "Continue Learning"
+        "continue_learning": "Continue Learning",
+        "get_started": "Get Started",
+        "welcome_to_udaan": "Welcome to Udaan",
+        "welcom_message_udaan": "उडानमा हजुरलाई स्वागत छ|",
+        "select_your_prefered_language": "Select your preferred language.",
+        "select_your_prefered_language_message": "कृपाया आफुलाइ सजिलो लाग्ने भाषा चानोत गार्नुहोस|",
+        "english": "English",
+        "nepali": "Nepali",
+        "skip": "Skip",
+        "next": "Next",
+        "save": "Save",
+        "saving": "Saving",
+        "course": "Course",
+        "select_your_interest": "Select your Interests ",
+        "select_your_interest_message": "Let us help you to find course you are looking for."
     },
     "menus": {
         "dashboard": "Dashboard",

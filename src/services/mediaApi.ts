@@ -32,7 +32,14 @@ export const mediaApi = createApi({
                 method: "POST",
             }),
         }),
+        getPlayableUrl: builder.mutation<GlobalResponse & { data: { url: string } }, { url?: string }>({
+            query: ({ url }) => ({
+                url: `/playable-video`,
+                method: "POST",
+                body: { video_link: url }
+            }),
+        })
     })
 })
 
-export const { useUploadMediaImageMutation, useDownloadMediaMutation } = mediaApi;
+export const { useUploadMediaImageMutation, useDownloadMediaMutation, useGetPlayableUrlMutation } = mediaApi;

@@ -15,7 +15,7 @@ export default function CourseBanner({ data, havePurchased }: { data?: CoursePro
             background: `url(/banner-bg.svg) no-repeat center/cover, ${theme.palette.primary.main}`
         }}>
             <div className="flex flex-col lg:grid grid-cols-20 gap-6">
-                <div className="col-span-4 hidden lg:block">
+                <div className="lg:col-span-8 xl:col-span-4 hidden lg:block">
                     <Box className=" thumbnail aspect-264/210 rounded-2xl lg:flex items-center overflow-hidden" sx={{
                         background: theme.palette.primary.contrastText
                     }}>
@@ -23,7 +23,7 @@ export default function CourseBanner({ data, havePurchased }: { data?: CoursePro
                     </Box>
                 </div>
 
-                <div className="col-span-10">
+                <div className="lg:col-span-12 xl:col-span-10 ">
                     <div className="flex flex-col gap-3.5 ">
                         {course?.mega_categories?.length ? (
                             <div className="flex gap-2 flex-wrap">
@@ -80,9 +80,9 @@ export default function CourseBanner({ data, havePurchased }: { data?: CoursePro
                     </div>
                 </div>
 
-                <div className="col-span-6">
+                <div className="lg:col-span-20 xl:col-span-6 ">
                     {havePurchased ?
-                        <Box className="rounded-md p-4 bg-[rgba(255,255,255,0.12)] flex flex-col gap-4" sx={{
+                        <Box className="rounded-md p-4 bg-[rgba(255,255,255,0.12)] flex flex-col gap-4 w-full" sx={{
                             color: theme.palette.primary.contrastText
                         }}>
                             <Typography variant="body2">Progress</Typography>

@@ -282,6 +282,9 @@ const commonThemeOptions: ThemeOptions = {
   components: {
     MuiCssBaseline: {
       styleOverrides: (theme) => ({
+        body: {
+          background: theme.palette.primary.contrastText
+        },
         ".subscription__description": {
           ul: {
             display: "flex",
@@ -506,7 +509,7 @@ const commonThemeOptions: ThemeOptions = {
     MuiInputLabel: {
       styleOverrides: {
         root: ({ theme }) => ({
-          fontSize: "16px",
+          ...theme.typography.subtitle1,
           color: theme.palette.textField.name,
           marginBottom: "8px",
           fontWeight: 400,

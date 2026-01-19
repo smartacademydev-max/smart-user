@@ -1,3 +1,4 @@
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import i18n from "i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import HttpApi from "i18next-http-backend";
@@ -13,6 +14,7 @@ import Loading from "./Loading.tsx";
 import GlobalRoutes from "./routes/Routes.tsx";
 import { store } from "./store/store.ts";
 import UdaanThemeProvider from "./ThemeProvider.tsx";
+
 i18n
   .use(HttpApi)
   .use(LanguageDetector)
@@ -38,16 +40,19 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>
       <I18nextProvider i18n={i18n}>
-        <Suspense fallback={<Loading />}>
-          <UdaanThemeProvider>
-            {/* <ScreenProtection> */}
-            <GlobalRoutes />
-            <Toast />
-            <SessionExpiredPopup />
-            <ReadingDialog />
-            {/* </ScreenProtection> */}
-          </UdaanThemeProvider>
-        </Suspense>
+        <UdaanThemeProvider>
+          <Suspense fallback={<Loading />}>
+
+            <GoogleOAuthProvider clientId='361289665406-npg48sokjoqcdepd1qov5dq4l6meipri.apps.googleusercontent.com'>
+              {/* <ScreenProtection> */}
+              <GlobalRoutes />
+              <Toast />
+              <SessionExpiredPopup />
+              <ReadingDialog />
+              {/* </ScreenProtection> */}
+            </GoogleOAuthProvider>
+          </Suspense>
+        </UdaanThemeProvider>
       </I18nextProvider>
     </Provider>
   </StrictMode>,

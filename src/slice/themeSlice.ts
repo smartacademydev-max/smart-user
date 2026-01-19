@@ -13,7 +13,7 @@ export type ThemeMode = (typeof ThemeMode)[keyof typeof ThemeMode];
 
 export interface DefaultThemeProps {
     fontFamily: FontFamily;
-    i18n: I18nProps;
+    lang: I18nProps;
     miniDrawer: boolean;
     mode: ThemeMode;
 }
@@ -24,7 +24,7 @@ const initialState: DefaultThemeProps = storedTheme
     ? JSON.parse(storedTheme)
     : {
         fontFamily: "Inter",
-        i18n: "en",
+        lang: null,
         mode: ThemeMode.LIGHT,
         miniDrawer: false,
     };
@@ -40,7 +40,7 @@ export const ThemeSlice = createSlice({
             localStorage.setItem("themeConfig", JSON.stringify(state));
         },
         setLanguage: (state, action: PayloadAction<I18nProps>) => {
-            state.i18n = action.payload;
+            state.lang = action.payload;
             localStorage.setItem("themeConfig", JSON.stringify(state));
         },
         setMiniDrawer: (state, action: PayloadAction<boolean>) => {
@@ -49,7 +49,7 @@ export const ThemeSlice = createSlice({
         },
         resetTheme: (state) => {
             state.fontFamily = "Inter";
-            state.i18n = "en";
+            state.lang = "en";
             state.mode = ThemeMode.LIGHT;
             state.miniDrawer = false;
             localStorage.setItem("themeConfig", JSON.stringify(state));

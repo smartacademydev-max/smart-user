@@ -17,6 +17,15 @@ export const PATH = {
         },
         CHOOSE_PLATFORM: {
             ROOT: "/choose-platform"
+        },
+        CHOOSE_PREFERED_LANG: {
+            ROOT: "/prefered-language"
+        },
+        INTRO: {
+            ROOT: "/intro"
+        },
+        INTEREST: {
+            ROOT: "/auth/interest"
         }
     },
     DASHBOARD: {

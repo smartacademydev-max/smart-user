@@ -1,5 +1,5 @@
-import { Outlet } from 'react-router-dom'
-import ResponsiveDrawer from '../components/pages/layout/sidebar'
+import { Outlet } from 'react-router-dom';
+import ResponsiveDrawer from '../components/pages/layout/sidebar';
 
 export default function RootLayout() {
     return (

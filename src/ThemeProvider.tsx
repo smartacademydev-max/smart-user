@@ -8,7 +8,7 @@ import { createAppTheme } from './theme';
 
 export default function UdaanThemeProvider({ children }: { children: React.ReactNode }) {
     const { i18n } = useTranslation();
-    const { i18n: lang, mode } = useAppSelector(
+    const { lang, mode } = useAppSelector(
         (state: RootState) => state.udaan_theme
     );
 

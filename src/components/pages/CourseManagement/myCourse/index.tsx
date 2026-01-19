@@ -5,17 +5,19 @@ import { PATH } from "../../../../routes/PATH";
 import { useGetUserPurchasedCourseQuery } from "../../../../services/courseApi";
 import { EmptyList } from "../../../molecules/EmptyList";
 import TablePagination from "../../../molecules/Pagination";
+import TabController from "../../../molecules/TabController";
 import CourseCard from "../../../organism/Cards/CourseCard/CourseCard";
 import PageHeader from "../../../organism/PageHeader";
 
 export default function MyCourseRoot() {
     const { t } = useTranslation();
+    const [activeTab, setActiveTab] = useState<"trial" | "purchased">("trial");
     const [qp, setQp] = useState({
         pageIndex: 1,
         pageSize: 8,
     });
     const theme = useTheme();
-    const { data, isLoading } = useGetUserPurchasedCourseQuery({ ...qp });
+    const { data, isLoading } = useGetUserPurchasedCourseQuery({ ...qp, type: activeTab });
 
     const courses = data?.data?.data || [];
     const pagination = data?.data?.pagination || null;
@@ -23,12 +25,22 @@ export default function MyCourseRoot() {
 
     return (
         <div className="flex flex-col justify-between h-full">
-            <Box>
-                <PageHeader
-                    breadcrumb={[{
-                        title: t("messages.my_course")
-                    }]}
-                />
+            <PageHeader
+                breadcrumb={[{
+                    title: t("messages.my_course")
+                }]}
+            />
+            <Box className="h-full overflow-auto">
+                <div className="mb-4 lg:mb-6">
+                    <TabController
+                        options={[
+                            { value: "trial", label: "Free Trial" },
+                            { value: "purchased", label: "Purchased" }
+                        ]}
+                        currentActive={activeTab}
+                        setActiveTab={setActiveTab}
+                    />
+                </div>
                 {!isLoading && !courses.length ?
                     <EmptyList
                         title="No Course Purchased Yet !"

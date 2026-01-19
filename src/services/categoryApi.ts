@@ -9,7 +9,6 @@ export const categoryApi = createApi({
     baseQuery: baseQuery,
     tagTypes: ["Category"],
     endpoints: (builder) => ({
-
         getAllCategory: builder.query<CategroyList, QueryParams>({
             query: ({ pageIndex, pageSize, search }) => {
                 const queryString = buildQueryParams({
@@ -31,6 +30,15 @@ export const categoryApi = createApi({
                     ]
                     : [{ type: "Category", id: "LIST" }],
         }),
+        getAllInterest: builder.query<{ data: { id: number; name: string; courses: number }[] }, void>({
+            query: () => {
+
+                return {
+                    url: `/interests`,
+                    method: "GET",
+                };
+            },
+        }),
 
         getCategoryById: builder.query<{ data: CategoryProps }, { id: string }>({
             query: ({ id }) => ({
@@ -39,6 +47,7 @@ export const categoryApi = createApi({
             }),
             providesTags: (_result, _error, { id }) => [{ type: "Category", id }],
         }),
+
         getAllMegaCategory: builder.query<CategoryTypeResponse, void>({
             query: () => ({
                 url: `/course/category`,
@@ -46,6 +55,7 @@ export const categoryApi = createApi({
             }),
             providesTags: () => [{ type: "Category", id: "LIST" }],
         }),
+
         getAllCategoryRelatedToMegaCategory: builder.query<CategoryTypeResponse, { currentCategory: string }>({
             query: ({ currentCategory }) => ({
                 url: `/course/category/children?category=${currentCategory}`,
@@ -53,12 +63,21 @@ export const categoryApi = createApi({
             }),
             providesTags: () => [{ type: "Category", id: "LIST" }],
         }),
+
         getAllSubCategoryRelatedToCategory: builder.query<CategoryTypeResponse, { currentCategory: string }>({
             query: ({ currentCategory }) => ({
                 url: `/course/category/sub-children?category=${currentCategory}`,
                 method: "GET",
             }),
             providesTags: () => [{ type: "Category", id: "LIST" }],
+        }),
+
+        updateUserInterest: builder.mutation<void, { categories: number[] }>({
+            query: (body) => ({
+                url: "/interest",
+                method: "POST",
+                body
+            })
         }),
     })
 })
@@ -68,5 +87,7 @@ export const {
     useGetCategoryByIdQuery,
     useGetAllMegaCategoryQuery,
     useGetAllCategoryRelatedToMegaCategoryQuery,
-    useGetAllSubCategoryRelatedToCategoryQuery
+    useGetAllSubCategoryRelatedToCategoryQuery,
+    useUpdateUserInterestMutation,
+    useGetAllInterestQuery
 } = categoryApi;

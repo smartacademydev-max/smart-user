@@ -102,7 +102,6 @@ export default function ReadingDialog() {
         { skip: !courseId || !open }
     );
 
-
     const mediaList = data?.data?.data || [];
     const totalPages = data?.data?.pagination?.total_pages || 0;
     const currentPage = qp.pageIndex;
@@ -125,7 +124,6 @@ export default function ReadingDialog() {
     useEffect(() => {
         if (open) {
             setQp({ pageIndex: 1, pageSize: 15 });
-            setAllMedia([]);
         }
     }, [open, courseId, type]);
 
@@ -298,6 +296,7 @@ export default function ReadingDialog() {
                                 justifyContent: 'center',
                                 alignItems: 'center',
                                 minHeight: '400px',
+                                height: "100%",
                                 backgroundColor: '#000',
                             }}>
                                 <CircularProgress size={60} />
@@ -314,40 +313,6 @@ export default function ReadingDialog() {
                             },
                         ],
                     };
-
-                    // const plyrOptions: PlyrProps['options'] = {
-                    //     autoplay: false,
-                    //     controls: [
-                    //         'play-large',
-                    //         'play',
-                    //         'rewind',
-                    //         'progress',
-                    //         'fast-forward',
-                    //         'current-time',
-                    //         'duration',
-                    //         'mute',
-                    //         'volume',
-                    //         'settings',
-                    //     ],
-                    //     keyboard: { focused: true, global: false },
-                    //     clickToPlay: true,
-                    //     disableContextMenu: true,
-                    //     fullscreen: { enabled: true },
-                    //     seekTime: 10,
-                    //     youtube: {
-                    //         noCookie: false,
-                    //         rel: 0,
-                    //         showinfo: 0,
-                    //         iv_load_policy: 3,
-                    //         modestbranding: 1,
-                    //         controls: 0,
-                    //         disablekb: 0,
-                    //         fs: 1,
-                    //         cc_load_policy: 0,
-                    //         autoplay: 0,
-                    //         origin: window.location.origin
-                    //     },
-                    // };
 
                     const plyrOptions: PlyrProps['options'] = {
                         autoplay: false,

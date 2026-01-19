@@ -1,91 +1,32 @@
-import { ArrowLeft } from "iconsax-reactjs";
+import { ArrowBack } from "@mui/icons-material";
+import { Box, Button, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { PATH } from "../../../routes/PATH";
 
 export default function NotFound() {
   const navigate = useNavigate();
-
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "var(--mui-palette-gray-gray1)", // light gray background
-        padding: "24px",
-      }}
-    >
-      <div
-        style={{
-          backgroundColor: "var(--mui-palette-primary-white)",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-          borderRadius: "16px",
-          padding: "40px",
-          maxWidth: "420px",
-          width: "100%",
-          textAlign: "center",
-        }}
-      >
-        <h1
-          style={{
-            fontSize: "70px",
-            fontWeight: 800,
-            color: "var(--mui-palette-primary-main)",
-          }}
-        >
-          404
-        </h1>
-
-        <h2
-          style={{
-            fontSize: "24px",
-            fontWeight: 600,
-            color: "var(--mui-palette-text-dark)",
-            marginTop: "16px",
-          }}
-        >
-          Page Not Found
-        </h2>
-
-        <p
-          style={{
-            color: "var(--mui-palette-text-middle)",
-            marginTop: "8px",
-          }}
-        >
-          Oops! The page you're looking for doesn't exist or has been moved.
-        </p>
-
-        <button
-          onClick={() => navigate(-1)}
-          style={{
-            marginTop: "24px",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "8px",
-            backgroundColor: "var(--mui-palette-button-main)",
-            color: "var(--mui-palette-button-contrastText)",
-            padding: "12px 24px",
-            borderRadius: "12px",
-            border: "none",
-            cursor: "pointer",
-            fontWeight: 500,
-            fontSize: "16px",
-            transition: "0.2s",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor =
-              "var(--mui-palette-button-hover)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor =
-              "var(--mui-palette-button-main)";
-          }}
-        >
-          <ArrowLeft size={20} />
-          Go Back
-        </button>
+    <Box sx={{
+      bgcolor: (theme) => theme.palette.background.sidebar,
+      color: (theme) => theme.palette.primary.contrastText
+    }} className="min-h-screen w-full flex justify-content-center items-center">
+      <div className="container mx-auto">
+        <div className="content text-center">
+          <h1
+            className="text-9xl lg:text-[200px] font-extrabold leading-none"
+            style={{
+              background: "linear-gradient(90deg, #1D82F5, #F59E0B)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
+            404
+          </h1>
+          <h2 className="text-3xl mb-4">Page Not Found</h2>
+          <Typography variant="subtitle1" className="mb-4!">The page you are looking is either deleted or moved to new route.</Typography>
+          <Button variant="contained" color="primary" onClick={() => navigate(PATH.DASHBOARD.ROOT)} startIcon={<ArrowBack />}>Go To Dashboard</Button>
+        </div>
       </div>
-    </div>
-  );
+    </Box>
+  )
 }

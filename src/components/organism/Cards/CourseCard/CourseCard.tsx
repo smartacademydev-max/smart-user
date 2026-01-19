@@ -70,7 +70,8 @@ export default function CourseCard({ course, havePurchased = false }: { course: 
                         sellingPrice={course?.sale_price}
                         markedPrice={course?.marked_price}
                         to={PATH.COURSE_MANAGEMENT.COURSES.VIEW_COURSE.ROOT(course.id)}
-                        havePurchased={havePurchased || false}
+                        havePurchased={havePurchased || course?.user?.has_purchased}
+                        freeTrialCount={course?.user?.free_trial_count}
                     />
                 </div>
             </Box>

@@ -51,8 +51,8 @@ export default function BannerCourseTypeModule({ courseType, courseExpiry, cours
                             payment_method: "free",
                             transaction_amount: "0",
                             transaction_status: "success",
-                            transaction_id: `TXN-FREE-${user?.id}-${id}`,
-                            reference_id: `RFF-FREE-${user?.id}-${id}`,
+                            transaction_id: `UDAAN-TXN-${new Date()}-${user?.id}-${id}`,
+                            reference_id: `UDAAN-INVOICE-${new Date()}-${user?.id}-${id}`,
                             is_trial: false,
                         },
                         id: Number(id)

@@ -24,7 +24,19 @@
         "purchase_now": "अहिले खरिद गर्नुहोस्",
         "free_trial": "निःशुल्क परीक्षण",
         "free_trial_already_taken": "निःशुल्क परीक्षण पहिले नै लिइसकिएको छ",
-        "continue_learning": "सिकाइलाई निरन्तरता दिनुहोस्"
+        "continue_learning": "सिकाइलाई निरन्तरता दिनुहोस्",
+        "get_started": "सुरु गर्नुहोस्",
+        "welcome_to_udaan": "Welcome to Udaan",
+        "welcom_message_udaan": "उडानमा हजुरलाई स्वागत छ|",
+        "select_your_prefered_language": "आफुलाई सजिलो लाग्ने भाषा छान्नुहोस्।",
+        "select_your_prefered_language_message": "कृपया आफुलाई सजिलो लाग्ने भाषा चयन गर्नुहोस्।",
+        "english": "अंग्रेजी",
+        "nepali": "नेपाली",
+        "skip": "छोड्नुहोस्",
+        "next": "अर्को",
+        "save": "सेभ गर्नुहोस्",
+        "saving": "सेभ हुँदैछ",
+        "course": "कोर्स"
     },
     "menus": {
         "dashboard": "ड्यासबोर्ड",

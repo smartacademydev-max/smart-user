@@ -135,12 +135,13 @@ export const courseApi = createApi({
                 { type: "Course" as const, id: "LIST" },
             ],
         }),
-        getUserPurchasedCourse: builder.query<CourseList, QueryParams>({
-            query: ({ pageIndex, pageSize, search, }) => {
+        getUserPurchasedCourse: builder.query<CourseList, QueryParams & { type?: "trial" | "purchased" }>({
+            query: ({ pageIndex, pageSize, search, type }) => {
                 const queryString = buildQueryParams({
                     page: pageIndex,
                     page_size: pageSize,
                     search,
+                    type: type
                 });
                 return {
                     url: `/my-course?${queryString}`,

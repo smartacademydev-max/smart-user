@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import React, { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { setMode, ThemeMode } from "../../../../slice/themeSlice";
+import { setLanguage, setMode, ThemeMode } from "../../../../slice/themeSlice";
 import { useAppDispatch, useAppSelector } from "../../../../store/hook";
 
 // Iconsax imports
@@ -28,9 +28,8 @@ import {
 export default function SettingMenu() {
     const theme = useTheme();
     const dispatch = useAppDispatch();
-    // const navigate = useNavigate();
     const { i18n } = useTranslation();
-    const mode = useAppSelector((state) => state.udaan_theme.mode);
+    const { mode, lang } = useAppSelector((state) => state.udaan_theme);
 
     const [open, setOpen] = useState(false);
     const anchorRef = useRef<HTMLDivElement | null>(null);
@@ -53,10 +52,10 @@ export default function SettingMenu() {
 
     const handleLanguageSwitch = () => {
         const newLang = i18n.language === "en" ? "np" : "en";
+        dispatch(setLanguage(newLang));
         i18n.changeLanguage(newLang);
     };
 
-    // const handleSettingsRedirect = () => navigate("/dashboard/settings");
 
     return (
         <>
@@ -67,6 +66,7 @@ export default function SettingMenu() {
                 sx={{
                     background: theme.palette.separator.dark,
                     minWidth: { xs: 36, lg: 44 },
+                    height: { xs: 36, lg: 44 },
                     aspectRatio: "1/1",
                     display: "flex",
                     alignItems: "center",
@@ -129,7 +129,7 @@ export default function SettingMenu() {
                                             <ListItemText
                                                 primary={
                                                     <Typography variant="subtitle2">
-                                                        {i18n.language === "en" ? "नेपाली (Nepali)" : "English"}
+                                                        {lang === "en" ? "नेपाली (Nepali)" : "English"}
                                                     </Typography>
                                                 }
                                             />

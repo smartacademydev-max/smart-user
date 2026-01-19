@@ -11,7 +11,7 @@ export default function AuthRoot() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                background: theme.palette.background.sidebar,
+                background: theme.palette.primary.light,
             }}>
             <Box
                 sx={{
