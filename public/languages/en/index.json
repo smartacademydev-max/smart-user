@@ -38,7 +38,14 @@
         "saving": "Saving",
         "course": "Course",
         "select_your_interest": "Select your Interests ",
-        "select_your_interest_message": "Let us help you to find course you are looking for."
+        "select_your_interest_message": "Let us help you to find course you are looking for.",
+        "profile": "Profile",
+        "linked_devices": "Linked Devices",
+        "settings": "Settings",
+        "morning": "Good Morning",
+        "afternoon": "Good Afternoon",
+        "evening": "Good Evening",
+        "welcome": "Welcome"
     },
     "menus": {
         "dashboard": "Dashboard",

@@ -105,8 +105,6 @@ export default function IntroScreenRoot() {
                             )}
                         </div>
                     ) : null}
-
-                    {/* Dots */}
                     <div className="flex justify-center items-center gap-2 mt-4 md:mt-6">
                         {screens.map((_, index) => (
                             <Box

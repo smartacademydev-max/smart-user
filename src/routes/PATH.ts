@@ -103,9 +103,12 @@ export const PATH = {
     MY_COURSE: {
         ROOT: "/my-course"
     },
-    USER: {
-        MY_ACCOUNT: {
-            ROOT: "/my-account"
+    SETTINGS: {
+        PROFILE: {
+            ROOT: "/profile"
+        },
+        LINKED_DEVICES: {
+            ROOT: "/linked-devices"
         }
     },
     SUPPORT: {

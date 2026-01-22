@@ -32,6 +32,8 @@ import PurchaseRoot from "../components/pages/Purchase";
 import PurchaseFailure from "../components/pages/Purchase/failure";
 import PurchaseLayout from "../components/pages/Purchase/PurchaseLayout";
 import PaymentSuccessPage from "../components/pages/Purchase/success";
+import SettingRoot from "../components/pages/Settings";
+import ProfilePage from "../components/pages/Settings/ProfilePage";
 import SupportRoot from "../components/pages/Support";
 import TestManagementRoot from "../components/pages/TestManagement";
 import AllTestRoot from "../components/pages/TestManagement/allTest";
@@ -39,10 +41,10 @@ import ReviewTestRoot from "../components/pages/TestManagement/reviewTest";
 import ReviewSubjectTestRoot from "../components/pages/TestManagement/reviewTest/subjective";
 import SingleSubjectiveTest from "../components/pages/TestManagement/singleSubjectiveTest";
 import SingleTestRoot from "../components/pages/TestManagement/singleTest";
-import MyAccount from "../components/pages/UserManagement/MyAccount";
 import { PATH } from "./PATH";
 import Private from "./Private";
 import RootLayout from "./RootLayout";
+import LinkedDevices from "../components/pages/Settings/LinkedDevices";
 
 const router = createBrowserRouter([
   {
@@ -108,7 +110,7 @@ const router = createBrowserRouter([
             path: PATH.DASHBOARD.ROOT, element: <App />
           },
           // COURSE INSIDE LAYOUT
-        {
+          {
             element: <CourseRoot />,
             children: [
               { path: PATH.COURSE_MANAGEMENT.COURSES.ROOT, element: <AllCourses /> },
@@ -194,10 +196,11 @@ const router = createBrowserRouter([
             ]
           },
           {
-            path: PATH.USER.MY_ACCOUNT.ROOT,
-            element:
-              <MyAccount />
-
+            element: <SettingRoot />,
+            children: [
+              { path: PATH.SETTINGS.PROFILE.ROOT, element: <ProfilePage /> },
+              { path: PATH.SETTINGS.LINKED_DEVICES.ROOT, element: <LinkedDevices /> },
+            ]
           },
           {
             path: PATH.SUPPORT.ROOT,

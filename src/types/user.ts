@@ -10,10 +10,20 @@ export interface RegisterUserProps {
 	name: string;
 	email: string;
 	phone: string;
+	profile: File | null;
 	profile_url?: string;
+	interested_categories?: number[];
+	address?: string;
+	role: {
+		id: string;
+		name: string;
+	};
+	password: string;
+	password_confirmation: string;
+	designation?: string;
 }
 
-export const RegisterUserInitialData = {
+export const RegisterUserInitialData: RegisterUserProps = {
 	name: "",
 	email: "",
 	phone: "",
