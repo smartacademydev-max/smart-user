@@ -11,7 +11,7 @@ import PageHeader from "../../../organism/PageHeader";
 
 export default function MyCourseRoot() {
     const { t } = useTranslation();
-    const [activeTab, setActiveTab] = useState<"trial" | "purchased">("trial");
+    const [activeTab, setActiveTab] = useState<"trial" | "purchased">("purchased");
     const [qp, setQp] = useState({
         pageIndex: 1,
         pageSize: 8,
@@ -34,8 +34,8 @@ export default function MyCourseRoot() {
                 <div className="mb-4 lg:mb-6">
                     <TabController
                         options={[
+                            { value: "purchased", label: "Purchased" },
                             { value: "trial", label: "Free Trial" },
-                            { value: "purchased", label: "Purchased" }
                         ]}
                         currentActive={activeTab}
                         setActiveTab={setActiveTab}
