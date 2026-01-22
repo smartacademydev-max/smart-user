@@ -135,7 +135,7 @@ export const courseApi = createApi({
                 { type: "Course" as const, id: "LIST" },
             ],
         }),
-        getUserPurchasedCourse: builder.query<CourseList, QueryParams & { type?: "trial" | "purchased" }>({
+        getUserPurchasedCourse: builder.query<CourseList, QueryParams & { type?: "trial" | "purchased" | "free" }>({
             query: ({ pageIndex, pageSize, search, type }) => {
                 const queryString = buildQueryParams({
                     page: pageIndex,
@@ -195,6 +195,14 @@ export const courseApi = createApi({
                 }
             })
         }),
+        trackCourseProgress: builder.mutation<GlobalResponse, { id: number; body: { media_id: number; type: courseTabType } }>({
+            query: ({ id, body }) => ({
+                url: `/course/${id}/progress`,
+                method: "POST",
+                body,
+            }),
+            invalidatesTags: (_result, _error, { id }) => [{ type: "Course" as const, id }],
+        }),
     }),
 });
 
@@ -213,6 +221,6 @@ export const {
     useGetSingleLiveClassQuery,
     useGetMeetingSignatureMutation,
     usePurchaseWithKhaltiMutation,
-    usePurchaseCourseWithEsewaMutation
-
+    usePurchaseCourseWithEsewaMutation,
+    useTrackCourseProgressMutation
 } = courseApi;

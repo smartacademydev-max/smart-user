@@ -45,7 +45,13 @@
         "morning": "Good Morning",
         "afternoon": "Good Afternoon",
         "evening": "Good Evening",
-        "welcome": "Welcome"
+        "welcome": "Welcome",
+        "mark_as_completed": "Mark as Completed",
+        "completed": "Completed",
+        "marking_as_completed": "Marking as Completed",
+        "subjects": "Subjects",
+        "browse_this_course": " Browse this Course",
+        "continue": "Continue"
     },
     "menus": {
         "dashboard": "Dashboard",
@@ -62,5 +68,8 @@
         "alumni": "Alumni",
         "feedback": "Feedback",
         "support": "Support"
+    },
+    "actions": {
+        "cancel": "Cancel"
     }
 }

@@ -1,23 +1,26 @@
-import { Box, Skeleton, useTheme } from "@mui/material";
+import { Box, OutlinedInput, Skeleton, useTheme } from "@mui/material";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { PATH } from "../../../../routes/PATH";
 import { useGetUserPurchasedCourseQuery } from "../../../../services/courseApi";
+import { useDebounce } from "../../../../utils/useDebounce";
 import { EmptyList } from "../../../molecules/EmptyList";
 import TablePagination from "../../../molecules/Pagination";
 import TabController from "../../../molecules/TabController";
-import CourseCard from "../../../organism/Cards/CourseCard/CourseCard";
+import MyCourseCard from "../../../organism/Cards/CourseCard/MyCourseCard";
 import PageHeader from "../../../organism/PageHeader";
 
 export default function MyCourseRoot() {
     const { t } = useTranslation();
-    const [activeTab, setActiveTab] = useState<"trial" | "purchased">("purchased");
+    const [activeTab, setActiveTab] = useState<"trial" | "purchased" | "free">("purchased");
     const [qp, setQp] = useState({
         pageIndex: 1,
         pageSize: 8,
     });
+    const [search, setSearch] = useState('');
+    const debouncedSearch = useDebounce(search, 500);
     const theme = useTheme();
-    const { data, isLoading } = useGetUserPurchasedCourseQuery({ ...qp, type: activeTab });
+    const { data, isLoading } = useGetUserPurchasedCourseQuery({ ...qp, type: activeTab, search: debouncedSearch });
 
     const courses = data?.data?.data || [];
     const pagination = data?.data?.pagination || null;
@@ -31,14 +34,23 @@ export default function MyCourseRoot() {
                 }]}
             />
             <Box className="h-full overflow-auto">
-                <div className="mb-4 lg:mb-6">
+                <div className="mb-4 lg:mb-6 flex justify-between items-center
+                ">
                     <TabController
                         options={[
                             { value: "purchased", label: "Purchased" },
                             { value: "trial", label: "Free Trial" },
+                            { value: "free", label: "Free" },
                         ]}
                         currentActive={activeTab}
                         setActiveTab={setActiveTab}
+                    />
+                    <OutlinedInput
+                        name="search"
+                        placeholder="Enter Course Name"
+                        size="small"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
                     />
                 </div>
                 {!isLoading && !courses.length ?
@@ -94,7 +106,8 @@ export default function MyCourseRoot() {
                         )) :
                             courses.map((course) => (
                                 <div className="col-span-1">
-                                    <CourseCard course={course} havePurchased={true} />
+                                    {/* <CourseCard  havePurchased={true} /> */}
+                                    <MyCourseCard course={course} />
                                 </div>
                             ))
                         }

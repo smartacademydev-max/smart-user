@@ -1,10 +1,12 @@
 import { Box, Button, CircularProgress, Dialog, DialogContent, Tooltip, Typography, useTheme } from '@mui/material';
-import { DocumentDownload, Maximize2 } from 'iconsax-reactjs';
+import { t } from 'i18next';
+import { Maximize2 } from 'iconsax-reactjs';
 import Plyr, { type APITypes, type PlyrProps } from "plyr-react";
 import "plyr-react/plyr.css";
 import { useEffect, useRef, useState } from 'react';
-import { useGetCourseMediaByTypeQuery } from '../../../services/courseApi';
+import { useGetCourseMediaByTypeQuery, useTrackCourseProgressMutation } from '../../../services/courseApi';
 import { resetReadingScreen, setReadingScreen } from '../../../slice/ReadingScreenSlice';
+import { showToast } from '../../../slice/toastSlice';
 import { useAppDispatch, useAppSelector } from '../../../store/hook';
 import type { courseTabType, CurriculumMediaType } from '../../../types/course';
 import type { MediaProps } from '../../../types/media';
@@ -101,6 +103,7 @@ export default function ReadingDialog() {
         { id: courseId!, type: switchType(type as CurriculumMediaType), qp: qp },
         { skip: !courseId || !open }
     );
+    const [updateProgress, { isLoading: markingAsCompleted }] = useTrackCourseProgressMutation();
 
     const mediaList = data?.data?.data || [];
     const totalPages = data?.data?.pagination?.total_pages || 0;
@@ -477,18 +480,25 @@ export default function ReadingDialog() {
     const upcomingMedia = getUpcomingMedia();
     const currentMediaId = media?.id;
 
-    const handleDownloadNote = async () => {
-        if (!mediaUrl) return;
+    const handleMarkAsCompleted = async () => {
+        try {
+            await updateProgress({
+                id: courseId!,
+                body: {
+                    media_id: media?.id!,
+                    type: switchType(type as CurriculumMediaType),
+                }
+            });
 
-        const link = document.createElement("a");
-        link.href = mediaUrl;
-        link.setAttribute("download", title ? `${title}.pdf` : "note.pdf");
-        link.style.display = "none";
-
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
+        } catch (e: any) {
+            dispatch(
+                showToast({
+                    message: e?.data?.message || 'Failed to mark as completed',
+                    severity: 'error'
+                })
+            )
+        }
+    }
 
     return (
         <Dialog
@@ -512,11 +522,6 @@ export default function ReadingDialog() {
                         <Button variant="contained" onClick={handleFullscreen} startIcon={<Maximize2 />}>
                             Fullscreen Zoom
                         </Button>
-                        {type === "temp_notes" &&
-                            <Button variant="contained" startIcon={<DocumentDownload />} onClick={handleDownloadNote}>
-                                Download Note
-                            </Button>
-                        }
                     </div>
                 </div>
 
@@ -617,11 +622,11 @@ export default function ReadingDialog() {
                 </div>
 
                 <div className='flex flex-col gap-4 md:flex md:flex-row-reverse mt-4'>
-                    <Button variant='contained' className='primary__btn'>
-                        Mark as Completed
+                    <Button variant='contained' className='primary__btn' onClick={handleMarkAsCompleted} disabled={markingAsCompleted}  >
+                        {markingAsCompleted ? t("messages.marking_as_completed") : t("messages.mark_as_completed")}
                     </Button>
                     <Button variant='contained' onClick={handleClose} className='cancel__btn'>
-                        Cancel
+                        {t("actions.cancel")}
                     </Button>
                 </div>
             </DialogContent>
