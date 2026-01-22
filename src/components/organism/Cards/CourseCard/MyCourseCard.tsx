@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { PATH } from "../../../../routes/PATH";
 import type { CourseProps } from "../../../../types/course";
-import { formatDateCustom } from "../../../../utils/dateFormat";
 import Bookmark from "../../../atom/Bookmark";
 import MyProgress from "../../../atom/MyProgress";
 import CourseStatus from "./CourseStatus";
@@ -12,10 +11,10 @@ import CourseStatus from "./CourseStatus";
 export default function MyCourseCard({ course }: { course: CourseProps }) {
     const navigate = useNavigate();
     const { t } = useTranslation();
-    const endDate = formatDateCustom(course?.end_at || "", { shortMonth: true });
-    const startDate = formatDateCustom(course?.started_from || "", { shortMonth: true });
-    const day = endDate.split(' ')[0];
-    const monthAndYear = endDate.split(' ').slice(1).join(' ');
+    const endDate = course?.ends_at || "";
+    const startDate = course?.started_from || "";
+    const day = endDate.split(',')[0].split(' ')[0];
+    const monthAndYear = endDate.split(',')[0].split(' ').slice(1).join(' ');
     return (
         <Box className="my__course__card rounded-lg p-3 md:p-4 h-full flex flex-col justify-between" sx={{
             border: (theme) => `1px solid ${theme.palette.separator.dark}`

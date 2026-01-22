@@ -74,7 +74,7 @@ export interface CourseProps {
     no_of_videos: number;
     no_of_tests: number;
     progress: number;
-    end_at?: string;
+    ends_at?: string;
     started_from?: string;
 }
 
