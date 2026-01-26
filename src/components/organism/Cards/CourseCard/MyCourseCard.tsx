@@ -86,7 +86,6 @@ export default function MyCourseCard({ course }: { course: CourseProps }) {
                     </Button>
                 </div>
             </div>
-
         </Box>
     )
 }

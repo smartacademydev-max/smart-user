@@ -1,6 +1,5 @@
 import { Typography } from "@mui/material";
-import { Book, Courthouse, SearchNormal, Star } from "iconsax-reactjs";
-import AnalyticsCard from "./components/organism/Cards/AnalyticsCard";
+import { Book, SearchNormal, Star } from "iconsax-reactjs";
 import InfoCard from "./components/organism/Cards/InfoCard";
 
 export default function App() {
@@ -38,9 +37,9 @@ export default function App() {
           </div>
         ))}
       </div> */}
-      <Typography variant="h4" fontWeight={600} className="mb-4! mt-8!">My Course</Typography>
+      {/* <Typography variant="h4" fontWeight={600} className="mb-4! mt-8!">My Course</Typography>
       <Typography variant="h4" fontWeight={600} className="mb-4! mt-8!">Live Classes</Typography>
-      <Typography variant="h4" fontWeight={600} className="mb-4! mt-8!">Available Tests</Typography>
+      <Typography variant="h4" fontWeight={600} className="mb-4! mt-8!">Available Tests</Typography> */}
       <Typography variant="h4" fontWeight={600} className="mb-4! mt-8!">Explore Course</Typography>
       <div className="flex flex-col gap-2 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-4 lg:gap-6">
         {exploreCoursesCards.map((card, index) => (
@@ -53,7 +52,7 @@ export default function App() {
           />
         ))}
       </div>
-      <Typography variant="h4" fontWeight={600} className="mb-4! mt-8!">Explore Course</Typography>
+      {/* <Typography variant="h4" fontWeight={600} className="mb-4! mt-8!">Explore Course</Typography>
       <div className="flex flex-col gap-2 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-4 lg:gap-6">
         {exploreCoursesCards.map((card, index) => (
           <InfoCard
@@ -64,7 +63,7 @@ export default function App() {
             cta={card.cta}
           />
         ))}
-      </div>
+      </div> */}
     </div>
   )
 }
