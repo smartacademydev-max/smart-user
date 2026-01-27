@@ -189,9 +189,7 @@ export default function AllLiveClassList() {
         <Box
           id="video__listing__wrapper"
           sx={{
-            maxHeight: selectedCourseId
-              ? "calc(100vh - 520px)"
-              : "calc(100vh - 450px)",
+            maxHeight: "100%",
             overflow: "auto",
           }}
         >
