@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import type { CategoryFilterParams, QueryParams } from "../types";
-import type { CourseList, CourseProps, courseTabType, CurriculumList } from "../types/course";
+import type { CourseList, CourseProps, courseTabType, CurriculumList, PlaylistListing } from "../types/course";
 import type { LiveClassList, LiveClassProps } from "../types/liveClass";
 import type { MediaList } from "../types/media";
 import type { EsewaPaymentPayload, PurchaseProps } from "../types/purchase";
@@ -80,6 +80,37 @@ export const courseApi = createApi({
                         { type: "Media" as const, id: "LIST" },
                     ]
                     : [{ type: "Media" as const, id: "LIST" }],
+        }),
+        getCourseMediaPlaylist: builder.query<PlaylistListing, { id: number | null; type: courseTabType; qp: QueryParams }>({
+            query: ({ id, type, qp }) => {
+                return ({
+                    url: `/course/${id}/playlist?${buildQueryParams({
+                        type, page: qp.pageIndex,
+                        page_size: qp.pageSize,
+                        search: qp.search
+                    })}`,
+                    method: "GET",
+                })
+            },
+            providesTags: (result) =>
+                result?.data?.data
+                    ? [
+                        ...result.data.data.map((media) => ({ type: "Media" as const, id: media.chapter_id })),
+                        { type: "Media" as const, id: "LIST" },
+                    ]
+                    : [{ type: "Media" as const, id: "LIST" }],
+        }),
+        getSinglePlaylist: builder.query<MediaList, QueryParams & { id: number, playlistId?: number, type: courseTabType }>({
+            query: ({ id, playlistId, type, pageIndex, pageSize, search }) => ({
+                url: `/course/${id}/playlist/${playlistId}?${buildQueryParams({
+                    type: type,
+                    search: search,
+                    page_size: pageSize,
+                    page: pageIndex
+                })}`,
+                method: "GET"
+            }),
+            providesTags: (_result, _error, { id }) => [{ type: "Media" as const, id }],
         }),
         getCourseTest: builder.query<TestList, QueryParams & { id: number }>({
             query: ({ id, pageIndex, pageSize, search }) => ({
@@ -212,6 +243,8 @@ export const {
     useGetCourseOverviewByIdQuery,
     useGetCourseCurriculumByIdQuery,
     useGetCourseMediaByTypeQuery,
+    useGetCourseMediaPlaylistQuery,
+    useGetSinglePlaylistQuery,
     useGetCourseTestQuery,
     useGetCourseLiveClassQuery,
     usePurchaseCourseMutation,

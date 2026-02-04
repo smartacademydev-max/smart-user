@@ -68,9 +68,12 @@ const SpotifyAudioPlayer = ({ audioUrl, imageUrl, title }: { audioUrl: string, i
 export default function ReadingDialog() {
     const theme = useTheme();
     const dispatch = useAppDispatch();
+
     const { open, type, media, title, isYouTube, mediaId, courseId } = useAppSelector(
         state => state.readScreen
     );
+
+    console.log({ courseId })
 
     const playerRef = useRef<PlyrInstance | null>(null);
     const containerRef = useRef<HTMLDivElement | null>(null);

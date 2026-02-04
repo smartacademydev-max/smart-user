@@ -21,7 +21,9 @@ export default function PrimaryMenu() {
   const theme = useTheme();
 
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) =>
+    location.pathname === path ||
+    location.pathname.startsWith(path + "/");
 
   return (
     <div className="primary__menu__wrapper relative">

@@ -137,6 +137,9 @@ export default function SingleGorkhapatraRoot() {
                 variant="text"
                 startIcon={<ArrowBack />}
                 onClick={handleBackClick}
+                sx={{
+                    color: (theme) => theme.palette.separator.darkest
+                }}
             >
                 <Typography color="text.middle">Back to Gorkhapatras</Typography>
             </Button>

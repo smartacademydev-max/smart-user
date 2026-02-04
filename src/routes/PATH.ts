@@ -92,7 +92,10 @@ export const PATH = {
         ROOT: "/test",
     },
     VIDEOS: {
-        ROOT: "/videos"
+        ROOT: "/videos",
+        VIEW_PLAYLIST: {
+            ROOT: (playlistId?: number, id?: number) => id && playlistId ? `/videos/playlist/${playlistId}/course/${id}` : "/videos/playlist/:playlistId/course/:id"
+        }
     },
     AUDIOS: {
         ROOT: "/audios"

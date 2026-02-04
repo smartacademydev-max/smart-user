@@ -29,7 +29,8 @@ import AllAudios from "../components/pages/MediaManagement/audios/allAudios";
 import NotesRoot from "../components/pages/MediaManagement/notes";
 import AllNotes from "../components/pages/MediaManagement/notes/allNotes";
 import VideosRoot from "../components/pages/MediaManagement/videos";
-import AllVideos from "../components/pages/MediaManagement/videos/allVideos";
+import CoursePlaylist from "../components/pages/MediaManagement/videos/allPlaylist";
+import SinglePlaylist from "../components/pages/MediaManagement/videos/allPlaylist/singlePlaylist";
 import AllNotices from "../components/pages/NoticeBoard/allNotices";
 import NoticeRoot from "../components/pages/NoticeBoard/index.";
 import SingleNoticeRoot from "../components/pages/NoticeBoard/singleNotice";
@@ -181,7 +182,8 @@ const router = createBrowserRouter([
             element:
               <VideosRoot />,
             children: [
-              { path: PATH.VIDEOS.ROOT, element: <AllVideos /> }
+              { path: PATH.VIDEOS.ROOT, element: <CoursePlaylist /> },
+              { path: PATH.VIDEOS.VIEW_PLAYLIST.ROOT(), element: <SinglePlaylist /> }
             ]
           },
           {

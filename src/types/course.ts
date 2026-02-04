@@ -164,3 +164,16 @@ export interface CurriculumList extends GlobalResponse {
         pagination: Pagination;
     }
 }
+
+export interface PlaylistProps {
+    chapter_id: number;
+    chapter_name: string;
+    count: number;
+}
+
+export interface PlaylistListing {
+    data: {
+        data: PlaylistProps[];
+        pagination: Pagination
+    }
+}
