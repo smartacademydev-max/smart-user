@@ -7,12 +7,13 @@ import { formatDateForDisplay } from "../../../../utils/dateFormat";
 import { renderHtml } from "../../../../utils/renderHtml";
 import CopyLink from "../../../atom/CopyLink";
 import NoticeCard from "../../../organism/Cards/NoticeCard";
+import SingleGorkhapatraLoading from "../../Gorkhapatra/SingleGorkhapatra/Loading";
 
 export default function SingleNoticeRoot() {
     const navigate = useNavigate();
     const { id } = useParams();
     const { data, isLoading } = useGetNotificationByIdQuery({ id: Number(id) }, { skip: !id });
-    const { data: notices, isLoading: loadingRelatedNotices } = useGetRelatedNotificationQuery({ id: Number(id), pageIndex: 1, pageSize: 3 }, { skip: !id });
+    const { data: notices } = useGetRelatedNotificationQuery({ id: Number(id), pageIndex: 1, pageSize: 3 }, { skip: !id });
 
     const relatedNotices = notices?.data?.data || [];
     const handleBackClick = () => {
@@ -22,6 +23,9 @@ export default function SingleNoticeRoot() {
     const noticeData = data?.data;
     const date: string = formatDateForDisplay(noticeData?.sent_at);
 
+    if (isLoading) {
+        return <SingleGorkhapatraLoading />;
+    }
     return (
         <div className="single__notice__root h-full overflow-auto pr-4">
             <Button

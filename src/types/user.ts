@@ -10,16 +10,16 @@ export interface RegisterUserProps {
 	name: string;
 	email: string;
 	phone: string;
-	profile: File | null;
+	profile?: File | null;
 	profile_url?: string;
 	interested_categories?: number[];
 	address?: string;
-	role: {
+	role?: {
 		id: string;
 		name: string;
 	};
-	password: string;
-	password_confirmation: string;
+	password?: string;
+	password_confirmation?: string;
 	designation?: string;
 }
 

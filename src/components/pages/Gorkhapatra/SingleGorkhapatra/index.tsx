@@ -8,6 +8,7 @@ import { formatDateForDisplay } from "../../../../utils/dateFormat";
 import { renderHtml } from "../../../../utils/renderHtml";
 import CopyLink from "../../../atom/CopyLink";
 import GorkhapatraCard from "../../../organism/Cards/GorkhapatraCard";
+import SingleGorkhapatraLoading from "./Loading";
 
 interface TocItem {
     id: string;
@@ -62,7 +63,7 @@ export default function SingleGorkhapatraRoot() {
         { skip: !id }
     );
 
-    const { data: relatedGorkhapatra, isLoading: loadingRelatedgGorkhapatras } = useRelatedGorkhapatraQuery({ id: Number(id) }, { skip: !id });
+    const { data: relatedGorkhapatra } = useRelatedGorkhapatraQuery({ id: Number(id) }, { skip: !id });
 
     const gorkhapatraData = data?.data;
     const date: string = formatDateForDisplay(gorkhapatraData?.created_at);
@@ -179,6 +180,9 @@ export default function SingleGorkhapatraRoot() {
 
     const showTocContent = isDesktop || isTocOpen;
 
+    if (isLoading) {
+        return <SingleGorkhapatraLoading />;
+    }
     return (
         <div
             ref={scrollContainerRef}
