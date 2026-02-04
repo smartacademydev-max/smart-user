@@ -375,13 +375,17 @@ const commonThemeOptions: ThemeOptions = {
           },
           '& blockquote': {
             borderLeft: `4px solid ${theme.palette.primary.main}`,
-            paddingLeft: '1rem',
+            padding: '0.75rem',
             margin: '1rem 0',
             fontStyle: 'italic',
             backgroundColor: theme.palette.action.hover,
+            borderRadius: "8px"
           },
           '& img': {
-            maxWidth: '100%',
+            maxWidth: {
+              xs: '100%',
+              md: "50%"
+            },
             height: 'auto',
           },
           '& table': {

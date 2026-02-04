@@ -9,7 +9,7 @@ import {
   Typography,
   useTheme
 } from "@mui/material";
-import { AudioSquare, Book, Bookmark, Element4, I24Support, Notepad2, PenAdd, SearchNormal, VideoOctagon, VideoPlay } from "iconsax-reactjs";
+import { AudioSquare, Book, Bookmark, DocumentText, Element4, I24Support, Notepad2, Notification, PenAdd, SearchNormal, VideoOctagon, VideoPlay } from "iconsax-reactjs";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
 import { PATH } from "../../../../routes/PATH";
@@ -144,6 +144,40 @@ export default function PrimaryMenu() {
                 <AudioSquare size={20} />
               </ListItemIcon>
               <ListItemText primary={t("menus.audios")} />
+            </ListItemButton>
+          </ListItem>
+
+        </List>
+
+        <div className="flex items-center gap-2 overflow-hidden mb-1 mt-8 text-nowrap">
+          <Typography variant='caption' mb={1} sx={{
+            color: theme.palette.text.light
+          }}>{t("messages.news_updates")}</Typography>
+          <Divider sx={{
+            borderColor: "#4B4B4B"
+          }} className="w-full" />
+        </div>
+        <List>
+          <ListItem disablePadding className="menu__item">
+            <ListItemButton
+              onClick={() => navigate(PATH.GORKHAPATRA.ROOT)}
+              className={isActive(PATH.GORKHAPATRA.ROOT) ? "active" : ""}
+            >
+              <ListItemIcon>
+                <DocumentText size={20} />
+              </ListItemIcon>
+              <ListItemText primary={t("messages.gorkhapatra")} className="text-nowrap!" />
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding className="menu__item">
+            <ListItemButton
+              onClick={() => navigate(PATH.NOTICE.ROOT)}
+              className={isActive(PATH.NOTICE.ROOT) ? "active" : ""}
+            >
+              <ListItemIcon>
+                <Notification size={20} />
+              </ListItemIcon>
+              <ListItemText primary={t("messages.notice")} className="text-nowrap!" />
             </ListItemButton>
           </ListItem>
         </List>

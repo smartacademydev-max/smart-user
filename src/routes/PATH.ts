@@ -103,6 +103,18 @@ export const PATH = {
     MY_COURSE: {
         ROOT: "/my-course"
     },
+    GORKHAPATRA: {
+        ROOT: "/gorkhapatra",
+        VIEW_GORKHAPATRA: {
+            ROOT: (id?: number) => id ? `/gorkhapatra/${id}` : "/gorkhapatra/:id"
+        }
+    },
+    NOTICE: {
+        ROOT: "/notice",
+        VIEW_NOTICE: {
+            ROOT: (id?: number) => id ? `/notice/${id}` : "/notice/:id"
+        }
+    },
     SETTINGS: {
         PROFILE: {
             ROOT: "/profile"

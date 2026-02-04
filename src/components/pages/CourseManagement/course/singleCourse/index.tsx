@@ -79,12 +79,12 @@ export default function SingleCourse() {
                             value: "curriculum"
                         },
                         {
-                            label: t("menus.notes"),
-                            value: "notes"
-                        },
-                        {
                             label: t("menus.videos"),
                             value: "videos"
+                        },
+                        {
+                            label: t("menus.notes"),
+                            value: "notes"
                         },
                         {
                             label: t("menus.audios"),

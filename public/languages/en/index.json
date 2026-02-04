@@ -51,7 +51,22 @@
         "marking_as_completed": "Marking as Completed",
         "subjects": "Subjects",
         "browse_this_course": " Browse this Course",
-        "continue": "Continue"
+        "continue": "Continue",
+        "gorkhapatra": "Gorkhapatra",
+        "news_updates": "News & Updates",
+        "view_details": "View Details",
+        "views": "Views",
+        "notice": "Notice",
+        "empty_states": {
+            "gorkhapatra": {
+                "title": "No Gorkhapatra Found",
+                "description": "No Gorkhapatra available yet. Click the button below to create a new Gorkhapatra."
+            },
+            "notification": {
+                "title": "No Notice Found",
+                "description": "No Notice available yet. Click the button below to create a new Notice."
+            }
+        }
     },
     "menus": {
         "dashboard": "Dashboard",
