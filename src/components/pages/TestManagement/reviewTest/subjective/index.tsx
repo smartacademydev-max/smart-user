@@ -197,11 +197,13 @@ export default function ReviewSubjectTestRoot() {
                     <Tabs value={tabIndex} onChange={handleTabChange} aria-label="answer categories">
                         <Tab label={`Answered (${data?.data?.answered?.length || 0})`} />
                         <Tab label={`Skipped (${data?.data?.skipped?.length || 0})`} />
+                        <Tab label={`Feedback`} />
                     </Tabs>
 
                     <Box className="mt-4 space-y-4">
                         {tabIndex === 0 && renderQuestions(data?.data?.answered || [], "answered")}
                         {tabIndex === 1 && renderQuestions(data?.data?.skipped || [], "skipped")}
+                        {tabIndex === 2 && renderQuestions(data?.data?.skipped || [], "skipped")}
                     </Box>
                 </div>
                 <div className="col-span-5 2xl:col-span-4">

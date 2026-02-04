@@ -38,12 +38,23 @@ export const notificationApi = createApi({
                 method: "GET",
             }),
             providesTags: [{ type: "Notifications", id: "LIST" }],
-        })
+        }),
+        getRelatedNotification: builder.query<NotificationListResponse, QueryParams & { id: number }>({
+            query: ({ id,pageIndex,pageSize }) => ({
+                url: `/notification/${id}/related?${buildQueryParams({
+                    page:pageIndex,
+                    page_size:pageSize
+                })}`,
+                method: "GET",
+            }),
+            providesTags: [{ type: "Notifications", id: "LIST" }],
+        }),
     }),
 });
 
 export const {
     useGetAllNotificationsQuery,
     useReadNotificationMutation,
-    useGetNotificationByIdQuery
+    useGetNotificationByIdQuery,
+    useGetRelatedNotificationQuery
 } = notificationApi;

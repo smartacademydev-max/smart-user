@@ -88,7 +88,19 @@ export const testApi = createApi({
                 url: `/course/${courseId}/test/${testId}/result`,
                 method: "GET",
             })
-        })
+        }),
+        getTestSample: builder.query<GlobalResponse & {
+            data: {
+                sample: File | null;
+                sample_url: string;
+                video_url: string;
+            }
+        }, { id?: number, resultId?: number }>({
+            query: ({ id }) => ({
+                url: `/test/${id}/sample`,
+                method: "GET",
+            }),
+        }),
     })
 })
 

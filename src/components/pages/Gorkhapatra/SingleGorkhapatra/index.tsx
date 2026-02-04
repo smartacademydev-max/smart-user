@@ -1,11 +1,13 @@
 import { ArrowBack } from "@mui/icons-material";
-import { Box, Button, Divider, Stack, Typography } from "@mui/material";
-import { ArrowRight2, Calendar, Eye, User } from "iconsax-reactjs";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Box, Button, Collapse, Divider, Stack, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { ArrowDown2, ArrowRight2, Calendar, Eye, User } from "iconsax-reactjs";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useGetGorkhapatraByIdQuery } from "../../../../services/gorkhapatraApi";
+import { useGetGorkhapatraByIdQuery, useRelatedGorkhapatraQuery } from "../../../../services/gorkhapatraApi";
 import { formatDateForDisplay } from "../../../../utils/dateFormat";
 import { renderHtml } from "../../../../utils/renderHtml";
+import CopyLink from "../../../atom/CopyLink";
+import GorkhapatraCard from "../../../organism/Cards/GorkhapatraCard";
 
 interface TocItem {
     id: string;
@@ -13,112 +15,150 @@ interface TocItem {
     level: number;
 }
 
-const SCROLL_OFFSET = 100;
+const SCROLL_OFFSET = 120;
+
+function processContentWithToc(htmlContent: string): { updatedContent: string; tocItems: TocItem[] } {
+    const tocItems: TocItem[] = [];
+    let headingIndex = 0;
+
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlContent;
+
+    const headings = tempDiv.querySelectorAll('h2, h3');
+
+    headings.forEach((heading) => {
+        const headingId = `heading-${headingIndex}`;
+        heading.setAttribute('id', headingId);
+
+        tocItems.push({
+            id: headingId,
+            text: heading.textContent?.trim() || "",
+            level: heading.tagName === "H2" ? 2 : 3,
+        });
+
+        headingIndex++;
+    });
+
+    return {
+        updatedContent: tempDiv.innerHTML,
+        tocItems,
+    };
+}
 
 export default function SingleGorkhapatraRoot() {
+
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
-    const contentRef = useRef<HTMLDivElement | null>(null);
     const scrollContainerRef = useRef<HTMLDivElement | null>(null);
-    const [tocItems, setTocItems] = useState<TocItem[]>([]);
     const [activeId, setActiveId] = useState<string>("");
+    const isClickScrolling = useRef(false);
+    const [isTocOpen, setIsTocOpen] = useState(false);
+
+    const theme = useTheme();
+    const isDesktop = useMediaQuery(theme.breakpoints.up("lg"));
 
     const { data, isLoading } = useGetGorkhapatraByIdQuery(
         { id: Number(id) },
         { skip: !id }
     );
 
+    const { data: relatedGorkhapatra, isLoading: loadingRelatedgGorkhapatras } = useRelatedGorkhapatraQuery({ id: Number(id) }, { skip: !id });
+
     const gorkhapatraData = data?.data;
     const date: string = formatDateForDisplay(gorkhapatraData?.created_at);
 
-    // Extract headings and create TOC
-    useEffect(() => {
-        if (!contentRef.current || !gorkhapatraData?.content) return;
-
-        const timer = setTimeout(() => {
-            const contentElement = contentRef.current;
-            if (!contentElement) return;
-
-            const headings = contentElement.querySelectorAll("h2, h3");
-            const items: TocItem[] = [];
-
-            headings.forEach((heading, index) => {
-                const headingId = `heading-${index}`;
-                heading.id = headingId;
-
-                items.push({
-                    id: headingId,
-                    text: heading.textContent || "",
-                    level: heading.tagName === "H2" ? 2 : 3,
-                });
-            });
-
-            setTocItems(items);
-
-            if (items.length > 0) {
-                setActiveId(items[0].id);
-            }
-        }, 300);
-
-        return () => clearTimeout(timer);
+    // Process content and extract TOC items
+    const { updatedContent, tocItems } = useMemo(() => {
+        if (!gorkhapatraData?.content) {
+            return { updatedContent: "", tocItems: [] };
+        }
+        return processContentWithToc(gorkhapatraData.content);
     }, [gorkhapatraData?.content]);
 
+    useEffect(() => {
+        if (tocItems.length > 0 && !activeId) {
+            setActiveId(tocItems[0].id);
+        }
+    }, [tocItems, activeId]);
+
+    const getElementOffsetTop = useCallback((element: HTMLElement): number => {
+        const scrollContainer = scrollContainerRef.current;
+        if (!scrollContainer || !element) return 0;
+
+        const containerRect = scrollContainer.getBoundingClientRect();
+        const elementRect = element.getBoundingClientRect();
+
+        return elementRect.top - containerRect.top + scrollContainer.scrollTop;
+    }, []);
+
     const handleScroll = useCallback(() => {
-        const contentElement = contentRef.current;
+        if (isClickScrolling.current) return;
+
         const scrollContainer = scrollContainerRef.current;
 
-        if (!contentElement || !scrollContainer || tocItems.length === 0) return;
-
-        const headings = contentElement.querySelectorAll("h2, h3");
-        if (!headings.length) return;
+        if (!scrollContainer || tocItems.length === 0) return;
 
         const scrollTop = scrollContainer.scrollTop;
         let newActiveId = tocItems[0]?.id || "";
 
-        for (let i = headings.length - 1; i >= 0; i--) {
-            const heading = headings[i] as HTMLElement;
-            const headingTop = heading.offsetTop;
+        for (let i = 0; i < tocItems.length; i++) {
+            const item = tocItems[i];
+            const element = document.getElementById(item.id);
+            if (!element) continue;
+
+            const headingTop = getElementOffsetTop(element);
 
             if (scrollTop >= headingTop - SCROLL_OFFSET) {
-                newActiveId = heading.id;
+                newActiveId = item.id;
+            } else {
                 break;
             }
         }
 
-        if (activeId !== newActiveId) {
-            setActiveId(newActiveId);
-        }
-    }, [tocItems, activeId]);
+        setActiveId(newActiveId);
+    }, [tocItems, getElementOffsetTop]);
 
     useEffect(() => {
         const scrollContainer = scrollContainerRef.current;
 
         if (!scrollContainer || tocItems.length === 0) return;
 
-        handleScroll();
+        const initialTimer = setTimeout(() => {
+            handleScroll();
+        }, 100);
 
         scrollContainer.addEventListener("scroll", handleScroll, { passive: true });
 
         return () => {
+            clearTimeout(initialTimer);
             scrollContainer.removeEventListener("scroll", handleScroll);
         };
     }, [tocItems, handleScroll]);
 
     const scrollToHeading = useCallback((headingId: string) => {
-        const element = document.getElementById(headingId);
         const scrollContainer = scrollContainerRef.current;
+        if (!scrollContainer) return;
 
-        if (!element || !scrollContainer) return;
+        const element = document.getElementById(headingId);
+        if (!element) {
+            console.warn(`Element not found for heading: ${headingId}`);
+            return;
+        }
 
-        const targetPosition = element.offsetTop - SCROLL_OFFSET;
+        isClickScrolling.current = true;
+        setActiveId(headingId);
+
+        const targetPosition = getElementOffsetTop(element) - SCROLL_OFFSET + 20;
 
         scrollContainer.scrollTo({
-            top: targetPosition,
+            top: Math.max(0, targetPosition),
             behavior: "smooth",
         });
 
-        setActiveId(headingId);
-    }, []);
+        setTimeout(() => {
+            isClickScrolling.current = false;
+        }, 800);
+    }, [getElementOffsetTop]);
 
     const handleBackClick = () => {
         navigate(-1);
@@ -126,7 +166,18 @@ export default function SingleGorkhapatraRoot() {
 
     const handleTocItemClick = (itemId: string) => {
         scrollToHeading(itemId);
+        if (!isDesktop) {
+            setIsTocOpen(false);
+        }
     };
+
+    const handleTocToggle = () => {
+        if (!isDesktop) {
+            setIsTocOpen((prev) => !prev);
+        }
+    };
+
+    const showTocContent = isDesktop || isTocOpen;
 
     return (
         <div
@@ -175,8 +226,8 @@ export default function SingleGorkhapatraRoot() {
                 )}
             </Box>
 
-            <Stack className="justify-between">
-                <Stack className="items-center! gap-2 mb-6">
+            <Stack className="justify-between flex-wrap!">
+                <Stack className="items-center! flex-wrap! gap-2 mb-6">
                     {gorkhapatraData?.added_by && (
                         <Stack className="items-center! gap-1">
                             <User />
@@ -203,82 +254,119 @@ export default function SingleGorkhapatraRoot() {
                     )}
                 </Stack>
                 <Stack>
-                    <Typography variant="subtitle2" color="text.middle">
-                        Share:
-                    </Typography>
+                    <CopyLink />
                 </Stack>
             </Stack>
 
-            {gorkhapatraData?.content && (
-                <div className="flex flex-col gap-4 lg:grid lg:grid-cols-12">
-                    <div className="lg:col-span-4 sticky top-4 self-start">
-                        <Typography
-                            variant="subtitle2"
-                            fontWeight={600}
-                            className="mb-2!"
+            {updatedContent && (
+                <div className="flex flex-col gap-4 lg:grid lg:grid-cols-12 mt-4">
+                    <div className="lg:col-span-4 sticky top-0 lg:top-4 self-start z-10">
+                        <Stack
+                            className="items-center! justify-between gap-4 w-full py-3 px-4 lg:py-0 lg:px-0"
+                            onClick={handleTocToggle}
+                            sx={{
+                                background: (theme) => theme.palette.primary.contrastText,
+                                cursor: isDesktop ? "default" : "pointer",
+                                border: (theme) => isDesktop ? "none" : `1px solid ${theme.palette.separator.dark}`,
+                            }}
                         >
-                            Table of Content
-                        </Typography>
-
-                        {tocItems.length > 0 ? (
-                            <Stack className="gap-2 flex-col!">
-                                {tocItems.map((item) => {
-                                    const isActive = activeId === item.id;
-
-                                    return (
-                                        <Box
-                                            key={item.id}
-                                            className="flex items-center justify-between py-4! px-5!"
-                                            onClick={() => handleTocItemClick(item.id)}
-                                            sx={{
-                                                paddingLeft: item.level === 3 ? 2 : 0,
-                                                paddingY: 1,
-                                                paddingRight: 1,
-                                                borderRadius: 1,
-                                                cursor: "pointer",
-                                                transition: "all 0.2s",
-                                                ...(isActive && {
-                                                    background: (theme) => theme.palette.primary.light,
-                                                    color: (theme) => theme.palette.primary.main,
-                                                }),
-                                                "&:hover": {
-                                                    background: (theme) => theme.palette.primary.light,
-                                                    color: (theme) => theme.palette.primary.main,
-                                                },
-                                                "&:active": {
-                                                    background: (theme) => theme.palette.primary.light,
-                                                    color: (theme) => theme.palette.primary.main,
-                                                },
-                                            }}
-                                        >
-                                            <Typography
-                                                variant="body2"
-                                                color={isActive ? "primary.main" : "text.dark"}
-                                                fontWeight={500}
-                                                className="line-clamp-1"
-                                            >
-                                                {item.text}
-                                            </Typography>
-                                            <ArrowRight2 size={16} />
-                                        </Box>
-                                    );
-                                })}
-                            </Stack>
-                        ) : (
-                            <Typography variant="caption" color="text.disabled">
-                                No headings found
+                            <Typography
+                                variant="subtitle2"
+                                fontWeight={600}
+                                className="line-clamp-1"
+                            >
+                                Table of Content
                             </Typography>
-                        )}
+                            {!isDesktop && (
+                                <ArrowDown2
+                                    size={18}
+                                    style={{
+                                        transition: "transform 0.3s ease",
+                                        transform: isTocOpen ? "rotate(180deg)" : "rotate(0deg)",
+                                    }}
+                                />
+                            )}
+                        </Stack>
+
+                        <Collapse in={showTocContent} timeout={300}>
+                            <Box
+                                sx={{
+                                    mt: isDesktop ? 2 : 1,
+                                    maxHeight: isDesktop ? "none" : "300px",
+                                    overflowY: isDesktop ? "visible" : "auto",
+                                    background: (theme) => theme.palette.background.paper,
+                                    borderRadius: 1,
+                                    border: (theme) => isDesktop ? "none" : `1px solid ${theme.palette.divider}`,
+                                }}
+                            >
+                                {tocItems.length > 0 ? (
+                                    <Stack className="gap-1 flex-col! p-2 lg:p-0">
+                                        {tocItems.map((item) => {
+                                            const isActive = activeId === item.id;
+
+                                            return (
+                                                <Box
+                                                    key={item.id}
+                                                    className="flex items-center justify-between"
+                                                    onClick={() => handleTocItemClick(item.id)}
+                                                    sx={{
+                                                        paddingLeft: item.level === 3 ? 3 : 1.5,
+                                                        paddingY: 1.5,
+                                                        paddingRight: 1.5,
+                                                        borderRadius: 1,
+                                                        cursor: "pointer",
+                                                        transition: "all 0.2s",
+                                                        ...(isActive && {
+                                                            background: (theme) => theme.palette.primary.light,
+                                                            color: (theme) => theme.palette.primary.main,
+                                                        }),
+                                                        "&:hover": {
+                                                            background: (theme) => theme.palette.primary.light,
+                                                            color: (theme) => theme.palette.primary.main,
+                                                        },
+                                                        "&:active": {
+                                                            background: (theme) => theme.palette.primary.light,
+                                                            color: (theme) => theme.palette.primary.main,
+                                                        },
+                                                    }}
+                                                >
+                                                    <Typography
+                                                        variant="body2"
+                                                        color={isActive ? "primary.main" : "text.dark"}
+                                                        fontWeight={500}
+                                                        className="line-clamp-1"
+                                                    >
+                                                        {item.text}
+                                                    </Typography>
+                                                    <ArrowRight2 size={16} />
+                                                </Box>
+                                            );
+                                        })}
+                                    </Stack>
+                                ) : (
+                                    <Typography variant="caption" color="text.disabled" className="p-4">
+                                        No headings found
+                                    </Typography>
+                                )}
+                            </Box>
+                        </Collapse>
                     </div>
 
-                    <div
-                        ref={contentRef}
-                        className="content general__content__box styled__list lg:col-span-8"
-                    >
-                        {renderHtml(gorkhapatraData.content)}
+                    <div className="content general__content__box styled__list lg:col-span-8">
+                        {renderHtml(updatedContent)}
                     </div>
                 </div>
             )}
+
+            {relatedGorkhapatra && relatedGorkhapatra?.data?.length > 0 ? <>
+                <Typography variant="h4" className="mt-16! mb-2!">More Gorkhapatra</Typography>
+                <div className="flex flex-col gap-4 md:grid md:grid-cols-2 lg:grid-cols-3 ">
+                    {relatedGorkhapatra?.data?.map((notice) => (
+                        <GorkhapatraCard
+                            data={notice} key={notice.title + notice.id}
+                        />
+                    ))}
+                </div></> : ""}
         </div>
     );
 }

@@ -24,7 +24,7 @@ export default function GorkhapatraCard({ data }: { data: GorkhapatraProps; }) {
                     {data?.thumbnail_url ? <img src={data?.thumbnail_url} alt={data?.title} className='w-full h-full object-cover' /> : <>
 
                         <Typography variant='h3' color='primary.contrastText' fontWeight={700}>{t("messages.gorkhapatra")}</Typography>
-                        <Typography variant='body2' color='info.main' className='text-center'>{data?.title}</Typography>
+                        <Typography variant='body2' color='info.main' className='text-center px-4'>{data?.title}</Typography>
                     </>}
                     {data.type ? <div className="absolute top-2 left-2">
                         <StatusPill variant={variant} status={data?.type} />

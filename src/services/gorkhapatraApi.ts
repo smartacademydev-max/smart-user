@@ -42,7 +42,7 @@ export const gorkhapatraApi = createApi({
             providesTags: (_result, _error, { id }) => [{ type: "Gorkhapatra", id }],
         }),
 
-        relatedGorkhapatra: builder.query<GorkhapatraList, { id: number }>({
+        relatedGorkhapatra: builder.query<{ data: GorkhapatraProps[] }, { id: number }>({
             query: ({ id }) => ({
                 url: `/gorkhapatra/${id}/related`,
                 method: "GET",

@@ -36,7 +36,7 @@ export interface QuestionList extends GlobalResponse {
 
 export interface TestProps {
     id?: number;
-    course_id?:number;
+    course_id?: number;
     name: string;
     test_type?: string;
     duration: {
@@ -122,7 +122,6 @@ export interface McqReportData {
     start_date: string;
     start_time: string;
     end_time: string;
-
     correct_answers: McqReportAnswerItem[];
     incorrect_answers: McqReportAnswerItem[];
     skipped_answers: McqReportAnswerItem[];
