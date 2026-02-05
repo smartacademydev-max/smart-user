@@ -31,7 +31,7 @@ export default function LiveClassAndTestFilter() {
 
     return (
         <div className="liveclass__test__filter mb-8">
-            <Typography variant="h4">Calendar</Typography>
+            <Typography variant="h4" fontWeight={600}>Calendar</Typography>
             <Divider className="my-4!" />
             <div className="2xl:grid 2xl:grid-cols-12 gap-6">
                 <div className="col-span-12 2xl:col-span-4">
