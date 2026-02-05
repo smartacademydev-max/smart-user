@@ -376,25 +376,25 @@ export default function DashboardCalendar({ onDateSelect }: DashboardCalendarPro
         return days;
     }, [firstDayOfMonth, daysInMonth]);
 
-    const formatSelectedDate = () => {
-        if (!selectedDate) return null;
+    // const formatSelectedDate = () => {
+    //     if (!selectedDate) return null;
 
-        const adDate = bsToAd(selectedDate.year, selectedDate.month, selectedDate.day);
-        const weekDay = adDate.getDay();
+    //     const adDate = bsToAd(selectedDate.year, selectedDate.month, selectedDate.day);
+    //     const weekDay = adDate.getDay();
 
-        if (useNepaliScript) {
-            return {
-                bs: `${NEPALI_WEEKDAYS[weekDay]}, ${NEPALI_MONTHS[selectedDate.month - 1]} ${toNepaliNumber(selectedDate.day)}, ${toNepaliNumber(selectedDate.year)}`,
-                ad: `${adDate.toLocaleDateString('en-US', { weekday: 'long' })}, ${adDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`
-            };
-        } else {
-            return {
-                bs: `${ENGLISH_WEEKDAYS[weekDay]}, ${ENGLISH_MONTHS[selectedDate.month - 1]} ${selectedDate.day}, ${selectedDate.year}`,
-                ad: `${adDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}`
-            };
-        }
-    };
-    const selectedDateFormatted = selectedDate ? formatSelectedDate() : null;
+    //     if (useNepaliScript) {
+    //         return {
+    //             bs: `${NEPALI_WEEKDAYS[weekDay]}, ${NEPALI_MONTHS[selectedDate.month - 1]} ${toNepaliNumber(selectedDate.day)}, ${toNepaliNumber(selectedDate.year)}`,
+    //             ad: `${adDate.toLocaleDateString('en-US', { weekday: 'long' })}, ${adDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`
+    //         };
+    //     } else {
+    //         return {
+    //             bs: `${ENGLISH_WEEKDAYS[weekDay]}, ${ENGLISH_MONTHS[selectedDate.month - 1]} ${selectedDate.day}, ${selectedDate.year}`,
+    //             ad: `${adDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}`
+    //         };
+    //     }
+    // };
+    // const selectedDateFormatted = selectedDate ? formatSelectedDate() : null;
     return (
         <div className="w-full mx-auto p-6 bg-white rounded-xl ">
             <div className="mb-6 space-y-4">
