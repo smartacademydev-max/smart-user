@@ -11,8 +11,11 @@ export const testApi = createApi({
     tagTypes: ["Test"],
     endpoints: (builder) => ({
         getUserAllTest: builder.query<TestList, QueryParams & { id?: number }>({
-            query: ({ id, pageIndex, pageSize, search }) => ({
-                url: `my-test?${buildQueryParams({ page: pageIndex, page_size: pageSize, search, course_id: id })}`,
+            query: ({ id, pageIndex, pageSize, search, startDate, endDate }) => ({
+                url: `my-test?${buildQueryParams({
+                    page: pageIndex, page_size: pageSize, search, course_id: id, start_date: startDate,
+                    end_date: endDate,
+                })}`,
                 method: "GET",
             }),
             providesTags: (_result, _error, { id }) => [{ type: "Test" as const, id }],

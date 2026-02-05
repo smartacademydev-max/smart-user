@@ -1,5 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
+import type { QueryParams } from "../types";
 import type { LiveClassList } from "../types/liveClass";
+import { buildQueryParams } from "../utils/buildQueryParams";
 import { baseQuery } from "./baseQuery";
 
 export const liveClassApi = createApi({
@@ -7,9 +9,16 @@ export const liveClassApi = createApi({
     baseQuery: baseQuery,
     tagTypes: ["LiveClass"],
     endpoints: (builder) => ({
-        getAllLiveClasses: builder.query<LiveClassList, { pageIndex: number; pageSize: number, type: "ongoing" | "upcoming"; id?: number }>({
-            query: ({ pageIndex, pageSize, type, id }) => ({
-                url: `/my-live?page=${pageIndex}&page_size=${pageSize}&type=${type}&course_id=${id}`,
+        getAllLiveClasses: builder.query<LiveClassList, QueryParams & { type?: "ongoing" | "upcoming"; id?: number }>({
+            query: ({ pageIndex, pageSize, type, id, startDate, endDate }) => ({
+                url: `/my-live?${buildQueryParams({
+                    page: pageIndex,
+                    page_size: pageSize,
+                    type: type,
+                    course_id: id,
+                    start_date: startDate,
+                    end_date: endDate,
+                })}`,
                 method: "GET",
             }),
         }),

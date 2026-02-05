@@ -26,7 +26,7 @@ export default function DashboardGorkhapatraListing() {
 
     return (
 
-        <div className="gorkhapatra__dashboard__listing">
+        <div className="gorkhapatra__dashboard__listing mb-8">
             <div className="flex justify-between items-center gap-4">
                 <Typography variant="h4" fontWeight={600} className="mb-4! mt-8!">{t("messages.gorkhapatra")}</Typography>
                 <Button variant="contained" onClick={() => navigate(PATH.GORKHAPATRA.ROOT)}>{t("actions.view_all")}</Button>
