@@ -123,6 +123,7 @@ export default function CourseBanner({ data, havePurchased }: { data?: CoursePro
                             courseExpiry={course?.course_expiry}
                             courseSubscription={course?.subscriptions || []}
                             purchaseStatus={course?.user}
+                            canTakeFreeTrial={course?.can_take_free_trial}
                         />}
                 </div>
             </div>

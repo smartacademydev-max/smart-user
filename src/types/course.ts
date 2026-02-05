@@ -76,6 +76,7 @@ export interface CourseProps {
     progress: number;
     ends_at?: string;
     started_from?: string;
+    can_take_free_trial: boolean;
 }
 
 export interface CourseList extends GlobalResponse {
