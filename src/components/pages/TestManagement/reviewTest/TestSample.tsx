@@ -6,6 +6,7 @@ import "plyr-react/plyr.css";
 import { useEffect, useRef, useState } from "react";
 import { useGetTestSampleQuery } from "../../../../services/testApi";
 import { extractYouTubeVideoId } from "../../../../utils/extractYoutubeVideoId";
+import { EmptyList } from "../../../molecules/EmptyList";
 import thumbnail from "/general-thumbnail.png";
 
 const waveAnimation = keyframes`
@@ -62,23 +63,6 @@ export default function TestSample({ id }: { id: number | null }) {
         };
     }, []);
 
-    if (isLoading) {
-        return (
-            <div className="flex flex-col gap-4 md:grid md:grid-cols-2">
-                <Box className="aspect-12/9 flex items-center justify-center rounded-lg" sx={{
-                    background: (theme) => theme.palette.primary.dark
-                }}>
-                    <Typography color="primary.contrastText">Loading PDF...</Typography>
-                </Box>
-                <Box className="aspect-12/9 flex items-center justify-center rounded-lg" sx={{
-                    background: (theme) => theme.palette.primary.dark
-                }}>
-                    <Typography color="primary.contrastText">Loading video...</Typography>
-                </Box>
-            </div>
-        );
-    }
-
     const plyrSource: PlyrProps['source'] = {
         type: "video",
         sources: [
@@ -114,17 +98,32 @@ export default function TestSample({ id }: { id: number | null }) {
             iv_load_policy: 3,
             cc_load_policy: 0,
             playsinline: 1,
-            // ❌ REMOVED: sho
-            // winfo (deprecated)
-            // ❌ REMOVED: modestbranding (deprecated)
-            // ❌ REMOVED: controls: 0 (Plyr handles this)
-            // ❌ REMOVED: disablekb (Plyr handles this)
-            // ❌ REMOVED: fs (Plyr handles this)
-            // ❌ REMOVED: autoplay (already set at top level)
-            // ❌ REMOVED: origin (causes bot detection issues)
-            // origin: window.location.origin
         },
     };
+
+    if (isLoading) {
+        return (
+            <div className="flex flex-col gap-4 md:grid md:grid-cols-2">
+                <Box className="aspect-12/9 flex items-center justify-center rounded-lg" sx={{
+                    background: (theme) => theme.palette.primary.dark
+                }}>
+                    <Typography color="primary.contrastText">Loading PDF...</Typography>
+                </Box>
+                <Box className="aspect-12/9 flex items-center justify-center rounded-lg" sx={{
+                    background: (theme) => theme.palette.primary.dark
+                }}>
+                    <Typography color="primary.contrastText">Loading video...</Typography>
+                </Box>
+            </div>
+        );
+    }
+
+    if (!isLoading && !sampleUrl && !videoUrl) {
+        return <EmptyList
+            title="Feedback Not Available"
+            description=""
+        />
+    }
 
     return (
         <>

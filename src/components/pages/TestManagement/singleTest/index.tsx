@@ -26,6 +26,8 @@ import TestSubmissionDialog, {
 } from "../../../organism/Dialog/TestSubmissionDialog";
 
 import { EmptyList } from "../../../molecules/EmptyList";
+import TabController from "../../../molecules/TabController";
+import TestSample from "../reviewTest/TestSample";
 import QuestionListView from "./QuestionListView";
 import QuestionView from "./QuestionView";
 
@@ -93,6 +95,7 @@ export default function SingleTestRoot() {
 
     const [result, setResult] = useState<McqSubmissionData | null>(null);
     const [resultOpen, setResultOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState("questions")
 
     const initialTimeRef = useRef<number | null>(null);
 
@@ -264,15 +267,27 @@ export default function SingleTestRoot() {
                 </Button>
 
                 <Divider className="my-4!" />
-
-                {!questions.length ? <EmptyList title="No Questions Found" description="No Questions added to this test yet!" /> : (questions.map((q, index) => (
-                    <Box key={q.question} className="flex gap-4 mb-4">
-                        <Typography>{index + 1}.</Typography>
-                        <Typography variant="h6">
-                            {renderHtml(q.question)}
-                        </Typography>
-                    </Box>
-                )))}
+                <div className="mb-4">
+                    <TabController
+                        currentActive={activeTab}
+                        setActiveTab={setActiveTab}
+                        options={[
+                            { label: "Questions", value: "questions" },
+                            { label: "Feedback", value: "feedback" }
+                        ]}
+                    />
+                </div>
+                {
+                    activeTab === "questions" ? !questions.length ? <EmptyList title="No Questions Found" description="No Questions added to this test yet!" /> : (questions.map((q, index) => (
+                        <Box key={q.question} className="flex gap-4 mb-4">
+                            <Typography>{index + 1}.</Typography>
+                            <Typography variant="h6">
+                                {renderHtml(q.question)}
+                            </Typography>
+                        </Box>
+                    ))) : ""
+                }
+                {activeTab === "feedback" ? <TestSample id={Number(testId)} /> : ""}
             </div>
         );
     }
