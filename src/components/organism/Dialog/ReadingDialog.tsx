@@ -73,8 +73,6 @@ export default function ReadingDialog() {
         state => state.readScreen
     );
 
-    console.log({ courseId })
-
     const playerRef = useRef<PlyrInstance | null>(null);
     const containerRef = useRef<HTMLDivElement | null>(null);
     const [isLoading, setIsLoading] = useState(true);

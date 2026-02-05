@@ -83,7 +83,7 @@ export default function ReviewTestRoot() {
         <div className="test__review__root">
             <Typography className="text2Xl mb-4!">{data?.data?.test_name}</Typography>
 
-            <ul className="flex items-center gap-4">
+            <ul className="flex flex-wrap items-center gap-4">
                 {items
                     .filter(item => item.value !== null && item.value !== undefined && item.value !== "")
                     .map((item, index, filteredItems) => {

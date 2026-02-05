@@ -95,7 +95,7 @@ export const testApi = createApi({
                 sample_url: string;
                 video_url: string;
             }
-        }, { id?: number, resultId?: number }>({
+        }, { id?: number | null }>({
             query: ({ id }) => ({
                 url: `/test/${id}/sample`,
                 method: "GET",
@@ -115,4 +115,5 @@ export const {
     useReviewSubjectiveTestResultQuery,
     useSubmitSubjectiveFinalMutation,
     useGetTestResultQuery,
+    useGetTestSampleQuery
 } = testApi;

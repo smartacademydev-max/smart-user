@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@mui/material";
-import { Share } from "iconsax-reactjs";
+import { Share, TickCircle } from "iconsax-reactjs";
 import { useState } from "react";
 
 export default function CopyLink() {
@@ -23,7 +23,7 @@ export default function CopyLink() {
     };
 
     return (
-        <Button variant="contained" color="primary" disabled={copied} onClick={handleCopy} startIcon={<Share />} sx={{
+        <Button variant="contained" color="primary" disabled={copied} onClick={handleCopy} startIcon={copied ? <TickCircle /> : <Share />} sx={{
             // color: (theme) => theme.palette.separator.darkest
         }}>
             {copied ? "Link Copied" : "Copy Link"}

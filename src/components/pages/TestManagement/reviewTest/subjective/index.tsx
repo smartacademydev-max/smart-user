@@ -8,6 +8,7 @@ import { formatDateCustom, formatDateTime } from "../../../../../utils/dateForma
 import { renderHtml } from "../../../../../utils/renderHtml";
 import { EmptyList } from "../../../../molecules/EmptyList";
 import TestResultSummary from "../../../../organism/ResultScreen";
+import TestSample from "../TestSample";
 export default function ReviewSubjectTestRoot() {
     const theme = useTheme();
     const { courseId, testId } = useParams();
@@ -157,10 +158,10 @@ export default function ReviewSubjectTestRoot() {
 
 
     return (
-        <div className="test__review__root">
+        <div className="test__review__root h-full overflow-auto">
             <Typography className="text2Xl mb-4!">{data?.data?.test_name}</Typography>
 
-            <ul className="flex items-center gap-4">
+            <ul className="flex flex-wrap items-center gap-4">
                 {items
                     .filter(item => item.value !== null && item.value !== undefined && item.value !== "")
                     .map((item, index, filteredItems) => {
@@ -200,10 +201,10 @@ export default function ReviewSubjectTestRoot() {
                         <Tab label={`Feedback`} />
                     </Tabs>
 
-                    <Box className="mt-4 space-y-4">
+                    <Box className="mt-4 space-y-4 overflow-auto h-full">
                         {tabIndex === 0 && renderQuestions(data?.data?.answered || [], "answered")}
                         {tabIndex === 1 && renderQuestions(data?.data?.skipped || [], "skipped")}
-                        {tabIndex === 2 && renderQuestions(data?.data?.skipped || [], "skipped")}
+                        {tabIndex === 2 && <TestSample id={testId ? Number(testId) : null} />}
                     </Box>
                 </div>
                 <div className="col-span-5 2xl:col-span-4">
