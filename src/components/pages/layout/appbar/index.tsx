@@ -4,14 +4,10 @@ import {
     IconButton,
     Stack,
     Toolbar,
-    Typography,
     useMediaQuery,
     useTheme
 } from "@mui/material";
 import { HamburgerMenu } from "iconsax-reactjs";
-import { useTranslation } from "react-i18next";
-import { useAppSelector } from "../../../../store/hook";
-import { getGreetingKey } from "../../../../utils/greeting";
 import NotificationModal from "./Notification";
 import ProfileMenu from "./Profile";
 import SettingMenu from "./Setting";
@@ -70,7 +66,7 @@ export default function CustomAppbar({
                         width: "100%",
                     }}
                 >
-                    
+
                     <Box className="flex gap-2 items-center justify-end lg:gap-4 w-full">
                         <NotificationModal />
                         <SettingMenu />
