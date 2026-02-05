@@ -137,8 +137,8 @@ const commonThemeOptions: ThemeOptions = {
     },
 
     h2: {
-      fontSize: "36px",
-      lineHeight: "50px",
+      fontSize: "24px",
+      lineHeight: "32px",
       [`@media (min-width:600px)`]: {
         fontSize: "42px",
         lineHeight: "60px",
@@ -162,7 +162,7 @@ const commonThemeOptions: ThemeOptions = {
       },
     },
     h4: {
-      fontSize: "18px",
+      fontSize: "14px",
       lineHeight: "24px",
       [`@media (min-width:600px)`]: {
         fontSize: "22px",
@@ -284,6 +284,12 @@ const commonThemeOptions: ThemeOptions = {
       styleOverrides: (theme) => ({
         body: {
           background: theme.palette.primary.contrastText
+        },
+        ".slick-dots li.slick-active ": {
+          backgroundColor: theme.palette.primary.contrastText
+        },
+        ".slick-dots li  ": {
+          backgroundColor: theme.palette.separator.darkest
         },
         ".subscription__description": {
           ul: {

@@ -97,3 +97,17 @@ canvas {
     height: 100% !important;
     width: 100% !important;
 }
+
+.slick-dots li {
+    border-radius: 50%;
+    width: 8px !important;
+    height: 8px !important;
+}
+
+.slick-track>div {
+    padding: 0 4px;
+}
+
+.slick-dots li button::before {
+    display: none !important;
+}

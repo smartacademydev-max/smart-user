@@ -11,7 +11,7 @@ export default function PlaylistCard({ data, courseId }: { data: PlaylistProps; 
             <Box className="layer__01 absolute left-1/2 -translate-x-1/2 -top-1.5 -z-1 rounded-md" sx={{
                 width: "calc(100% - 12px)",
                 height: "8px",
-                background: (theme) => theme.palette.primary.light
+                background: (theme) => theme.palette.separator.darker
             }} />
             <Box className="layer__02 absolute left-1/2 -translate-x-1/2 -top-3 -z-2 rounded-md" sx={{
                 width: "calc(100% - 32px)",
@@ -26,8 +26,8 @@ export default function PlaylistCard({ data, courseId }: { data: PlaylistProps; 
                 <Stack className="items-center gap-1 absolute bottom-4 right-4 rounded-lg py-2 px-4" sx={{
                     background: "rgba(255,255,255,0.3)"
                 }}>
-                    <Video size={20} />
-                    <Typography variant="subtitle1">{data?.count}</Typography>
+                    <Video size={16} />
+                    <Typography variant="subtitle2">{data?.count} Videos</Typography>
                 </Stack>
             </Box>
             <Typography variant="h6" fontWeight={600}>{data?.chapter_name}</Typography>

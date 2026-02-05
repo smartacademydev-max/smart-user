@@ -27,7 +27,7 @@ export default function AllNotices() {
     const pagination = data?.data?.pagination;
 
     return (
-        <div className="all__notice__root h-full overflow-hidden flex flex-col">
+        <div className="all__notice__root h-full overflow-hidden flex flex-col p-2">
             <div className="page__top mb-6">
                 <PageHeader
                     breadcrumb={[

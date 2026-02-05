@@ -22,11 +22,9 @@ export default function CustomAppbar({
 }: {
     handleDrawerToggle: () => void;
 }) {
-    const { t } = useTranslation();
     const theme = useTheme();
     const isLargeScreen = useMediaQuery("(min-width:1440px)");
     const drawerWidth = isLargeScreen ? 356 : 320;
-    const user = useAppSelector((state) => state.auth.user);
     return (
         <AppBar
             position="fixed"
@@ -68,26 +66,11 @@ export default function CustomAppbar({
                     sx={{
                         flexDirection: "row",
                         alignItems: "center",
-                        justifyContent: "between",
+                        justifyContent: "end",
                         width: "100%",
                     }}
                 >
-                    <Typography
-                        className="w-full"
-                        variant="h6"
-                        sx={{
-                            display: "flex",
-                            flexDirection: "column",
-                            lineHeight: 1.25,
-                        }}
-                    >
-                        <span>
-                            {t(getGreetingKey())},{" "}
-                            <Box component="span" sx={{ fontWeight: 600 }}>
-                                {user?.name}
-                            </Box>
-                        </span>
-                    </Typography>
+                    
                     <Box className="flex gap-2 items-center justify-end lg:gap-4 w-full">
                         <NotificationModal />
                         <SettingMenu />

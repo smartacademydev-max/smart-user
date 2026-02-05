@@ -85,6 +85,7 @@
         "support": "Support"
     },
     "actions": {
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "view_all": "View All"
     }
 }
