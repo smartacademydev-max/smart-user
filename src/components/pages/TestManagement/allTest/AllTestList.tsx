@@ -160,7 +160,7 @@ export default function AlltestList() {
                     }}
                 >
                     {loadingTest ? (
-                        <div className="flex flex-col gap-4 md:grid grid-cols-2 xl:grid-cols-3 lg:gap-6">
+                        <div className="flex flex-col gap-4 md:grid grid-cols-2 2xl:grid-cols-3 lg:gap-6">
                             {[...Array(6)].map((_, idx) => (
                                 <VideoSkeleton key={idx} />
                             ))}

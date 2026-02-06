@@ -67,6 +67,7 @@ export interface CourseProps {
         is_free_trial_valid: false,
         has_purchased: false
         free_trial_count: number;
+        free_trial_expires_at: string | null;
     },
     is_bookmarked?: boolean;
     no_of_notes: number;

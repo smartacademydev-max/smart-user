@@ -3,9 +3,6 @@ import type { CurriculumMediaType } from "../types/course";
 import type { MediaProps } from "../types/media";
 
 export interface ReadingScreenProps {
-    // video?: MediaProps | undefined;
-    // audio?: MediaProps | undefined;
-    // pdf?: MediaProps | undefined;
     media?: MediaProps | undefined;
     title?: string;
     message?: string;
@@ -14,6 +11,7 @@ export interface ReadingScreenProps {
     isYouTube?: boolean;
     mediaId?: string;
     courseId?: number | null;
+    playlistId?: number | null;
 }
 
 const initialState: ReadingScreenProps = {

@@ -106,6 +106,8 @@ export default function SinglePlaylist() {
                                     key={media.id}
                                     type="temp_video"
                                     havePurchased={true}
+                                    courseId={id ? Number(id) : null}
+                                    playlistId={playlistId ? Number(playlistId) : null}
                                 />
                             ))}
                         </div>

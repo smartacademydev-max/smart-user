@@ -17,7 +17,6 @@ export default function TestCard({ test, havePurchased, }: { test: TestProps; ha
       }}
     >
       <div className="top__wrapper">
-        {/* Top Section */}
         <div className="test__card__top flex gap-3">
           <Box className="w-full flex justify-between items-start gap-4">
             <Typography variant="subtitle1" fontWeight={600} color="text.dark">

@@ -12,7 +12,6 @@ import SessionExpiredPopup from "./components/organism/Dialog/SessonExpired.tsx"
 import Toast from "./components/organism/Toast/index.tsx";
 import Loading from "./Loading.tsx";
 import GlobalRoutes from "./routes/Routes.tsx";
-import ScreenProtection from './ScreenProtection.tsx';
 import { store } from "./store/store.ts";
 import "./style.scss";
 import UdaanThemeProvider from "./ThemeProvider.tsx";
@@ -46,12 +45,12 @@ createRoot(document.getElementById("root")!).render(
           <Suspense fallback={<Loading />}>
 
             <GoogleOAuthProvider clientId='361289665406-npg48sokjoqcdepd1qov5dq4l6meipri.apps.googleusercontent.com'>
-              <ScreenProtection>
-                <GlobalRoutes />
-                <Toast />
-                <SessionExpiredPopup />
-                <ReadingDialog />
-              </ScreenProtection>
+              {/* <ScreenProtection> */}
+              <GlobalRoutes />
+              <Toast />
+              <SessionExpiredPopup />
+              <ReadingDialog />
+              {/* </ScreenProtection> */}
             </GoogleOAuthProvider>
           </Suspense>
         </UdaanThemeProvider>

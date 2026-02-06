@@ -4,7 +4,7 @@ import { Maximize2 } from 'iconsax-reactjs';
 import Plyr, { type APITypes, type PlyrProps } from "plyr-react";
 import "plyr-react/plyr.css";
 import { useEffect, useRef, useState } from 'react';
-import { useGetCourseMediaByTypeQuery, useTrackCourseProgressMutation } from '../../../services/courseApi';
+import { useGetCourseMediaByTypeQuery, useGetSinglePlaylistQuery, useTrackCourseProgressMutation } from '../../../services/courseApi';
 import { resetReadingScreen, setReadingScreen } from '../../../slice/ReadingScreenSlice';
 import { showToast } from '../../../slice/toastSlice';
 import { useAppDispatch, useAppSelector } from '../../../store/hook';
@@ -69,7 +69,7 @@ export default function ReadingDialog() {
     const theme = useTheme();
     const dispatch = useAppDispatch();
 
-    const { open, type, media, title, isYouTube, mediaId, courseId } = useAppSelector(
+    const { open, type, media, title, isYouTube, mediaId, courseId, playlistId } = useAppSelector(
         state => state.readScreen
     );
 
@@ -104,9 +104,16 @@ export default function ReadingDialog() {
         { id: courseId!, type: switchType(type as CurriculumMediaType), qp: qp },
         { skip: !courseId || !open }
     );
+    const { data: playlistVideos } = useGetSinglePlaylistQuery(
+        { id: courseId!, type: switchType(type as CurriculumMediaType), ...qp, playlistId: Number(playlistId) },
+        { skip: !courseId || !open || !playlistId }
+    );
     const [updateProgress, { isLoading: markingAsCompleted }] = useTrackCourseProgressMutation();
 
-    const mediaList = data?.data?.data || [];
+    const mediaList = playlistId
+        ? playlistVideos?.data?.data ?? []
+        : data?.data?.data ?? [];
+
     const totalPages = data?.data?.pagination?.total_pages || 0;
     const currentPage = qp.pageIndex;
     const hasMore = currentPage < totalPages;

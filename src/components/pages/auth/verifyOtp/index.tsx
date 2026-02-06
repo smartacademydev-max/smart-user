@@ -17,7 +17,6 @@ import { showToast } from "../../../../slice/toastSlice";
 import { useAppDispatch, useAppSelector } from "../../../../store/hook";
 import AuthHeader from "../../../molecules/AuthHeader";
 
-// Validation schema
 const validationSchema = Yup.object({
     otp: Yup.string()
         .length(6, "OTP must be 6 digits")

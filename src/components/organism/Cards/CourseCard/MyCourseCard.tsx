@@ -15,6 +15,8 @@ export default function MyCourseCard({ course }: { course: CourseProps }) {
     const startDate = course?.started_from || "";
     const day = endDate.split(',')[0].split(' ')[0];
     const monthAndYear = endDate.split(',')[0].split(' ').slice(1).join(' ');
+    const expiredDay = course?.user?.free_trial_expires_at?.split(',')[0].split(' ')[0];
+    const expiredMonthAndYear = course?.user?.free_trial_expires_at?.split(',')[0].split(' ').slice(1).join(' ');
     return (
         <Box className="my__course__card rounded-lg p-3 md:p-4 h-full flex flex-col justify-between" sx={{
             border: (theme) => `1px solid ${theme.palette.separator.dark}`
@@ -54,12 +56,12 @@ export default function MyCourseCard({ course }: { course: CourseProps }) {
                 <Divider className="my-3!" />
                 <div className="flex flex-col gap-2 md:grid md:grid-cols-2">
                     {course?.course_type !== "free" ? <div className="middle">
-                        <Typography variant="caption">Expires</Typography>
+                        {course?.user?.free_trial_expires_at ? <Typography variant="caption" color="error">Expired on</Typography> : <Typography variant="caption">Expires</Typography>}
                         <div className="flex items-center gap-1.5">
-                            <Typography variant="h4">{day}</Typography>
+                            <Typography variant="h4">{expiredDay || day}</Typography>
                             <div className="date flex flex-col items-start justify-end">
                                 <Calendar size={12} />
-                                <Typography variant="caption">{monthAndYear}</Typography>
+                                <Typography variant="caption">{expiredMonthAndYear || monthAndYear}</Typography>
                             </div>
                         </div>
                     </div> : ""}
@@ -78,12 +80,18 @@ export default function MyCourseCard({ course }: { course: CourseProps }) {
                 </div>
                 <Divider className="mt-3! mb-5!" />
                 <div className="flex justify-content-between items-center gap-4">
-                    <Button variant="contained" color="primary" onClick={() => navigate(PATH.COURSE_MANAGEMENT.COURSES.VIEW_COURSE.ROOT(Number(course.id)))}>
-                        {t("messages.continue")}
-                    </Button>
-                    <Button variant="outlined" color="primary" onClick={() => navigate(PATH.COURSE_MANAGEMENT.COURSES.VIEW_COURSE.ROOT(Number(course.id)))}>
-                        {t("messages.browse_this_course")}
-                    </Button>
+                    {course?.user?.free_trial_expires_at ?
+                        <Button fullWidth color="primary" variant="contained" onClick={() => navigate(PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.ROOT(Number(course.id)))}>
+                            {t("messages.purchase_now")}
+                        </Button>
+                        : <>
+                            <Button variant="contained" color="primary" onClick={() => navigate(PATH.COURSE_MANAGEMENT.COURSES.VIEW_COURSE.ROOT(Number(course.id)))}>
+                                {t("messages.continue")}
+                            </Button>
+                            <Button variant="outlined" color="primary" onClick={() => navigate(PATH.COURSE_MANAGEMENT.COURSES.VIEW_COURSE.ROOT(Number(course.id)))}>
+                                {t("messages.browse_this_course")}
+                            </Button>
+                        </>}
                 </div>
             </div>
         </Box>

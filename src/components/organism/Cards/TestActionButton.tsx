@@ -1,4 +1,5 @@
 import { Button, Stack } from "@mui/material";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { PATH } from "../../../routes/PATH";
@@ -6,9 +7,49 @@ import { setPurchase } from "../../../slice/purchaseSlice";
 import type { TestProps } from "../../../types/question";
 import { formatDateTime } from "../../../utils/dateFormat";
 
+
 const TestActionButton = ({ test, havePurchased, id }: { test: TestProps, status?: any; havePurchased: boolean; id: number }) => {
+
+
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const [timeLeft, setTimeLeft] = useState<number | null>(null);
+
+    useEffect(() => {
+        if (!test.is_scheduled) return;
+
+        const startTime = new Date(test.start_datetime).getTime();
+        const now = Date.now();
+        const diff = startTime - now;
+
+        // Only start countdown if less than 24 hours
+        if (diff > 0 && diff <= 24 * 60 * 60 * 1000) {
+            setTimeLeft(diff);
+
+            const interval = setInterval(() => {
+                const newDiff = startTime - Date.now();
+
+                if (newDiff <= 0) {
+                    clearInterval(interval);
+                    setTimeLeft(null);
+                } else {
+                    setTimeLeft(newDiff);
+                }
+            }, 1000);
+
+            return () => clearInterval(interval);
+        }
+    }, [test.start_datetime, test.is_scheduled]);
+
+    const formatCountdown = (ms: number) => {
+        const totalSeconds = Math.floor(ms / 1000);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+
+        return `${hours}h ${minutes}m ${seconds}s`;
+    };
+
 
     const handleStartOrRetake = () => {
         if (!havePurchased) {
@@ -79,15 +120,23 @@ const TestActionButton = ({ test, havePurchased, id }: { test: TestProps, status
             </Button>
         )
     }
+
     if (test.is_scheduled) {
-        const now = Date.now();
         const startTime = new Date(test.start_datetime).getTime();
-        const hasStarted = now >= startTime;
+        const initialDiff = startTime - Date.now();
+
+        const shouldShowCountdown =
+            initialDiff > 0 && initialDiff <= 24 * 60 * 60 * 1000;
+
+        const hasStarted = !shouldShowCountdown || timeLeft === null || timeLeft <= 0;
 
         if (!hasStarted) {
             return (
                 <Button variant="contained" color="primary" disabled fullWidth>
-                    Test Starts at {formatDateTime(test.start_datetime)}
+                    {timeLeft
+                        ? `Starts in ${formatCountdown(timeLeft)}`
+                        : `Test Starts at ${formatDateTime(test.start_datetime)}`
+                    }
                 </Button>
             );
         }

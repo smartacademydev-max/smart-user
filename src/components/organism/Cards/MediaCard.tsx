@@ -41,12 +41,14 @@ export default function MediaCard({
     media,
     type,
     havePurchased,
-    courseId
+    courseId,
+    playlistId,
 }: {
     media: MediaProps;
     type?: CurriculumMediaType;
     havePurchased: boolean;
     courseId?: number | null;
+    playlistId?: number | null;
 }) {
     const theme = useTheme();
     const dispatch = useAppDispatch();
@@ -75,7 +77,8 @@ export default function MediaCard({
                 open: true,
                 type: type,
                 title: media.file_name,
-                courseId: courseId
+                courseId: courseId,
+                playlistId: playlistId
             };
 
             switch (type) {
