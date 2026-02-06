@@ -1,7 +1,7 @@
 import { Box, Divider, Typography, useTheme } from "@mui/material";
 import { useParams } from "react-router-dom";
 import type { TestProps } from "../../../types/question";
-import { formatDateCustom } from "../../../utils/dateFormat";
+import { formatDateTime } from "../../../utils/dateFormat";
 import { getStatus } from "../../../utils/getStatus";
 import TestActionButton from "./TestActionButton";
 
@@ -47,10 +47,18 @@ export default function TestCard({ test, havePurchased, }: { test: TestProps; ha
           </div>
           <div className="flex gap-1 items-center">
             <Typography variant="subtitle2" color="text.secondary" className="flex">
-              Date:
+              Start Date:
             </Typography>
             <Typography variant="subtitle2" fontWeight={600} color="text.dark" >
-              {formatDateCustom(test?.start_datetime, { shortMonth: true })}
+              {formatDateTime(test?.start_datetime)}
+            </Typography>
+          </div>
+          <div className="flex gap-1 items-center">
+            <Typography variant="subtitle2" color="text.secondary" className="flex">
+              End Date:
+            </Typography>
+            <Typography variant="subtitle2" fontWeight={600} color="text.dark" >
+              {formatDateTime(test?.end_datetime)}
             </Typography>
           </div>
         </div>

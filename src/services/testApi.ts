@@ -84,7 +84,8 @@ export const testApi = createApi({
             query: ({ courseId, testId }) => ({
                 url: `/course/${courseId}/test/${testId}/subjective/submit`,
                 method: "POST",
-            })
+            }),
+            invalidatesTags: () => [{ id: "LIST", type: "Test" }]
         }),
         getTestResult: builder.query<GlobalResponse & McqSubmissionResponse, { courseId: number; testId: number }>({
             query: ({ courseId, testId }) => ({

@@ -204,7 +204,7 @@ export default function VerifyOTP() {
         <>
             <AuthHeader
                 title="OTP Verification"
-                description="Please enter One time password sent to your registered email address/ phone no. to complete your verification."
+                description="Enter the One-Time Password (OTP) sent to your registered email or phone number. <span class='font-bold'>The OTP is valid for 1 month</span>, so you can reuse a previously received OTP within this period."
             />
 
             <Typography textAlign="center" className="mb-3!" sx={{ fontSize: { xs: 14, lg: 16 } }}>

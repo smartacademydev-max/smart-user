@@ -69,26 +69,21 @@ export default function QuestionListView({
         return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
     };
 
-    const percentageLeft =
-        initialTime !== undefined && timeLeft !== undefined && initialTime > 0
-            ? timeLeft / initialTime
-            : 1;
-
     const getTimerColor = () => {
-        if (percentageLeft > 0.1) {
+        const fiveMinutesInMs = 5 * 60 * 1000; // 300000ms
+
+        if (timeLeft !== undefined && timeLeft <= fiveMinutesInMs) {
             return {
-                bg: theme.palette.success.light,
-                border: theme.palette.success.main,
-                color: theme.palette.success.main,
+                bg: "rgba(255, 200, 200, 0.2)",
+                border: "rgb(255, 80, 80)",
+                color: "rgb(255, 50, 50)",
             };
         }
 
-        const redIntensity = Math.min(255, Math.floor((1 - percentageLeft / 0.1) * 255));
-
         return {
-            bg: `rgba(255, ${200 - redIntensity}, ${200 - redIntensity}, 0.2)`,
-            border: `rgb(255, ${80 - redIntensity / 3}, ${80 - redIntensity / 3})`,
-            color: `rgb(255, ${50 - redIntensity / 4}, ${50 - redIntensity / 4})`,
+            bg: theme.palette.success.light,
+            border: theme.palette.success.main,
+            color: theme.palette.success.main,
         };
     };
 

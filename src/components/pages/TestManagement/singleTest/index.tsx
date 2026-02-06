@@ -30,7 +30,8 @@ import TabController from "../../../molecules/TabController";
 import TestSample from "../reviewTest/TestSample";
 import QuestionListView from "./QuestionListView";
 import QuestionView from "./QuestionView";
-
+import TwoMinAudio from "/audios/mcq-2-min-warning.mp3";
+import FiveMinAudio from "/audios/mcq-5-min-warning.mp3";
 /* ---------------- Skeletons ---------------- */
 
 const HeaderSkeleton = () => (
@@ -61,7 +62,6 @@ const QuestionSkeleton = () => (
     </div>
 );
 
-/* ---------------- Component ---------------- */
 
 export default function SingleTestRoot() {
     const navigate = useNavigate();
@@ -77,7 +77,6 @@ export default function SingleTestRoot() {
     const STORAGE_KEY = `mcq_test_progress_${courseId}_${testId}`;
     const RESULT_KEY = `mcq_test_result_${courseId}_${testId}`;
 
-    /* ---------------- State ---------------- */
 
     const [attendedQuestion, setAttendedQuestion] = useState<Answers[]>([]);
     const [currentQuestion, setCurrentQuestion] =
@@ -98,8 +97,18 @@ export default function SingleTestRoot() {
     const [activeTab, setActiveTab] = useState("questions")
 
     const initialTimeRef = useRef<number | null>(null);
+    const fiveMinPlayedRef = useRef(false);
+    const twoMinPlayedRef = useRef(false);
 
-    /* ---------------- API ---------------- */
+    const fiveMinAudioRef = useRef<HTMLAudioElement | null>(null);
+    const twoMinAudioRef = useRef<HTMLAudioElement | null>(null);
+
+
+    useEffect(() => {
+        fiveMinAudioRef.current = new Audio(FiveMinAudio);
+        twoMinAudioRef.current = new Audio(TwoMinAudio);
+    }, []);
+
 
     const {
         data,
@@ -113,18 +122,37 @@ export default function SingleTestRoot() {
     const [submitMcq, { isLoading: submitting }] =
         useSubmitMcqMutation();
 
-    /* ---------------- Restore Progress ---------------- */
 
     useEffect(() => {
         if (!data || data.overview?.test_type !== "mcq") return;
 
-        initialTimeRef.current = data.overview.time;
+        const endTime = data.overview.end_datetime ? new Date(data.overview.end_datetime).getTime() : null;
+        const currentTime = Date.now();
+        const timeRemainingFromEnd = endTime ? Math.max(endTime - currentTime, 0) : null;
+
+        if (timeRemainingFromEnd !== null && timeRemainingFromEnd <= 0) {
+            dispatch(
+                showToast({
+                    message: "This test has already ended.",
+                    severity: "error",
+                })
+            );
+            localStorage.removeItem(STORAGE_KEY);
+            navigate(PATH.TEST.ROOT);
+            return;
+        }
+
+        const actualTimeLeft = timeRemainingFromEnd !== null
+            ? Math.min(data.overview.time, timeRemainingFromEnd)
+            : data.overview.time;
+
+        initialTimeRef.current = actualTimeLeft;
 
         const saved = localStorage.getItem(STORAGE_KEY);
 
         if (!saved) {
             setCurrentQuestion(data.data[0]);
-            setTimeLeft(data.overview.time);
+            setTimeLeft(actualTimeLeft);
             return;
         }
 
@@ -137,9 +165,8 @@ export default function SingleTestRoot() {
 
         const diff = Date.now() - parsed.lastUpdated;
         setTimeLeft(Math.max(parsed.timeLeft - diff, 0));
-    }, [data, STORAGE_KEY]);
+    }, [data, STORAGE_KEY, dispatch, navigate]);
 
-    /* ---------------- Persist Progress ---------------- */
 
     useEffect(() => {
         if (timeLeft === undefined || timerPaused) return;
@@ -155,7 +182,6 @@ export default function SingleTestRoot() {
         );
     }, [attendedQuestion, currentIndex, timeLeft, timerPaused, STORAGE_KEY]);
 
-    /* ---------------- Timer ---------------- */
 
     useEffect(() => {
         if (timeLeft === undefined || timerPaused || timeLeft <= 0) return;
@@ -168,7 +194,32 @@ export default function SingleTestRoot() {
         return () => clearInterval(id);
     }, [timeLeft, timerPaused]);
 
-    /* ---------------- Auto Submit ---------------- */
+
+    useEffect(() => {
+        if (timeLeft === undefined || timerPaused) return;
+
+        const fiveMinutesInMs = 5 * 60 * 1000;
+        const twoMinutesInMs = 2 * 60 * 1000;
+
+        if (timeLeft <= fiveMinutesInMs && timeLeft > fiveMinutesInMs - 1000 && !fiveMinPlayedRef.current) {
+            fiveMinPlayedRef.current = true;
+            if (fiveMinAudioRef.current) {
+                fiveMinAudioRef.current.play().catch((error) => {
+                    console.error("Failed to play 5-minute warning audio:", error);
+                });
+            }
+        }
+
+        if (timeLeft <= twoMinutesInMs && timeLeft > twoMinutesInMs - 1000 && !twoMinPlayedRef.current) {
+            twoMinPlayedRef.current = true;
+            if (twoMinAudioRef.current) {
+                twoMinAudioRef.current.play().catch((error) => {
+                    console.error("Failed to play 2-minute warning audio:", error);
+                });
+            }
+        }
+    }, [timeLeft, timerPaused]);
+
 
     useEffect(() => {
         if (timeLeft === 0 && !timerPaused) {
@@ -177,7 +228,6 @@ export default function SingleTestRoot() {
         }
     }, [timeLeft, timerPaused]);
 
-    /* ---------------- Handlers ---------------- */
 
     const handleAnswer = (value: Answers) => {
         setAttendedQuestion(prev => {
@@ -235,7 +285,6 @@ export default function SingleTestRoot() {
         }
     };
 
-    /* ---------------- Derived Safe Values ---------------- */
 
     const isReady = !!data && !isLoading && !isFetching;
     const isMCQ = data?.overview?.test_type === "mcq";
@@ -244,7 +293,6 @@ export default function SingleTestRoot() {
     const isFirst = currentIndex === 0;
     const isLast = currentIndex === questions.length - 1;
 
-    /* ---------------- Render ---------------- */
 
     if (!isReady) {
         return (
