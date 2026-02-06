@@ -23,14 +23,17 @@ export default function PlaylistCard({ data, courseId }: { data: PlaylistProps; 
                 background: (theme) => theme.palette.separator.dark
             }} />
             <Box className="aspect-120/70 relative flex flex-col gap-4 justify-center items-center text-center rounded-md mb-1.5 overflow-hidden" sx={{
-                background: (theme) => theme.palette.primary.dark,
+                background: (theme) => theme.palette.separator.dark,
                 color: (theme) => theme.palette.primary.contrastText,
             }}>
                 {/* <Typography variant="subtitle1">{data?.chapter_name}</Typography> */}
                 <img src="/playlist.png" alt="" className="w-full h-full object-cover" />
-                <Stack className="items-center gap-1 absolute bottom-4 right-4 rounded-lg py-2 px-4" sx={{
-                    background: "rgba(255,255,255,0.9)"
-                }}>
+                <Stack className="items-center gap-1 absolute bottom-4 right-4 rounded-lg py-2 px-4" sx={(theme) => ({
+                    background:
+                        theme.palette.mode === "light"
+                            ? "rgba(0,0,0,0.9)"
+                            : "rgba(255,255,255,0.9)",
+                })}>
                     <Video size={16} />
                     <Typography variant="subtitle2">{data?.count} Videos</Typography>
                 </Stack>
