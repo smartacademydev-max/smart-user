@@ -76,7 +76,8 @@ export interface SingleMcqResponse extends GlobalResponse {
     overview: {
         name: string;
         time: number;
-        test_type: QuestionTypeProps
+        test_type: QuestionTypeProps;
+        end_datetime: string;
     }
 }
 export interface Answers {
