@@ -261,7 +261,7 @@ export default function SingleTestRoot() {
 
     if (!isMCQ) {
         return (
-            <div className="subject__test_view">
+            <div className="subject__test_view h-full flex flex-col overflow-hidden">
                 <Button startIcon={<ArrowLeft />} onClick={() => navigate(-1)}>
                     Back to Test
                 </Button>
@@ -278,14 +278,16 @@ export default function SingleTestRoot() {
                     />
                 </div>
                 {
-                    activeTab === "questions" ? !questions.length ? <EmptyList title="No Questions Found" description="No Questions added to this test yet!" /> : (questions.map((q, index) => (
-                        <Box key={q.question} className="flex gap-4 mb-4">
-                            <Typography>{index + 1}.</Typography>
-                            <Typography variant="h6">
-                                {renderHtml(q.question)}
-                            </Typography>
-                        </Box>
-                    ))) : ""
+                    activeTab === "questions" ? !questions.length ? <EmptyList title="No Questions Found" description="No Questions added to this test yet!" /> : <Box className="h-full overflow-auto">
+                        {questions.map((q, index) => (
+                            <Box key={q.question} className="flex gap-4 mb-4">
+                                <Typography>{index + 1}.</Typography>
+                                <Typography variant="h6">
+                                    {renderHtml(q.question)}
+                                </Typography>
+                            </Box>
+                        ))}
+                    </Box> : ""
                 }
                 {activeTab === "feedback" ? <TestSample id={Number(testId)} /> : ""}
             </div>
