@@ -56,12 +56,12 @@ export default function MyCourseCard({ course }: { course: CourseProps }) {
                 <Divider className="my-3!" />
                 <div className="flex flex-col gap-2 md:grid md:grid-cols-2">
                     {course?.course_type !== "free" ? <div className="middle">
-                        {course?.user?.free_trial_expires_at ? <Typography variant="caption" color="error">Expired on</Typography> : <Typography variant="caption">Expires</Typography>}
+                        {!course?.user?.is_free_trial_valid && !course?.user?.has_purchased ? <Typography variant="caption" color="error">Expired on</Typography> : <Typography variant="caption">Expires</Typography>}
                         <div className="flex items-center gap-1.5">
                             <Typography variant="h4">{expiredDay || day}</Typography>
                             <div className="date flex flex-col items-start justify-end">
                                 <Calendar size={12} />
-                                <Typography variant="caption">{expiredMonthAndYear || monthAndYear}</Typography>
+                                <Typography variant="caption">{!course?.user?.is_free_trial_valid ? expiredMonthAndYear : monthAndYear}</Typography>
                             </div>
                         </div>
                     </div> : ""}
@@ -80,7 +80,7 @@ export default function MyCourseCard({ course }: { course: CourseProps }) {
                 </div>
                 <Divider className="mt-3! mb-5!" />
                 <div className="flex justify-content-between items-center gap-4">
-                    {course?.user?.free_trial_expires_at ?
+                    {!course?.user?.is_free_trial_valid ?
                         <Button fullWidth color="primary" variant="contained" onClick={() => navigate(PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.ROOT(Number(course.id)))}>
                             {t("messages.purchase_now")}
                         </Button>
