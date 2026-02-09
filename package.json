@@ -41,8 +41,7 @@
     "slick-carousel": "^1.8.1",
     "tailwindcss": "^4.1.16",
     "uuid": "^13.0.0",
-    "yup": "^1.7.1",
-    "@zener/nepali-datepicker-react": "^1.6.0"
+    "yup": "^1.7.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
