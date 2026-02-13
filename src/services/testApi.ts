@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import type { QueryParams } from "../types";
-import type { McqReportData, McqSubmissionPayload, McqSubmissionResponse, SingleMcqResponse, TestList } from "../types/question";
+import type { McqReportData, McqSubmissionPayload, McqSubmissionResponse, QuestionTypeProps, SingleMcqResponse, TestList } from "../types/question";
 import type { GlobalResponse } from "../types/user";
 import { buildQueryParams } from "../utils/buildQueryParams";
 import { baseQuery } from "./baseQuery";
@@ -105,6 +105,17 @@ export const testApi = createApi({
                 method: "GET",
             }),
         }),
+        getAllIndividualTest: builder.query<TestList, QueryParams & { type: QuestionTypeProps }>({
+            query: ({ pageIndex, pageSize, search, type }) => ({
+                url: `/test?${buildQueryParams({
+                    page: pageIndex,
+                    page_size: pageSize,
+                    search: search,
+                    type: type
+                })}`
+            }),
+            providesTags: [{ type: "Test", id: "LIST" }]
+        })
     })
 })
 
@@ -119,5 +130,6 @@ export const {
     useReviewSubjectiveTestResultQuery,
     useSubmitSubjectiveFinalMutation,
     useGetTestResultQuery,
-    useGetTestSampleQuery
+    useGetTestSampleQuery,
+    useGetAllIndividualTestQuery
 } = testApi;

@@ -19,6 +19,7 @@
     "@tailwindcss/postcss": "^4.1.16",
     "@tanstack/react-table": "^8.21.3",
     "@zoom/meetingsdk": "^5.0.0",
+    "apexcharts": "^5.3.6",
     "crypto-js": "^4.2.0",
     "docx-preview": "^0.3.7",
     "formik": "^2.4.9",

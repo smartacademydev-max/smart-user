@@ -72,6 +72,17 @@ export default function PrimaryMenu() {
           </ListItem>
           <ListItem disablePadding className="menu__item">
             <ListItemButton
+              onClick={() => navigate(PATH.TEST.EXPLORE_TEST.ROOT)}
+              className={isActive(PATH.TEST.EXPLORE_TEST.ROOT) ? "active" : ""}
+            >
+              <ListItemIcon>
+                <SearchNormal size={20} />
+              </ListItemIcon>
+              <ListItemText primary={t("menus.exploreTest")} />
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding className="menu__item">
+            <ListItemButton
               onClick={() => navigate(PATH.COURSE_MANAGEMENT.COURSES.SAVED_COURSES.ROOT)}
               className={isActive(PATH.COURSE_MANAGEMENT.COURSES.SAVED_COURSES.ROOT) ? "active" : ""}
             >

@@ -69,9 +69,7 @@ const toNepaliNumber = (num: number | string): string => {
     }).join('');
 };
 
-/**
- * Count total days from reference BS date to target BS date
- */
+
 const countBSDays = (fromYear: number, fromMonth: number, fromDay: number,
     toYear: number, toMonth: number, toDay: number): number => {
     let totalDays = 0;

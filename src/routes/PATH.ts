@@ -90,6 +90,18 @@ export const PATH = {
     },
     TEST: {
         ROOT: "/test",
+        EXPLORE_TEST: {
+            ROOT: "/explore-test"
+        },
+        PURCHASE: {
+            ROOT: (id?: number | null) => (id ? `/test/${id}/purchase` : "/test/:id/purchase"),
+            SUCCESS: {
+                ROOT: "/test/:id/purchase/success"
+            },
+            FAILURE: {
+                ROOT: "/test/:id/purchase/failure"
+            }
+        },
     },
     VIDEOS: {
         ROOT: "/videos",

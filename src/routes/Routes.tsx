@@ -45,6 +45,7 @@ import ProfilePage from "../components/pages/Settings/ProfilePage";
 import SupportRoot from "../components/pages/Support";
 import TestManagementRoot from "../components/pages/TestManagement";
 import AllTestRoot from "../components/pages/TestManagement/allTest";
+import ExploreAllTest from "../components/pages/TestManagement/exploreTest";
 import ReviewTestRoot from "../components/pages/TestManagement/reviewTest";
 import ReviewSubjectTestRoot from "../components/pages/TestManagement/reviewTest/subjective";
 import SingleSubjectiveTest from "../components/pages/TestManagement/singleSubjectiveTest";
@@ -138,13 +139,17 @@ const router = createBrowserRouter([
               { path: PATH.TEST.ROOT, element: <AllTestRoot /> },
             ]
           },
+          { path: PATH.TEST.EXPLORE_TEST.ROOT, element: <ExploreAllTest /> },
           {
             element:
               <PurchaseRoot />,
             children: [
               { path: PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.ROOT(), element: <PurchaseLayout /> },
+              { path: PATH.TEST.PURCHASE.ROOT(), element: <PurchaseLayout /> },
               { path: PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.SUCCESS.ROOT, element: <PaymentSuccessPage /> },
               { path: PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.FAILURE.ROOT, element: <PurchaseFailure /> },
+              { path: PATH.TEST.PURCHASE.SUCCESS.ROOT, element: <PaymentSuccessPage /> },
+              { path: PATH.TEST.PURCHASE.FAILURE.ROOT, element: <PurchaseFailure /> },
               // { path: PATH.COURSE_MANAGEMENT.LIVE_CLASSES.PURCHASE.ROOT(), element: <PurchaseLayout /> },
             ],
           },

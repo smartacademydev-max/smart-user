@@ -1,4 +1,5 @@
 import type { GorkhapatraTypes } from "../types/gorkhapatra";
+import type { QuestionTypeProps } from "../types/question";
 
 export type StatusVariant = "success" | "info" | "warning" | "error";
 
@@ -20,4 +21,10 @@ export const getGorkhapatraStatus = statusMap<GorkhapatraTypes>({
     all: "info",
     mcqs: "success",
     descriptive: "warning",
+});
+export const getTestStatus = statusMap<QuestionTypeProps>({
+    all: "info",
+    mcq: "success",
+    subjective: "warning",
+    omr: "info"
 });

@@ -3,7 +3,7 @@ import type { StatusVariant } from '../../utils/statusMap'
 
 export default function StatusPill({ status, variant }: { variant: StatusVariant, status: string }) {
     return (
-        <Box className="py-1 px-2! rounded-full"
+        <Box className="py-1 px-2! rounded-full max-w-fit"
             sx={{
                 color: (theme) => theme.palette[variant].main,
                 background: (theme) => theme.palette[variant].light,

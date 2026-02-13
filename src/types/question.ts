@@ -1,7 +1,7 @@
 import type { Pagination } from ".";
 import type { GlobalResponse } from "./user";
 
-export type QuestionTypeProps = "mcq" | "subjective"
+export type QuestionTypeProps = "mcq" | "subjective" | "omr" | ""
 export interface OptionProps {
     id: number | null,
     option: string,
@@ -59,6 +59,8 @@ export interface TestProps {
     is_scheduled?: boolean;
     is_graded?: boolean;
     has_expired?: boolean;
+    marked_price?: string,
+    sale_price?: string,
 }
 
 
