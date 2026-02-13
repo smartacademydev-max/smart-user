@@ -23,7 +23,7 @@ export const getGorkhapatraStatus = statusMap<GorkhapatraTypes>({
     descriptive: "warning",
 });
 export const getTestStatus = statusMap<QuestionTypeProps>({
-    all: "info",
+    "": "info",
     mcq: "success",
     subjective: "warning",
     omr: "info"
