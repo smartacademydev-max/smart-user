@@ -98,8 +98,11 @@ export default function SingleLiveClassRoot() {
                     sdkKey = import.meta.env.VITE_ZOOM_MEETING_SDK_SECRET1;
                 } else if (meetingData.account_id === 2) {
                     sdkKey = import.meta.env.VITE_ZOOM_MEETING_SDK_SECRET2;
-                } else {
+                } else if (meetingData.account_id === 3) {
                     sdkKey = import.meta.env.VITE_ZOOM_MEETING_SDK_SECRET3;
+                }
+                else {
+                    sdkKey = import.meta.env.VITE_ZOOM_MEETING_SDK_SECRET4;
                 }
 
                 if (!meetingNumber) throw new Error("Invalid Meeting URL in server data.");
