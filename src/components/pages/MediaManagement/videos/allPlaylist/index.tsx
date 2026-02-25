@@ -125,18 +125,20 @@ export default function CoursePlaylist() {
                     </h2>
                 </div>)}
 
-            {playlist && playlist?.data?.data?.length > 0 ? (
-                <div className="flex flex-col gap-4 md:grid md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-                    {playlist?.data?.data?.map((item) => (
-                        <PlaylistCard data={item} key={item.chapter_id} courseId={selectedCourse?.id} />
-                    ))}
-                </div>
-            ) : (
-                <EmptyList
-                    title="No Videos Found"
-                    description="There are no videos available for the selected course."
-                />
-            )}
+            <div className="h-full overflow-auto">
+                {playlist && playlist?.data?.data?.length > 0 ? (
+                    <div className="flex flex-col gap-4 md:grid md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+                        {playlist?.data?.data?.map((item) => (
+                            <PlaylistCard data={item} key={item.chapter_id} courseId={selectedCourse?.id} />
+                        ))}
+                    </div>
+                ) : (
+                    <EmptyList
+                        title="No Videos Found"
+                        description="There are no videos available for the selected course."
+                    />
+                )}
+            </div>
         </div >
     );
 }

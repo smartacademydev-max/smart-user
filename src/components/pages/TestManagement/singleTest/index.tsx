@@ -25,6 +25,7 @@ import TestSubmissionDialog, {
     type SubmissionType,
 } from "../../../organism/Dialog/TestSubmissionDialog";
 
+import WaterMark from "../../../../Watermark";
 import { EmptyList } from "../../../molecules/EmptyList";
 import TabController from "../../../molecules/TabController";
 import TestSample from "../reviewTest/TestSample";
@@ -310,6 +311,7 @@ export default function SingleTestRoot() {
     if (!isMCQ) {
         return (
             <div className="subject__test_view h-full flex flex-col overflow-hidden">
+                <WaterMark />
                 <Button startIcon={<ArrowLeft />} onClick={() => navigate(-1)}>
                     Back to Test
                 </Button>
