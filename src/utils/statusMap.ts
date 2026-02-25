@@ -22,9 +22,20 @@ export const getGorkhapatraStatus = statusMap<GorkhapatraTypes>({
     mcqs: "success",
     descriptive: "warning",
 });
+export const getTransactionStatus = statusMap<"failed" | "success" | "pending">({
+    failed: "error",
+    success: "success",
+    pending: "warning",
+});
 export const getTestStatus = statusMap<QuestionTypeProps>({
     "": "info",
     mcq: "success",
     subjective: "warning",
     omr: "info"
 });
+
+export const getCourseStatus = (progress?: number): StatusVariant => {
+    if (progress === 0) return "error";
+    if (progress === 100) return "success";
+    return "warning";
+};

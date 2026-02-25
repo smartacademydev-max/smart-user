@@ -1,5 +1,8 @@
 {
     "messages": {
+        "enrolled_courses": "Enrolled Courses",
+        "transaction_information": "Transaction Information",
+        "download_admin_card": "Download Admin Card",
         "main": "Main",
         "learning": "Learning",
         "communication": "Communication",

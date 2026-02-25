@@ -61,6 +61,7 @@ export interface CourseProps {
     subscriptions?: CourseSubscription[] | null;
     marked_price?: string,
     sale_price?: string,
+    purchased_date?: string;
     mega_categories?: string[];
     user: {
         has_taken_freetrial: false,
@@ -78,6 +79,8 @@ export interface CourseProps {
     ends_at?: string;
     started_from?: string;
     can_take_free_trial: boolean;
+    course_completion_status: "completed" | "ongoing" | "not_started";
+    
 }
 
 export interface CourseList extends GlobalResponse {

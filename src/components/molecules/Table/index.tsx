@@ -60,7 +60,7 @@ export default function UdaanTable<T extends object>({
                 }}
                 className="w-full h-full overflow-auto">
                 <Table className="h-full">
-                    <TableHead>
+                    <TableHead >
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => (
@@ -70,13 +70,13 @@ export default function UdaanTable<T extends object>({
                                             position: "sticky",
                                             top: 0,
                                             zIndex: 2,
-                                            backgroundColor: theme.palette.background.paper,
+                                            backgroundColor: theme.palette.primary.main,
                                             fontWeight: 600,
                                             borderBottom: `1px solid ${theme.palette.separator.dark}`,
                                         }}
                                         className="py-2! px-3! 2xl:px-4! 2xl:py-4!"
                                     >
-                                        <Typography variant="subtitle2" color="text.middle" className="text-nowrap">
+                                        <Typography variant="subtitle2" color="white" className="text-nowrap">
                                             {flexRender(
                                                 header.column.columnDef.header,
                                                 header.getContext()

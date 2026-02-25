@@ -5,6 +5,7 @@ import type { LiveClassList, LiveClassProps } from "../types/liveClass";
 import type { MediaList } from "../types/media";
 import type { EsewaPaymentPayload, PurchaseProps } from "../types/purchase";
 import type { TestList } from "../types/question";
+import type { TransactionsResponse } from "../types/transactions";
 import type { GlobalResponse } from "../types/user";
 import { buildQueryParams } from "../utils/buildQueryParams";
 import { baseQuery } from "./baseQuery";
@@ -234,6 +235,24 @@ export const courseApi = createApi({
             }),
             invalidatesTags: (_result, _error, { id }) => [{ type: "Course" as const, id }],
         }),
+        getAllUserTransacions: builder.query<TransactionsResponse, QueryParams>({
+            query: ({ pageIndex, pageSize, search }) => ({
+                url: `/user/transactions?${buildQueryParams({ page: pageIndex, page_size: pageSize, search })}`,
+                method: "GET",
+            })
+        }),
+        downloadAdmitCard: builder.query<GlobalResponse & {
+            data: {
+                preview_url: string;
+                download_url: string;
+            }
+        }, void>({
+            query: () => ({
+                url: `/user/admit-card`,
+                method: "GET",
+            })
+        })
+
     }),
 });
 
@@ -255,5 +274,7 @@ export const {
     useGetMeetingSignatureMutation,
     usePurchaseWithKhaltiMutation,
     usePurchaseCourseWithEsewaMutation,
-    useTrackCourseProgressMutation
+    useTrackCourseProgressMutation,
+    useGetAllUserTransacionsQuery,
+    useDownloadAdmitCardQuery
 } = courseApi;

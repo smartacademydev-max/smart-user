@@ -9,7 +9,7 @@ export default function StatusPill({ status, variant }: { variant: StatusVariant
                 background: (theme) => theme.palette[variant].light,
             }}
         >
-            <Typography variant='subtitle2' className='text-center w-full capitalize'>{status}</Typography>
+            <Typography variant='subtitle2' className='text-center w-full capitalize text-nowrap'>{status}</Typography>
         </Box>
     )
 }
