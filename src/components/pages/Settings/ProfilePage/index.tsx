@@ -1,4 +1,5 @@
 import {
+    Autocomplete,
     Button,
     Dialog,
     DialogActions,
@@ -8,23 +9,30 @@ import {
     IconButton,
     InputLabel,
     OutlinedInput,
+    TextField,
     Typography,
     useTheme
 } from "@mui/material";
+import type { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import { useFormik } from "formik";
 import { CloseCircle } from "iconsax-reactjs";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import * as Yup from "yup";
+import { useGetAllCountriesQuery } from "../../../../services/countryApi";
 import { useDownloadAdmitCardQuery } from "../../../../services/courseApi";
 import { useUpdateProfileMutation } from "../../../../services/settingApi";
+import { setCredentials } from "../../../../slice/authSlice";
 import { showToast } from "../../../../slice/toastSlice";
 import { useAppDispatch, useAppSelector } from "../../../../store/hook";
 import type { User } from "../../../../types/user";
+import MakuraDatePicker from "../../../atom/MakuraDatePicker";
 import ProfileImageUpload from "./ProfileImageUpload";
 import UserEnrolledCourses from "./UserEnrolledCourses";
 import UserTransactions from "./UserTransactions";
 
+type SelectOption = { label: string; value: string };
 
 const validationSchema = Yup.object({
     name: Yup.string().required("Name is required"),
@@ -46,6 +54,13 @@ export default function ProfilePageRoot() {
     const [open, setOpen] = useState(false);
     const theme = useTheme();
 
+    const { data: countriesData } = useGetAllCountriesQuery();
+
+    const countries: SelectOption[] = countriesData
+        ? countriesData
+            .map((c: any) => ({ label: c.name.common as string, value: c.name.common as string }))
+            .sort((a, b) => a.label.localeCompare(b.label))
+        : [];
 
     const formik = useFormik<Partial<User>>({
         initialValues: {
@@ -53,8 +68,14 @@ export default function ProfilePageRoot() {
             email: user?.email || "",
             phone: user?.phone || "",
             address: user?.address || "",
-            profile: null,
-            profile_url: user?.profile_url || "",
+            joined_date: user?.joined_date || "",
+            gender: user?.gender || "other",
+            country: user?.country || "",
+            province: user?.province || "",
+            dob: user?.dob ? dayjs(user.dob) : "",
+            city: user?.city || "",
+            thumbnail: null,
+            thumbnail_url: user?.thumbnail_url || "",
         },
         enableReinitialize: true,
         validationSchema,
@@ -66,18 +87,37 @@ export default function ProfilePageRoot() {
                 formData.append("email", values.email ?? "");
                 formData.append("phone", values.phone ?? "");
 
-                if (values.address) {
-                    formData.append("address", values.address);
+                if (values.city) {
+                    formData.append("city", values.city);
+                }
+                if (values.dob) {
+                    const dobString = typeof values.dob === "string" ? values.dob : values.dob.format('YYYY-MM-DD');
+                    formData.append("dob", dobString);
+                }
+                if (values.country) {
+                    formData.append("country", values.country);
+                }
+                if (values.gender) {
+                    formData.append("gender", values.gender);
+                }
+                if (values.province) {
+                    formData.append("province", values.province);
                 }
 
-                if (values.profile instanceof File) {
-                    formData.append("thumbnail", values.profile);
+                if (values.thumbnail instanceof File) {
+                    formData.append("thumbnail", values.thumbnail);
                 }
 
-                if (values.profile_url) {
-                    formData.append("thumbnail_url", values.profile_url);
+                if (values.thumbnail_url) {
+                    formData.append("thumbnail_url", values.thumbnail_url);
                 }
                 const response = await updateProfile(formData).unwrap();
+                dispatch(setCredentials({
+                    user: {
+                        ...user,
+                        ...response?.data?.user,
+                    },
+                }));
                 dispatch(
                     showToast({
                         message: response?.message || "Profile Updated Successfully",
@@ -105,7 +145,7 @@ export default function ProfilePageRoot() {
                 throw new Error("Download URL not found");
             }
 
-            if (!user?.profile_url) {
+            if (!user?.thumbnail_url) {
                 return dispatch(
                     showToast({
                         message: "Please upload profile picture to download admit card",
@@ -125,6 +165,22 @@ export default function ProfilePageRoot() {
         }
     }
 
+    const Genders = [
+        { label: "Male", value: "male" },
+        { label: "Female", value: "female" },
+        { label: "Other", value: "other" }
+    ]
+
+    const Provinces = [
+        { label: "Province 1", value: "province_1" },
+        { label: "Province 2", value: "province_2" },
+        { label: "Bagmati Province", value: "bagmati_province" },
+        { label: "Gandaki Province", value: "gandaki_province" },
+        { label: "Lumbini Province", value: "lumbini_province" },
+        { label: "Karnali Province", value: "karnali_province" },
+        { label: "Sudurpashchim Province", value: "sudurpashchim_province" },
+    ]
+
     return (
         <div className="profile__page__container  overflow-auto ">
             <form
@@ -138,15 +194,15 @@ export default function ProfilePageRoot() {
                 <Divider className="mt-2! mb-6!" />
 
                 <div className="flex flex-col md:grid md:grid-cols-12 gap-4 lg:gap-6">
-                    <div className="md:col-span-2">
+                    <div className="md:col-span-3 2xl:col-span-2">
                         <InputLabel>Your Profile Picture</InputLabel>
 
                         <ProfileImageUpload
-                            previewUrl={formik.values.profile_url}
-                            onChange={(file) => formik.setFieldValue("profile", file)}
+                            previewUrl={formik.values.thumbnail_url}
+                            onChange={(file) => formik.setFieldValue("thumbnail", file)}
                         />
                     </div>
-                    <div className="col-span-10">
+                    <div className="col-span-9 lg:col-span-10">
                         <div className="flex flex-col gap-4 lg:gap-6 md:grid md:grid-cols-2">
 
                             {/* Username */}
@@ -169,6 +225,7 @@ export default function ProfilePageRoot() {
                             <div className="col-span-1">
                                 <InputLabel>Email</InputLabel>
                                 <OutlinedInput
+                                    disabled
                                     fullWidth
                                     name="email"
                                     value={formik.values.email}
@@ -185,6 +242,7 @@ export default function ProfilePageRoot() {
                             <div className="col-span-1">
                                 <InputLabel>Phone</InputLabel>
                                 <OutlinedInput
+                                    disabled
                                     fullWidth
                                     name="phone"
                                     value={formik.values.phone}
@@ -197,22 +255,114 @@ export default function ProfilePageRoot() {
                                 </FormHelperText>
                             </div>
 
-                            {/* Address (nullable) */}
                             <div className="col-span-1">
-                                <InputLabel>Address</InputLabel>
+                                <InputLabel>Joined Date</InputLabel>
                                 <OutlinedInput
+                                    disabled
                                     fullWidth
-                                    name="address"
-                                    value={formik.values.address || ""}
+                                    name="joined_date"
+                                    value={formik.values.joined_date}
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
-                                    placeholder="Enter address"
-                                    error={formik.touched.address && Boolean(formik.errors.address)}
+                                    error={formik.touched.joined_date && Boolean(formik.errors.joined_date)}
                                 />
                                 <FormHelperText error>
-                                    {formik.touched.address && formik.errors.address}
+                                    {formik.touched.joined_date && formik.errors.joined_date}
                                 </FormHelperText>
                             </div>
+
+                            <div className="col-span-1">
+                                <InputLabel>Gender <Typography variant="caption" color="text.middle">(Optional)</Typography></InputLabel>
+                                <Autocomplete
+                                    disableClearable
+                                    options={Genders}
+                                    getOptionLabel={(option) => option.label || ""}
+                                    isOptionEqualToValue={(option, value) => option.value === value.value}
+                                    value={
+                                        Genders.find(
+                                            acc => acc.value === formik.values.gender
+                                        ) || undefined
+                                    }
+                                    onChange={(_e, v) => formik.setFieldValue("gender", v?.value || null)}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            placeholder="Select Gender"
+
+                                        />
+                                    )}
+                                />
+
+                            </div>
+
+                            <div className="col-span-1">
+                                <InputLabel>Date Of Birth <Typography variant="caption" color="text.middle">(Optional)</Typography></InputLabel>
+                                <MakuraDatePicker
+                                    value={formik.values.dob ? dayjs(formik.values.dob) : null}
+                                    onChange={(date: Dayjs | null) => formik.setFieldValue("dob", date ? date.format('YYYY-MM-DDTHH:mm:ss') : "")}
+                                />
+                            </div>
+                            <div className="col-span-1">
+                                <InputLabel>Country <Typography variant="caption" color="text.middle">(Optional)</Typography></InputLabel>
+                                <Autocomplete
+                                    disableClearable
+                                    options={countries}
+                                    getOptionLabel={(option) => option.label || ""}
+                                    isOptionEqualToValue={(option, value) => option.value === value.value}
+                                    value={
+                                        countries.find(
+                                            acc => acc.value === formik.values.country
+                                        ) || undefined
+                                    }
+                                    onChange={(_e, v) => formik.setFieldValue("country", v?.value || null)}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            placeholder="Select Country"
+                                        />
+                                    )}
+                                />
+                            </div>
+                            <div className="col-span-1">
+                                <InputLabel>Province <Typography variant="caption" color="text.middle">(Optional)</Typography></InputLabel>
+                                <Autocomplete
+                                    disableClearable
+                                    options={Provinces}
+                                    getOptionLabel={(option) => option.label || ""}
+                                    isOptionEqualToValue={(option, value) => option.value === value.value}
+                                    value={
+                                        Provinces.find(
+                                            acc => acc.value === formik.values.province
+                                        ) || undefined
+                                    }
+                                    onChange={(_e, v) => formik.setFieldValue("province", v?.value || null)}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            placeholder="Select Province"
+
+                                        />
+                                    )}
+                                />
+                            </div>
+
+                            <div className="col-span-2">
+                                <InputLabel>City <Typography variant="caption" color="text.middle">(Optional)</Typography></InputLabel>
+                                <OutlinedInput
+                                    fullWidth
+                                    name="city"
+                                    value={formik.values.city}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    error={formik.touched.city && Boolean(formik.errors.city)}
+                                    placeholder="Enter your city"
+                                />
+                                <FormHelperText error>
+                                    {formik.touched.city && formik.errors.city}
+                                </FormHelperText>
+                            </div>
+
+
                         </div>
                     </div>
                 </div>
@@ -242,7 +392,6 @@ export default function ProfilePageRoot() {
                 </DialogContent>
                 <DialogActions>
                     <Button variant="contained" color="primary" onClick={handleAdmitCardDownload}>{downloading ? "Downloading" : t("messages.download_admin_card")}</Button>
-
                 </DialogActions >
             </Dialog >
         </div >

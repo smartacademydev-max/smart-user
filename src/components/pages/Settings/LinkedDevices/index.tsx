@@ -62,7 +62,7 @@ export default function LinkedDevices() {
                             </svg>
                         </Box>
                         <Box>
-                            <Typography fontWeight={400} className="capitalize">
+                            <Typography fontWeight={400} variant="subtitle2" className="capitalize">
                                 {row.original.location || "N/A"}
                             </Typography>
                             <Link to={`https://ip2location.com/demo/${row.original.ip}`} target="_blank">
@@ -82,7 +82,7 @@ export default function LinkedDevices() {
                 header: "OS",
                 accessorKey: "os",
                 cell: ({ row }) => (
-                    <Typography fontWeight={500} className="capitalize">
+                    <Typography fontWeight={500} variant="subtitle2" className="capitalize">
                         {row.original.os || "N/A"}
                     </Typography>
                 ),
@@ -91,7 +91,7 @@ export default function LinkedDevices() {
                 header: "Browser",
                 accessorKey: "browser",
                 cell: ({ row }) => (
-                    <Typography fontWeight={500} className="capitalize">
+                    <Typography fontWeight={500} variant="subtitle2" className="capitalize">
                         {row.original.browser || "N/A"}
                     </Typography>
                 ),
@@ -100,7 +100,7 @@ export default function LinkedDevices() {
                 header: "Last accessed",
                 accessorKey: "last_accessed",
                 cell: ({ row }) => (
-                    <Typography fontWeight={500} className="capitalize">
+                    <Typography fontWeight={500} variant="subtitle2" className="capitalize">
                         {formatDateTime(row.original.updated_at || "")}
                     </Typography>
                 ),
@@ -120,7 +120,7 @@ export default function LinkedDevices() {
                                 handleLogout(Number(row.original.id))
                             }
                         >
-                            <Typography className="capitalize">
+                            <Typography className="capitalize" variant="subtitle2">
                                 {isLoggingOut ? "Logging out..." : "Sign out"}
                             </Typography>
                         </Button>

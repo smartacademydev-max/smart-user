@@ -1,3 +1,4 @@
+import type { Dayjs } from "dayjs";
 import type { Pagination } from ".";
 
 export type PermissionProps = string[];
@@ -10,8 +11,8 @@ export interface RegisterUserProps {
 	name: string;
 	email: string;
 	phone: string;
-	profile?: File | null;
-	profile_url?: string;
+	thumbnail?: File | null;
+	thumbnail_url?: string;
 	interested_categories?: number[];
 	address?: string;
 	role?: {
@@ -33,8 +34,8 @@ export const RegisterUserInitialData: RegisterUserProps = {
 	},
 	password: "",
 	password_confirmation: "",
-	profile: null,
-	profile_url: "",
+	thumbnail: null,
+	thumbnail_url: "",
 	designation: "",
 }
 
@@ -48,8 +49,15 @@ export interface GlobalResponse {
 	status: string;
 }
 
+export type Gender = "male" | "female" | "other";
 export interface User extends RegisterUserProps {
 	permissions: PermissionProps;
+	joined_date: string;
+	gender: Gender
+	country: string;
+	province: string;
+	city: string
+	dob: string | Dayjs
 	// role: string[];
 }
 
