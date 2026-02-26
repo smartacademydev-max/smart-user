@@ -27,15 +27,15 @@ export const getTransactionStatus = statusMap<"failed" | "success" | "pending">(
     success: "success",
     pending: "warning",
 });
-export const getTestStatus = statusMap<QuestionTypeProps>({
-    "": "info",
-    mcq: "success",
-    subjective: "warning",
-    omr: "info"
-});
 
 export const getCourseStatus = (progress?: number): StatusVariant => {
     if (progress === 0) return "error";
     if (progress === 100) return "success";
     return "warning";
 };
+export const getTestStatus = statusMap<QuestionTypeProps>({
+    "": "info",
+    mcq: "success",
+    subjective: "warning",
+    omr: "info"
+});
