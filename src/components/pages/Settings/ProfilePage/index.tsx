@@ -195,7 +195,7 @@ export default function ProfilePageRoot() {
                 </div>
                 <Divider className="mt-2! mb-6!" />
 
-                <div className="flex flex-col md:grid md:grid-cols-12 gap-4 lg:gap-6">
+                <div className="flex flex-col md:grid md:grid-cols-12 gap-4 lg:gap-6 items-start">
                     <div className="md:col-span-3 2xl:col-span-2">
                         <InputLabel>Your Profile Picture</InputLabel>
 
