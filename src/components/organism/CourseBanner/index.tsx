@@ -1,5 +1,8 @@
-import { Box, Divider, Typography, useTheme } from "@mui/material";
+import { Box, Button, Divider, Typography, useTheme } from "@mui/material";
 import { Calendar } from "iconsax-reactjs";
+import { useTranslation } from "react-i18next";
+import { setPurchase } from "../../../slice/purchaseSlice";
+import { useAppDispatch } from "../../../store/hook";
 import type { CourseProps } from "../../../types/course";
 import { formatDateCustom } from "../../../utils/dateFormat";
 import { renderHtml } from "../../../utils/renderHtml";
@@ -9,7 +12,8 @@ import BannerCourseTypeModule from "./BannerCourseTypeModule";
 
 export default function CourseBanner({ data, havePurchased }: { data?: CourseProps; isLoading: boolean, havePurchased: boolean }) {
     const theme = useTheme();
-
+    const { t } = useTranslation();
+    const dispatch = useAppDispatch();
 
     const course = data || null;
 
@@ -117,6 +121,12 @@ export default function CourseBanner({ data, havePurchased }: { data?: CoursePro
                                     <Typography variant="caption">{startDate.split(",")[0]}</Typography>
                                     <Typography variant="subtitle1" >-</Typography>
                                 </div> : ""}
+                                {course?.user?.has_taken_freetrial ? <Button variant="contained" className="black__btn mt-4!" fullWidth onClick={() => dispatch(
+                                    setPurchase({
+                                        courseId: Number(course?.id),
+                                        open: true
+                                    })
+                                )}>{t("messages.purchase_now")}</Button> : ""}
                             </div>
                         </Box> : <BannerCourseTypeModule
                             courseType={course?.course_type}

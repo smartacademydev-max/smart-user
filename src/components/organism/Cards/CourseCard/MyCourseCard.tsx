@@ -17,6 +17,8 @@ export default function MyCourseCard({ course }: { course: CourseProps }) {
     const monthAndYear = endDate.split(',')[0].split(' ').slice(1).join(' ');
     const expiredDay = course?.user?.free_trial_expires_at?.split(',')[0].split(' ')[0];
     const expiredMonthAndYear = course?.user?.free_trial_expires_at?.split(',')[0].split(' ').slice(1).join(' ');
+
+
     return (
         <Box className="my__course__card rounded-lg p-3 md:p-4 h-full flex flex-col justify-between" sx={{
             border: (theme) => `1px solid ${theme.palette.separator.dark}`
@@ -61,7 +63,7 @@ export default function MyCourseCard({ course }: { course: CourseProps }) {
                             <Typography variant="h4">{expiredDay || day}</Typography>
                             <div className="date flex flex-col items-start justify-end">
                                 <Calendar size={12} />
-                                <Typography variant="caption">{!course?.user?.is_free_trial_valid ? expiredMonthAndYear : monthAndYear}</Typography>
+                                <Typography variant="caption">{!course?.user?.is_free_trial_valid ? monthAndYear : expiredMonthAndYear}</Typography>
                             </div>
                         </div>
                     </div> : ""}

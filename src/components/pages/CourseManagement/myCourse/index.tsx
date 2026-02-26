@@ -43,7 +43,7 @@ export default function MyCourseRoot() {
                             { value: "free", label: "Free" },
                         ]}
                         currentActive={activeTab}
-                        setActiveTab={setActiveTab}
+                        setActiveTab={(value) => { setQp({ ...qp, pageIndex: 1 }); setActiveTab(value as any) }}
                     />
                     <OutlinedInput
                         name="search"
