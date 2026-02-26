@@ -63,9 +63,9 @@ export default function ProfileMenu() {
                         minWidth: { lg: "160px" },
                         "&:hover": { backgroundColor: theme.palette.action.hover },
                     }}>
-                    {user?.profile_url ? (
+                    {user?.thumbnail_url ? (
                         <img
-                            src={user.profile_url}
+                            src={user.thumbnail_url}
                             alt={`${user?.name} Profile Picture`}
                             className="user__profile w-7 h-7 rounded-full"
                         />
@@ -96,9 +96,9 @@ export default function ProfileMenu() {
                     }}
                     className="lg:hidden!"
                 >
-                    {user?.profile_url ? (
+                    {user?.thumbnail_url ? (
                         <img
-                            src={user.profile_url}
+                            src={user.thumbnail_url}
                             alt={`${user?.name} Profile Picture`}
                             className="user__profile w-7 h-7 rounded-full"
                         />
