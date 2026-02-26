@@ -49,6 +49,7 @@ export default function ProfilePageRoot() {
     const { t } = useTranslation();
     const dispatch = useAppDispatch();
     const user = useAppSelector((state) => state.auth.user);
+    const token = useAppSelector((state) => state.auth.token);
     const [updateProfile, { isLoading }] = useUpdateProfileMutation();
     const { data, isLoading: downloading } = useDownloadAdmitCardQuery();
     const [open, setOpen] = useState(false);
@@ -113,6 +114,7 @@ export default function ProfilePageRoot() {
                 }
                 const response = await updateProfile(formData).unwrap();
                 dispatch(setCredentials({
+                    token: token,
                     user: {
                         ...user,
                         ...response?.data?.user,
