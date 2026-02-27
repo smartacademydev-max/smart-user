@@ -34,11 +34,6 @@ export default function SingleCourse() {
         search: ""
     })
 
-    const [qpTest, setQpTest] = useState<QueryParams>({
-        pageIndex: 1,
-        pageSize: 12,
-        search: ""
-    })
     const [qpLiveClass, setQpLiveClass] = useState<QueryParams>({
         pageIndex: 1,
         pageSize: 12,
