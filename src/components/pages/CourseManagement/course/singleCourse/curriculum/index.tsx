@@ -2,14 +2,13 @@ import { Box, Collapse, Divider, useTheme } from '@mui/material';
 import { ArrowRight2 } from 'iconsax-reactjs';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useGetCourseCurriculumByIdQuery } from '../../../../../../services/courseApi';
 import type { CurriculumMediaProps, CurriculumProps } from '../../../../../../types/course';
 import CustomCollapseIcon from '../../../../../atom/CustomCollapseIcon';
 import MediaCard from '../../../../../organism/Cards/MediaCard';
 import MobileCurriculum from './MobileCurriculum';
 
 interface Props {
-    data?: CurriculumProps[];
-    isLoading: boolean;
     havePurchased: boolean;
 }
 
@@ -475,9 +474,9 @@ const EmptyChaptersState = () => {
     );
 };
 
-export default function SingleCourseCurriculum({ data, havePurchased }: Props) {
+export default function SingleCourseCurriculum({ havePurchased }: Props) {
     const { id } = useParams();
-
+    const { data } = useGetCourseCurriculumByIdQuery({ id: Number(id), pageIndex: 1, pageSize: 50 }, { skip: !id });
     const [openSubjectId, setOpenSubjectId] = useState<number | null>(null);
     const [activeChapterId, setActiveChapterId] = useState<number | null>(null);
     const [openUnitIds, setOpenUnitIds] = useState<Set<number>>(new Set());
@@ -486,10 +485,10 @@ export default function SingleCourseCurriculum({ data, havePurchased }: Props) {
 
     // Set first subject and chapter active on load
     useEffect(() => {
-        if (data && data.length > 0) {
-            setOpenSubjectId(Number(data[0].id));
-            if (data[0].chapters && data[0].chapters.length > 0) {
-                setActiveChapterId(Number(data[0].chapters[0].id));
+        if (data && data?.data?.data.length > 0) {
+            setOpenSubjectId(Number(data?.data?.data[0].id));
+            if (data?.data?.data[0].chapters && data?.data?.data[0].chapters.length > 0) {
+                setActiveChapterId(Number(data?.data?.data[0].chapters[0].id));
             }
         }
     }, [data]);
@@ -498,9 +497,8 @@ export default function SingleCourseCurriculum({ data, havePurchased }: Props) {
         const newSubjectId = openSubjectId === subjectId ? null : subjectId;
         setOpenSubjectId(newSubjectId);
 
-        // Auto-select first chapter when opening a subject
         if (newSubjectId !== null) {
-            const subject = data?.find(s => s.id === newSubjectId);
+            const subject = data?.data?.data?.find(s => s.id === newSubjectId);
             if (subject?.chapters && subject.chapters.length > 0) {
                 setActiveChapterId(Number(subject.chapters[0].id));
             } else {
@@ -549,7 +547,7 @@ export default function SingleCourseCurriculum({ data, havePurchased }: Props) {
         });
     };
 
-    const activeSubject = data?.find(s => s.id === openSubjectId);
+    const activeSubject = data?.data?.data?.find(s => s.id === openSubjectId);
     const activeChapter = activeSubject?.chapters?.find(c => c.id === activeChapterId);
 
     // Check if active subject has no chapters
@@ -559,7 +557,7 @@ export default function SingleCourseCurriculum({ data, havePurchased }: Props) {
         <div className="pb-4">
             <div className="2xl:grid gap-6 2xl:grid-cols-12 hidden ">
                 <SubjectSidebar
-                    subjects={data || []}
+                    subjects={data?.data?.data || []}
                     openSubjectId={openSubjectId}
                     activeChapterId={activeChapterId}
                     onSubjectToggle={toggleSubject}
@@ -590,7 +588,7 @@ export default function SingleCourseCurriculum({ data, havePurchased }: Props) {
                 </div>
             </div>
             <div className="2xl:hidden">
-                <MobileCurriculum havePurchased={havePurchased} data={data} courseId={Number(id)} />
+                <MobileCurriculum havePurchased={havePurchased} data={data?.data?.data || []} courseId={Number(id)} />
             </div>
         </div>
     );

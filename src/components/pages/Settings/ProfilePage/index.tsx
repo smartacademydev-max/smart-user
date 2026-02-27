@@ -117,7 +117,7 @@ export default function ProfilePageRoot() {
                     token: token,
                     user: {
                         ...user,
-                        ...response?.data?.user,
+                        ...response?.data,
                     },
                 }));
                 dispatch(

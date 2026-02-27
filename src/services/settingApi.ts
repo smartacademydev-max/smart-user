@@ -1,7 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import type { QueryParams } from "../types";
 import type { AppSettingProps, LinkedDeviceList } from "../types/setting";
-import type { GlobalResponse, UserResponse } from "../types/user";
+import type { GlobalResponse, User } from "../types/user";
 import { buildQueryParams } from "../utils/buildQueryParams";
 import { baseQuery } from "./baseQuery";
 
@@ -16,7 +16,7 @@ export const settingApi = createApi({
                 method: "GET",
             }),
         }),
-        updateProfile: builder.mutation<UserResponse, FormData>({
+        updateProfile: builder.mutation<GlobalResponse & { data: User }, FormData>({
             query: (body) => ({
                 url: `/me`,
                 method: "POST",
