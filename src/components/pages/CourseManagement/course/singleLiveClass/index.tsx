@@ -37,6 +37,8 @@ export default function SingleLiveClassRoot() {
     const { data: liveClassData, isLoading: isLoadingLiveClass } = useGetSingleLiveClassQuery({
         courseId: Number(courseId),
         liveId: Number(liveId),
+    }, {
+        skip: !courseId || !liveId,
     });
 
     const [generateSignature] = useGetMeetingSignatureMutation();
