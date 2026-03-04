@@ -1,3 +1,5 @@
+import type { PurchaseModuleTypes } from "../types/purchase";
+
 export const PATH = {
     AUTH: {
         LOGIN: {
@@ -42,13 +44,15 @@ export const PATH = {
                 ROOT: (courseId?: number, liveId?: number) => (courseId && liveId ? `/courses/${courseId}/live/${liveId}` : "/courses/:courseId/live/:liveId"),
             },
             PURCHASE: {
-                ROOT: (id?: number) => (id ? `/courses/${id}/purchase` : "/courses/:id/purchase"),
+                ROOT: (id?: number, moduleType?: PurchaseModuleTypes) => (id ? `/${moduleType}/${id}/purchase` : "/:type/:id/purchase"),
                 SUCCESS: {
-                    ROOT: "/courses/:id/purchase/success"
+                    ROOT: (id?: number, moduleType?: PurchaseModuleTypes) =>
+                        (id ? `/${moduleType}/${id}/purchase/success` : "/:type/:id/purchase/success"),
                 },
                 FAILURE: {
-                    ROOT: "/courses/:id/purchase/failure"
-                }
+                    ROOT: (id?: number, moduleType?: PurchaseModuleTypes) =>
+                        (id ? `/${moduleType}/${id}/purchase/failure` : "/:type/:id/purchase/failure"),
+                },
             },
             PLANS: {
                 ROOT: `/courses/:id/plans`

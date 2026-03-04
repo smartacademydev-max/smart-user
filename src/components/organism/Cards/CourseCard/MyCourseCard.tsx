@@ -83,7 +83,7 @@ export default function MyCourseCard({ course }: { course: CourseProps }) {
                 <Divider className="mt-3! mb-5!" />
                 <div className="flex justify-content-between items-center gap-4">
                     {!course?.user?.is_free_trial_valid && !course?.user?.has_purchased ?
-                        <Button fullWidth color="primary" variant="contained" onClick={() => navigate(PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.ROOT(Number(course.id)))}>
+                        <Button fullWidth color="primary" variant="contained" onClick={() => navigate(PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.ROOT(Number(course.id), "course"))}>
                             {t("messages.purchase_now")}
                         </Button>
                         : <>

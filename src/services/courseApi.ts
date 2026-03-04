@@ -3,7 +3,7 @@ import type { CategoryFilterParams, QueryParams } from "../types";
 import type { CourseList, CourseProps, courseTabType, CurriculumList, PlaylistListing } from "../types/course";
 import type { LiveClassList, LiveClassProps } from "../types/liveClass";
 import type { MediaList } from "../types/media";
-import type { EsewaPaymentPayload, PurchaseProps } from "../types/purchase";
+import type { EsewaPaymentPayload, PurchaseModuleTypes, PurchaseProps } from "../types/purchase";
 import type { TestList } from "../types/question";
 import type { TransactionsResponse } from "../types/transactions";
 import type { GlobalResponse } from "../types/user";
@@ -146,20 +146,26 @@ export const courseApi = createApi({
                 { type: "Media" as const, id: "LIST" },   // refetch all media
             ],
         }),
-        purchaseCourseWithEsewa: builder.mutation<GlobalResponse & { data: EsewaPaymentPayload }, { id: number }>({
-            query: ({ id }) => ({
-                url: `/course/${id}/payment/esewa`,
+        purchaseCourseWithEsewa: builder.mutation<GlobalResponse & { data: EsewaPaymentPayload }, { id: number, moduleType: PurchaseModuleTypes }>({
+            query: ({ id, moduleType }) => ({
+                url: `/payment/esewa`,
                 method: "POST",
+                body: {
+                    module_type: moduleType,
+                    module_id: id,
+                },
             }),
             invalidatesTags: (_result, _error, { id }) => [{ type: "Course" as const, id }],
         }),
-        purchaseWithKhalti: builder.mutation<GlobalResponse & { data: { payment_url: string; pidx: string; order_id: string } }, { id: number, type: string, amount: number }>({
-            query: ({ id, type, amount }) => ({
-                url: `/course/${id}/payment/khalti`,
+        purchaseWithKhalti: builder.mutation<GlobalResponse & { data: { payment_url: string; pidx: string; order_id: string } }, { id: number, type: string, amount: number, moduleType: PurchaseModuleTypes }>({
+            query: ({ id, type, amount, moduleType }) => ({
+                url: `/payment/khalti`,
                 method: "POST",
                 body: {
                     type,
-                    amount
+                    amount,
+                    module_id: id,
+                    module_type: moduleType
                 }
             }),
             invalidatesTags: (_result, _error, { id }) => [

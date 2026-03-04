@@ -126,7 +126,7 @@ export default function ExploreTestCard({ test, }: { test: TestProps; }) {
                         {markedPrice ? <Typography variant='caption' color='text.middle' className='text-nowrap'><del>{t("messages.npr")} {markedPrice}</del></Typography> : ""}
                         {sellingPrice ? <Typography variant='subtitle1' fontWeight={600} className='text-nowrap'>{t("messages.npr")} {sellingPrice}</Typography> : ""}
                     </div>
-                    <Button variant="contained" color="primary" onClick={() => navigate(PATH.TEST.PURCHASE.ROOT(test?.id ? Number(test.id) : null))}>
+                    <Button variant="contained" color="primary" onClick={() => navigate(PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.ROOT(test?.id ? Number(test.id) : undefined, "test"))}>
                         Buy Now
                     </Button>
                 </div>

@@ -21,7 +21,7 @@ const renderButton = (
                     fullWidth
                     className="primary__btn"
                     onClick={() => {
-                        navigate(PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.ROOT(Number(id)));
+                        navigate(PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.ROOT(Number(id), "course"));
                         dispatch(resetPurchase())
                     }}
                 >
