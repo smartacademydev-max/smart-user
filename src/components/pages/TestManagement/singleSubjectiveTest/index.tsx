@@ -327,7 +327,7 @@ export default function SingleSubjectiveTest() {
     }, [subjectiveAnswer?.data]);
 
     return (
-        <div className="single__subject__test__root">
+        <div className="single__subject__test__root h-full overflow-auto">
             <div className="test__header flex items-center justify-between">
                 <div className="title">
                     <Button

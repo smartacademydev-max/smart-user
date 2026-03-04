@@ -22,14 +22,14 @@ export const testApi = createApi({
         }),
         getTestById: builder.query<SingleMcqResponse, { courseId: number; testId: number }>({
             query: ({ courseId, testId }) => ({
-                url: `/course/${courseId}/test/${testId}`,
+                url: `/test/${testId}?course_id=${courseId}`,
                 method: "GET",
             }),
 
         }),
-        submitMcq: builder.mutation<McqSubmissionResponse, { body: McqSubmissionPayload, courseId: number; testId: number }>({
+        submitMcq: builder.mutation<McqSubmissionResponse, { body: McqSubmissionPayload, courseId?: number; testId: number }>({
             query: ({ courseId, testId, body }) => ({
-                url: `/course/${courseId}/test/${testId}/mcq`,
+                url: `/test/${testId}/mcq${courseId ? `?course_id=${courseId}` : ''}`,
                 method: "POST",
                 body
             })
@@ -39,9 +39,9 @@ export const testApi = createApi({
                 id: number;
                 url: string
             }[]
-        }, { courseId: number; testId: number, questionId: number, body: FormData }>({
+        }, { courseId?: number; testId: number, questionId: number, body: FormData }>({
             query: ({ courseId, testId, questionId, body }) => ({
-                url: `/course/${courseId}/test/${testId}/subjective/${questionId}/media`,
+                url: `/test/${testId}/subjective/${questionId}/media${courseId ? `?course_id=${courseId}` : ''}`,
                 method: "POST",
                 body: body
             })
@@ -51,9 +51,9 @@ export const testApi = createApi({
                 id: number;
                 url: string
             }[]
-        }, { courseId: number; testId: number, questionId: number }>({
+        }, { courseId?: number; testId: number, questionId: number }>({
             query: ({ courseId, testId, questionId }) => ({
-                url: `/course/${courseId}/test/${testId}/subjective/${questionId}/media`,
+                url: `/test/${testId}/subjective/${questionId}/media${courseId ? `?course_id=${courseId}` : ''}`,
                 method: "GET",
             })
         }),
@@ -64,32 +64,32 @@ export const testApi = createApi({
             }[]
         }, { courseId: number; testId: number, questionId: number, mediaId: number }>({
             query: ({ courseId, testId, questionId, mediaId }) => ({
-                url: `/course/${courseId}/test/${testId}/subjective/${questionId}/media/${mediaId}`,
+                url: `/test/${testId}/subjective/${questionId}/media/${mediaId}${courseId ? `?course_id=${courseId}` : ''}`,
                 method: "DELETE",
             })
         }),
         reviewTestResult: builder.query<{ data: McqReportData }, { courseId: number; testId: number }>({
             query: ({ courseId, testId }) => ({
-                url: `/course/${courseId}/test/${testId}/review`,
+                url: `/test/${testId}/review${courseId ? `?course_id=${courseId}` : ''}`,
                 method: "GET",
             })
         }),
         reviewSubjectiveTestResult: builder.query<{ data: any }, { courseId: number; testId: number }>({
             query: ({ courseId, testId }) => ({
-                url: `/course/${courseId}/test/${testId}/review/subjective`,
+                url: `/test/${testId}/review/subjective${courseId ? `?course_id=${courseId}` : ''}`,
                 method: "GET",
             })
         }),
         submitSubjectiveFinal: builder.mutation<GlobalResponse, { courseId: number; testId: number, questionId: number }>({
             query: ({ courseId, testId }) => ({
-                url: `/course/${courseId}/test/${testId}/subjective/submit`,
+                url: `/test/${testId}/subjective/submit${courseId ? `?course_id=${courseId}` : ''}`,
                 method: "POST",
             }),
             invalidatesTags: () => [{ id: "LIST", type: "Test" }]
         }),
         getTestResult: builder.query<GlobalResponse & McqSubmissionResponse, { courseId: number; testId: number }>({
             query: ({ courseId, testId }) => ({
-                url: `/course/${courseId}/test/${testId}/result`,
+                url: `/test/${testId}/result${courseId ? `?course_id=${courseId}` : ''}`,
                 method: "GET",
             })
         }),

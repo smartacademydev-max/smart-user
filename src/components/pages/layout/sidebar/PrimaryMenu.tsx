@@ -70,7 +70,7 @@ export default function PrimaryMenu() {
               <ListItemText primary={t("menus.exploreCourse")} />
             </ListItemButton>
           </ListItem>
-          {/* <ListItem disablePadding className="menu__item">
+          <ListItem disablePadding className="menu__item">
             <ListItemButton
               onClick={() => navigate(PATH.TEST.EXPLORE_TEST.ROOT)}
               className={isActive(PATH.TEST.EXPLORE_TEST.ROOT) ? "active" : ""}
@@ -80,7 +80,7 @@ export default function PrimaryMenu() {
               </ListItemIcon>
               <ListItemText primary={t("menus.exploreTest")} />
             </ListItemButton>
-          </ListItem> */}
+          </ListItem>
           <ListItem disablePadding className="menu__item">
             <ListItemButton
               onClick={() => navigate(PATH.COURSE_MANAGEMENT.COURSES.SAVED_COURSES.ROOT)}

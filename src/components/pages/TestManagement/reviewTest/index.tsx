@@ -80,7 +80,7 @@ export default function ReviewTestRoot() {
     const { data: result } = useGetTestResultQuery({ courseId: Number(courseId), testId: Number(testId) });
 
     return (
-        <div className="test__review__root">
+        <div className="test__review__root h-full overflow-auto">
             <Typography className="text2Xl mb-4!">{data?.data?.test_name}</Typography>
 
             <ul className="flex flex-wrap items-center gap-4">
