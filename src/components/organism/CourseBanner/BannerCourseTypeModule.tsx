@@ -56,7 +56,8 @@ export default function BannerCourseTypeModule({ courseType, courseExpiry, cours
                             reference_id: `UDAAN-INVOICE-${new Date()}-${user?.id}-${id}`,
                             is_trial: false,
                         },
-                        id: Number(id)
+                        id: Number(id),
+                        moduleType: "course"
                     });
                     dispatch(
                         showToast({
@@ -98,7 +99,8 @@ export default function BannerCourseTypeModule({ courseType, courseExpiry, cours
                                     reference_id: `RFF-FREE-${user?.id}-${id}`,
                                     is_trial: true,
                                 },
-                                id: Number(id)
+                                id: Number(id),
+                                moduleType: "course"
                             }).unwrap();
                             dispatch(
                                 showToast({

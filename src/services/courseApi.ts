@@ -133,11 +133,15 @@ export const courseApi = createApi({
                 method: "GET"
             })
         }),
-        purchaseCourse: builder.mutation<GlobalResponse, { body: PurchaseProps; id: number }>({
-            query: ({ body, id }) => ({
-                url: `/course/${id}/purchase`,
+        purchaseCourse: builder.mutation<GlobalResponse, { body: PurchaseProps; id: number, moduleType: PurchaseModuleTypes }>({
+            query: ({ body, id, moduleType }) => ({
+                url: `/purchase`,
                 method: "POST",
-                body,
+                body:{
+                    ...body,
+                    module_id: id,
+                    module_type: moduleType
+                },
             }),
             invalidatesTags: (_result, _error, { id }) => [
                 { type: "Course" as const, id },          // refetch this course

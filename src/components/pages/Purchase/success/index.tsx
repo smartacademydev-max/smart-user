@@ -1,27 +1,32 @@
 import { Button, CircularProgress } from '@mui/material';
 import { TickCircle } from 'iconsax-reactjs';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { usePurchaseCourseMutation } from '../../../../services/courseApi';
 import { showToast } from '../../../../slice/toastSlice';
 import { useAppDispatch } from '../../../../store/hook';
+import type { PurchaseModuleTypes } from '../../../../types/purchase';
 
 export default function PurchaseSuccess() {
     const navigate = useNavigate();
+    const hasVerified = useRef(false);
     const dispatch = useAppDispatch();
-    const { id } = useParams();
+    const { id, type } = useParams();
     const [searchParams] = useSearchParams();
     const [verifying, setVerifying] = useState(true);
     const [verified, setVerified] = useState(false);
 
     const [verifyPaymentAPI] = usePurchaseCourseMutation();
 
+
     useEffect(() => {
+        if (hasVerified.current) return;
+        hasVerified.current = true;
+
         const verifyPayment = async () => {
             try {
                 let backendPayload: any = null;
 
-                // ---------- ESEWA ----------
                 const encodedData = searchParams.get('data');
                 if (encodedData) {
                     const decodedData = JSON.parse(atob(encodedData));
@@ -31,9 +36,9 @@ export default function PurchaseSuccess() {
                     }
 
                     backendPayload = {
-                        payment_method: "esewa" as const,
+                        payment_method: "esewa",
                         transaction_amount: decodedData.total_amount,
-                        transaction_status: "success" as const,
+                        transaction_status: "success",
                         transaction_id: decodedData.transaction_uuid,
                         reference_id: decodedData.transaction_code,
                         is_trial: false,
@@ -42,7 +47,6 @@ export default function PurchaseSuccess() {
                     };
                 }
 
-                // ---------- KHALTI ----------
                 const pidx = searchParams.get('pidx');
                 if (!backendPayload && pidx) {
                     const status = searchParams.get('status');
@@ -52,11 +56,11 @@ export default function PurchaseSuccess() {
                     }
 
                     backendPayload = {
-                        payment_method: "khalti" as const,
+                        payment_method: "khalti",
                         transaction_amount: Number(
                             searchParams.get('total_amount') || searchParams.get('amount')
                         ),
-                        transaction_status: "success" as const,
+                        transaction_status: "success",
                         transaction_id:
                             searchParams.get('transaction_id') ||
                             searchParams.get('txnId') ||
@@ -67,7 +71,7 @@ export default function PurchaseSuccess() {
                         is_trial: false,
                         course_type: "expiry",
                         subscription_id: null
-                    }
+                    };
                 }
 
                 if (!backendPayload) {
@@ -76,23 +80,24 @@ export default function PurchaseSuccess() {
 
                 const response = await verifyPaymentAPI({
                     body: backendPayload,
-                    id: Number(id)
+                    id: Number(id),
+                    moduleType: type as PurchaseModuleTypes
                 }).unwrap();
 
                 setVerified(true);
+
                 dispatch(showToast({
-                    message: response?.message || "Payment successful! You now have access to the course.",
+                    message: response?.message || "Payment successful!",
                     severity: "success"
                 }));
+                navigate(`/${type}/${id}/purchase/success`, { replace: true });
 
             } catch (error: any) {
-                console.error('Payment verification error:', error);
-
                 dispatch(showToast({
                     message:
                         error?.data?.message ||
                         error?.message ||
-                        "Payment verification failed. Please contact support.",
+                        "Payment verification failed.",
                     severity: "error"
                 }));
 
@@ -105,7 +110,7 @@ export default function PurchaseSuccess() {
         };
 
         verifyPayment();
-    }, [searchParams, id, navigate, dispatch, verifyPaymentAPI]);
+    }, []);
 
 
     if (verifying) {
