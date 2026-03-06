@@ -75,7 +75,7 @@ export interface TestList {
 
 export interface SingleMcqResponse extends GlobalResponse {
     data: QuestionProps[];
-    overview: {
+    overview: TestProps & {
         name: string;
         time: number;
         test_type: QuestionTypeProps;

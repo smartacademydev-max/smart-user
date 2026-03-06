@@ -4,6 +4,7 @@ import { useFormik } from 'formik';
 import { ArrowLeft } from 'iconsax-reactjs';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGetCourseByIdQuery, usePurchaseCourseWithEsewaMutation, usePurchaseWithKhaltiMutation } from "../../../services/courseApi";
+import { useGetTestByIdQuery } from '../../../services/testApi';
 import { showToast } from '../../../slice/toastSlice';
 import { useAppDispatch } from '../../../store/hook';
 import type { PaymentOption, PurchaseFormValues, PurchaseModuleTypes } from "../../../types/purchase";
@@ -43,11 +44,25 @@ export default function PurchaseLayout() {
         { id: 2, label: "Khalti", value: "khalti", image: "/khalti.svg" },
     ];
 
-    const { data } = useGetCourseByIdQuery({ id: Number(id) }, { skip: !id });
+    const { data } = useGetCourseByIdQuery({ id: Number(id) }, { skip: !id || type !== "course" });
+    const { data: test } = useGetTestByIdQuery({ testId: Number(id) }, { skip: !id || type !== "test" })
     const [payViaEsewa, { isLoading: payingViaEsewa }] = usePurchaseCourseWithEsewaMutation();
     const [payViaKhalti, { isLoading: isKhaltiLoading }] = usePurchaseWithKhaltiMutation();
 
-    const price = Number(data?.data?.sale_price) || 0;
+    let price = 0;
+
+    switch (type) {
+        case "course":
+            price = Number(data?.data?.sale_price) || 0;
+            break;
+
+        case "test":
+            price = Number(test?.overview?.sale_price) || 0;
+            break;
+
+        default:
+            price = 0;
+    }
     // const vat = price * 0.13;
     const vat = 0;
     const total = price + vat;

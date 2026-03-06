@@ -20,12 +20,11 @@ export const testApi = createApi({
             }),
             providesTags: (_result, _error, { id }) => [{ type: "Test" as const, id }],
         }),
-        getTestById: builder.query<SingleMcqResponse, { courseId: number; testId: number }>({
+        getTestById: builder.query<SingleMcqResponse, { courseId?: number; testId: number }>({
             query: ({ courseId, testId }) => ({
-                url: `/test/${testId}?course_id=${courseId}`,
+                url: `/test/${testId}${courseId ? `?course_id=${courseId}` : ''}`,
                 method: "GET",
             }),
-
         }),
         submitMcq: builder.mutation<McqSubmissionResponse, { body: McqSubmissionPayload, courseId?: number; testId: number }>({
             query: ({ courseId, testId, body }) => ({
