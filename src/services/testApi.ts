@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import type { QueryParams } from "../types";
-import type { McqReportData, McqSubmissionPayload, McqSubmissionResponse, QuestionTypeProps, SingleMcqResponse, TestList } from "../types/question";
+import type { McqReportData, McqSubmissionPayload, McqSubmissionResponse, QuestionTypeProps, SingleMcqResponse, TestList, TestProps } from "../types/question";
 import type { GlobalResponse } from "../types/user";
 import { buildQueryParams } from "../utils/buildQueryParams";
 import { baseQuery } from "./baseQuery";
@@ -10,11 +10,12 @@ export const testApi = createApi({
     baseQuery: baseQuery,
     tagTypes: ["Test"],
     endpoints: (builder) => ({
-        getUserAllTest: builder.query<TestList, QueryParams & { id?: number }>({
-            query: ({ id, pageIndex, pageSize, search, startDate, endDate }) => ({
+        getUserAllTest: builder.query<TestList, QueryParams & { id?: number, status?: string }>({
+            query: ({ id, pageIndex, pageSize, search, startDate, endDate, status }) => ({
                 url: `my-test?${buildQueryParams({
                     page: pageIndex, page_size: pageSize, search, course_id: id, start_date: startDate,
                     end_date: endDate,
+                    status
                 })}`,
                 method: "GET",
             }),
@@ -104,6 +105,14 @@ export const testApi = createApi({
                 method: "GET",
             }),
         }),
+        getTestOverview: builder.query<GlobalResponse & {
+            data: TestProps
+        }, { id?: number | null }>({
+            query: ({ id }) => ({
+                url: `/test/${id}/overview`,
+                method: "GET",
+            }),
+        }),
         getAllIndividualTest: builder.query<TestList, QueryParams & { type: QuestionTypeProps }>({
             query: ({ pageIndex, pageSize, search, type }) => ({
                 url: `/test?${buildQueryParams({
@@ -130,5 +139,6 @@ export const {
     useSubmitSubjectiveFinalMutation,
     useGetTestResultQuery,
     useGetTestSampleQuery,
-    useGetAllIndividualTestQuery
+    useGetAllIndividualTestQuery,
+    useGetTestOverviewQuery
 } = testApi;

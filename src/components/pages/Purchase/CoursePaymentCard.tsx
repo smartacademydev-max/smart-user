@@ -22,7 +22,7 @@ export default function CoursePaymentCard({ price, vat, total, isLoading }: Prop
             <div className="flex flex-col gap-2 5">
 
                 <div className="grid grid-cols-2">
-                    <Typography variant="subtitle1" color="text.middle">Course Price:</Typography>
+                    <Typography variant="subtitle1" color="text.middle">Model Price:</Typography>
                     <Typography variant="subtitle1" color="text.dark" className="text-end font-medium">
                         NRs. {price.toLocaleString()}
                     </Typography>

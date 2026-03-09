@@ -8,6 +8,7 @@ import { useGetUserAllTestQuery } from "../../../../services/testApi";
 import type { QueryParams } from "../../../../types";
 import type { TestProps } from "../../../../types/question";
 import { EmptyList } from "../../../molecules/EmptyList";
+import TabController from "../../../molecules/TabController";
 import TestCard from "../../../organism/Cards/TestCard";
 import PageHeader from "../../../organism/PageHeader";
 import TableFilter from "../../../organism/TableFilter";
@@ -33,7 +34,7 @@ export default function AlltestList() {
 
     const [qp, _setQp] = useState<QueryParams>({
         pageIndex: 1,
-        pageSize: 10,
+        pageSize: 12,
         search: '',
     });
     const [search, setSearch] = useState<string>("");
@@ -42,13 +43,14 @@ export default function AlltestList() {
         pageIndex: 1,
         pageSize: 15,
     });
+    const [activeTab, setActiveTab] = useState("");
     const [allTest, setAllTest] = useState<TestProps[]>([]);
 
     const { data: myCourse, isLoading } = useGetUserPurchasedCourseQuery(qp);
     const myCourses = myCourse?.data?.data || [];
 
     const { data: tests, isLoading: loadingTest } = useGetUserAllTestQuery(
-        { ...qpTest },
+        { ...qpTest, status: activeTab },
     );
 
     const selectedCourse = myCourses.find(course => course.id === selectedCourseId);
@@ -113,7 +115,7 @@ export default function AlltestList() {
         );
     }
 
-    if (!myCourses.length) {
+    if (!isLoading && !myCourses.length) {
         return (
             <EmptyList
                 title="You Haven't Purchased any course"
@@ -127,12 +129,28 @@ export default function AlltestList() {
     }
     return (
         <div className="all__note__listing h-full flex flex-col jsutify-between">
-            <div className="mb-6">
+            <div className="flex flex-col mb-4">
                 <PageHeader
                     breadcrumb={[{
                         title: t("messages.all_test")
                     }]}
                 />
+                <div className="mb-4">
+                    <TabController
+                        options={[
+                            { label: "All", value: "" },
+                            { label: "Individual", value: "individual_test" }
+                        ]}
+                        setActiveTab={(newValue) => {
+                            setActiveTab(newValue), setQpTest({
+                                ...qpTest,
+                                pageIndex: 1
+                            })
+                        }}
+                        currentActive={activeTab}
+                    />
+                </div>
+
                 <TableFilter
                     search={search || ""}
                     setSearch={(search) => setSearch(search)}

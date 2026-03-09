@@ -97,6 +97,30 @@ export const PATH = {
         EXPLORE_TEST: {
             ROOT: "/explore-test"
         },
+        VIEW_TEST: {
+            ROOT: ({ testId }: { testId?: number }) =>
+                testId
+                    ? `/test/${testId}`
+                    : `/test/:testId`,
+            REVIEW_TEST: {
+                ROOT: ({ testId }: { testId?: number }) =>
+                    testId
+                        ? `/test/${testId}/review`
+                        : `/test/:testId/review`,
+                REVIEW_SUBJECTIVE_TEST: {
+                    ROOT: ({ testId }: { testId?: number }) =>
+                        testId
+                            ? `/test/${testId}/review/subjective`
+                            : `/test/:testId/review/subjective`,
+                }
+            },
+            SUBJECTIVE_TEST: {
+                ROOT: ({ testId }: { testId?: number }) =>
+                    testId
+                        ? `/test/${testId}/subjective`
+                        : `/test/:testId/subjective`,
+            }
+        },
     },
     VIDEOS: {
         ROOT: "/videos",

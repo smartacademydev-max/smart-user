@@ -137,6 +137,10 @@ const router = createBrowserRouter([
               <TestManagementRoot />,
             children: [
               { path: PATH.TEST.ROOT, element: <AllTestRoot /> },
+              { path: PATH.TEST.VIEW_TEST.ROOT({}), element: <SingleTestRoot /> },
+              { path: PATH.TEST.VIEW_TEST.SUBJECTIVE_TEST.ROOT({}), element: <SingleSubjectiveTest /> },
+              { path: PATH.TEST.VIEW_TEST.REVIEW_TEST.ROOT({}), element: <ReviewTestRoot /> },
+              { path: PATH.TEST.VIEW_TEST.REVIEW_TEST.REVIEW_SUBJECTIVE_TEST.ROOT({}), element: <ReviewSubjectTestRoot /> },
             ]
           },
           { path: PATH.TEST.EXPLORE_TEST.ROOT, element: <ExploreAllTest /> },

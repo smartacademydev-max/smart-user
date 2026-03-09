@@ -117,7 +117,7 @@ export default function SingleTestRoot() {
         isFetching,
     } = useGetTestByIdQuery(
         { courseId: numericCourseId, testId: numericTestId },
-        { skip: !numericCourseId || !numericTestId }
+        { skip: !numericTestId }
     );
 
     const [submitMcq, { isLoading: submitting }] =

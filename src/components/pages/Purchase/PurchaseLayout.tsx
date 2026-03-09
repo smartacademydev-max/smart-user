@@ -4,7 +4,7 @@ import { useFormik } from 'formik';
 import { ArrowLeft } from 'iconsax-reactjs';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGetCourseByIdQuery, usePurchaseCourseWithEsewaMutation, usePurchaseWithKhaltiMutation } from "../../../services/courseApi";
-import { useGetTestByIdQuery } from '../../../services/testApi';
+import { useGetTestOverviewQuery } from '../../../services/testApi';
 import { showToast } from '../../../slice/toastSlice';
 import { useAppDispatch } from '../../../store/hook';
 import type { PaymentOption, PurchaseFormValues, PurchaseModuleTypes } from "../../../types/purchase";
@@ -45,7 +45,7 @@ export default function PurchaseLayout() {
     ];
 
     const { data } = useGetCourseByIdQuery({ id: Number(id) }, { skip: !id || type !== "course" });
-    const { data: test } = useGetTestByIdQuery({ testId: Number(id) }, { skip: !id || type !== "test" })
+    const { data: test } = useGetTestOverviewQuery({ id: Number(id) }, { skip: !id || type !== "test" })
     const [payViaEsewa, { isLoading: payingViaEsewa }] = usePurchaseCourseWithEsewaMutation();
     const [payViaKhalti, { isLoading: isKhaltiLoading }] = usePurchaseWithKhaltiMutation();
 
@@ -57,7 +57,7 @@ export default function PurchaseLayout() {
             break;
 
         case "test":
-            price = Number(test?.overview?.sale_price) || 0;
+            price = Number(test?.data?.sale_price) || 0;
             break;
 
         default:
