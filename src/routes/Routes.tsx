@@ -45,7 +45,12 @@ import ProfilePage from "../components/pages/Settings/ProfilePage";
 import SupportRoot from "../components/pages/Support";
 import TestManagementRoot from "../components/pages/TestManagement";
 import AllTestRoot from "../components/pages/TestManagement/allTest";
-import ExploreAllTest from "../components/pages/TestManagement/exploreTest";
+import ExploreTestRoot from "../components/pages/TestManagement/exploreTest";
+import ExploreAllTest from "../components/pages/TestManagement/exploreTest/ExploreAllTest";
+import ExploreBundle from "../components/pages/TestManagement/exploreTest/ExploreBundle";
+import ExploreIndividualTest from "../components/pages/TestManagement/exploreTest/ExploreIndividualTest";
+import ExploreOmr from "../components/pages/TestManagement/exploreTest/ExploreOmr";
+import SingleBundle from "../components/pages/TestManagement/exploreTest/SingleBundle";
 import ReviewTestRoot from "../components/pages/TestManagement/reviewTest";
 import ReviewSubjectTestRoot from "../components/pages/TestManagement/reviewTest/subjective";
 import SingleSubjectiveTest from "../components/pages/TestManagement/singleSubjectiveTest";
@@ -130,7 +135,6 @@ const router = createBrowserRouter([
               { path: PATH.COURSE_MANAGEMENT.COURSES.SAVED_COURSES.ROOT, element: <SavedCourse /> },
             ],
           },
-          // COURSE OUTSIDE LAYOUT
 
           {
             element:
@@ -143,7 +147,16 @@ const router = createBrowserRouter([
               { path: PATH.TEST.VIEW_TEST.REVIEW_TEST.REVIEW_SUBJECTIVE_TEST.ROOT({}), element: <ReviewSubjectTestRoot /> },
             ]
           },
-          { path: PATH.TEST.EXPLORE_TEST.ROOT, element: <ExploreAllTest /> },
+          {
+            element: <ExploreTestRoot />,
+            children: [
+              { path: PATH.TEST.EXPLORE_TEST.ROOT, element: <ExploreAllTest /> },
+              { path: PATH.TEST.EXPLORE_TEST.INDIVIDUAl_TEST.ROOT, element: <ExploreIndividualTest /> },
+              { path: PATH.TEST.EXPLORE_TEST.BUNDLE_TEST.ROOT, element: <ExploreBundle /> },
+              { path: PATH.TEST.EXPLORE_TEST.BUNDLE_TEST.VIEW_BUNDLE.ROOT(), element: <SingleBundle /> },
+              { path: PATH.TEST.EXPLORE_TEST.OMR.ROOT, element: <ExploreOmr /> },
+            ]
+          },
           {
             element:
               <PurchaseRoot />,

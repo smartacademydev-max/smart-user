@@ -1,28 +1,11 @@
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useGetAllIndividualTestQuery } from "../../../../services/testApi";
-import type { QuestionTypeProps } from "../../../../types/question";
-import { EmptyList } from "../../../molecules/EmptyList";
-import TablePagination from "../../../molecules/Pagination";
-import TabController from "../../../molecules/TabController";
-import ExploreTestCard from "../../../organism/Cards/ExploreTestCard";
+import { Outlet } from "react-router-dom";
+import { PATH } from "../../../../routes/PATH";
+import LinkController from "../../../molecules/TabController/LinkController";
 import PageHeader from "../../../organism/PageHeader";
-import TableFilter from "../../../organism/TableFilter";
 
-export default function ExploreAllTest() {
+export default function ExploreTestRoot() {
     const { t } = useTranslation();
-    const [activeTab, setActiveTab] = useState<QuestionTypeProps>("");
-
-    const [search, setSearch] = useState("")
-    const [qp, setQp] = useState({
-        pageIndex: 1,
-        pageSize: 12
-    })
-
-    const { data } = useGetAllIndividualTestQuery({
-        ...qp, search: search, type: activeTab
-
-    });
 
     return (
         <div className="explore__test__root h-full overflow-auto">
@@ -33,38 +16,19 @@ export default function ExploreAllTest() {
                     ]}
                 />
                 <div className="flex flex-col gap-4">
-                    <TabController
-                        setActiveTab={(newValue) => setActiveTab(newValue)}
-                        currentActive={activeTab}
+                    <LinkController
                         options={[
-                            { label: "All", value: "" },
-                            { label: "Subjective", value: "subjective" },
-                            { label: "MCQs", value: "mcq" },
-                            { label: "OMR", value: "omr" },
+                            { label: "All", value: PATH.TEST.EXPLORE_TEST.ROOT },
+                            { label: "Individual Test", value: PATH.TEST.EXPLORE_TEST.INDIVIDUAl_TEST.ROOT },
+                            { label: "Bundle Test", value: PATH.TEST.EXPLORE_TEST.BUNDLE_TEST.ROOT },
+                            { label: "OMR", value: PATH.TEST.EXPLORE_TEST.OMR.ROOT },
                         ]}
                     />
-                    <TableFilter search={search} setSearch={setSearch} />
+
                 </div>
             </div>
-            {data && data?.data?.data?.length > 0 ? <>
-                <div className="flex flex-col gap-4 md:grid grid-cols-2 xl:grid-cols-3 lg:gap-6 mt-4">
-                    {data?.data?.data?.map((test) => (
-                        <ExploreTestCard
-                            test={test}
-                            key={test.id}
-                        />
-                    ))}
-                </div>
-                <TablePagination
-                    qp={qp}
-                    setQp={setQp}
-                    totalPages={data?.data?.pagination?.total_pages}
-                />
-            </>
-                : <EmptyList
-                    title="No Test Found"
-                    description="There are no tests available for the selected course."
-                />}
+
+            <Outlet />
         </div>
     )
 }

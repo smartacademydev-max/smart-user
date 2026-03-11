@@ -95,7 +95,19 @@ export const PATH = {
     TEST: {
         ROOT: "/test",
         EXPLORE_TEST: {
-            ROOT: "/explore-test"
+            ROOT: "/explore-test",
+            INDIVIDUAl_TEST: {
+                ROOT: "/explore-test/individual-test"
+            },
+            BUNDLE_TEST: {
+                ROOT: "/explore-test/bundle-test",
+                VIEW_BUNDLE: {
+                    ROOT: (id?: number) => (id ? `/explore-test/bundle-test/${id}` : "/explore-test/bundle-test/:id")
+                }
+            },
+            OMR: {
+                ROOT: "/explore-test/omr-test"
+            }
         },
         VIEW_TEST: {
             ROOT: ({ testId }: { testId?: number }) =>

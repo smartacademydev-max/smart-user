@@ -1,5 +1,6 @@
 {
     "messages": {
+        "sets": "Sets",
         "enrolled_courses": "Enrolled Courses",
         "transaction_information": "Transaction Information",
         "download_admin_card": "Download Admin Card",
@@ -90,6 +91,7 @@
     },
     "actions": {
         "cancel": "Cancel",
-        "view_all": "View All"
+        "view_all": "View All",
+        "view": "View"
     }
 }

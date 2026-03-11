@@ -1,4 +1,5 @@
 import type { Pagination } from ".";
+import type { DiscountTypeProps } from "./course";
 import type { GlobalResponse } from "./user";
 
 export type QuestionTypeProps = "mcq" | "subjective" | "omr" | ""
@@ -128,4 +129,36 @@ export interface McqReportData {
     correct_answers: McqReportAnswerItem[];
     incorrect_answers: McqReportAnswerItem[];
     skipped_answers: McqReportAnswerItem[];
+}
+
+export type TestTypeProps = "subjective" | "mcq"
+
+
+export interface SetProps {
+    id?: number;
+    name: string;
+    description: string;
+    price: string;
+    discount_type: DiscountTypeProps;
+    discount: string;
+    set_count: string;
+    test_ids: number[];
+    thumbnail: File | null;
+    thumbnail_url: string;
+    status: "published" | "draft";
+    marked_price?: string;
+    sale_price?: string;
+    sets: {
+        objective: number;
+        subjective: number;
+        omr: number;
+    }
+}
+
+
+export interface SetList extends GlobalResponse {
+    data: {
+        data: SetProps[];
+        pagination: Pagination
+    }
 }

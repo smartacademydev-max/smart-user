@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import type { QueryParams } from "../types";
-import type { McqReportData, McqSubmissionPayload, McqSubmissionResponse, QuestionTypeProps, SingleMcqResponse, TestList, TestProps } from "../types/question";
+import type { CategoryFilterParams, QueryParams } from "../types";
+import type { McqReportData, McqSubmissionPayload, McqSubmissionResponse, QuestionTypeProps, SetList, SetProps, SingleMcqResponse, TestList, TestProps } from "../types/question";
 import type { GlobalResponse } from "../types/user";
 import { buildQueryParams } from "../utils/buildQueryParams";
 import { baseQuery } from "./baseQuery";
@@ -8,7 +8,7 @@ import { baseQuery } from "./baseQuery";
 export const testApi = createApi({
     reducerPath: "testApi",
     baseQuery: baseQuery,
-    tagTypes: ["Test"],
+    tagTypes: ["Test", "Set"],
     endpoints: (builder) => ({
         getUserAllTest: builder.query<TestList, QueryParams & { id?: number, status?: string }>({
             query: ({ id, pageIndex, pageSize, search, startDate, endDate, status }) => ({
@@ -113,17 +113,34 @@ export const testApi = createApi({
                 method: "GET",
             }),
         }),
-        getAllIndividualTest: builder.query<TestList, QueryParams & { type: QuestionTypeProps }>({
-            query: ({ pageIndex, pageSize, search, type }) => ({
+        getAllIndividualTest: builder.query<TestList, QueryParams>({
+            query: ({ pageIndex, pageSize, search }) => ({
                 url: `/test?${buildQueryParams({
                     page: pageIndex,
                     page_size: pageSize,
-                    search: search,
-                    type: type
+                    search: search
                 })}`
             }),
             providesTags: [{ type: "Test", id: "LIST" }]
-        })
+        }),
+        getAllBundle: builder.query<SetList, QueryParams & { type?: QuestionTypeProps; days?: number | null; categoryFilter?: CategoryFilterParams; }>({
+            query: ({ pageIndex, pageSize, search }) => ({
+                url: `/bundle?${buildQueryParams({
+                    page: pageIndex,
+                    page_size: pageSize,
+                    search
+                })}`,
+                method: "GET",
+            }),
+            providesTags: [{ type: "Set", id: "LIST" }]
+        }),
+        getBundleById: builder.query<{ data: SetProps }, { id: number }>({
+            query: ({ id }) => ({
+                url: `/bundle/${id}`,
+                method: "GET"
+            }),
+            providesTags: (_result, _error, { id }) => [{ type: "Set", id }]
+        }),
     })
 })
 
@@ -140,5 +157,7 @@ export const {
     useGetTestResultQuery,
     useGetTestSampleQuery,
     useGetAllIndividualTestQuery,
-    useGetTestOverviewQuery
+    useGetTestOverviewQuery,
+    useGetAllBundleQuery,
+    useGetBundleByIdQuery
 } = testApi;
