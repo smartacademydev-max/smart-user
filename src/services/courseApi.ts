@@ -137,17 +137,17 @@ export const courseApi = createApi({
             query: ({ body, id, moduleType }) => ({
                 url: `/purchase`,
                 method: "POST",
-                body:{
+                body: {
                     ...body,
                     module_id: id,
                     module_type: moduleType
                 },
             }),
             invalidatesTags: (_result, _error, { id }) => [
-                { type: "Course" as const, id },          // refetch this course
-                { type: "Course" as const, id: "LIST" },  // refetch course list
-                { type: "Curriculum" as const, id: "LIST" }, // refetch all curriculum
-                { type: "Media" as const, id: "LIST" },   // refetch all media
+                { type: "Course" as const, id },
+                { type: "Course" as const, id: "LIST" },
+                { type: "Curriculum" as const, id: "LIST" },
+                { type: "Media" as const, id: "LIST" },
             ],
         }),
         purchaseCourseWithEsewa: builder.mutation<GlobalResponse & { data: EsewaPaymentPayload }, { id: number, moduleType: PurchaseModuleTypes }>({

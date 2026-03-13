@@ -50,7 +50,7 @@ export default function SingleSubjectiveTest() {
 
     const { data } = useGetTestByIdQuery(
         { courseId: Number(courseId), testId: Number(testId) },
-        { skip: !courseId || !testId }
+        { skip: !testId }
     );
 
     const { data: subjectiveAnswer, refetch: refetchAnswer } = useGetSubjectiveAnswerQuery(
@@ -210,6 +210,7 @@ export default function SingleSubjectiveTest() {
     const handleFileUpload = async (files: File[]) => {
         if (!files.length || !currentQuestion) return;
 
+        console.log("file is uploaded", { files })
         try {
             const formData = new FormData();
             files.forEach((file, index) => {

@@ -53,7 +53,7 @@ export default function NotificationModal() {
         } else {
             setItems((prev) => [...prev, ...notifications]);
         }
-    }, [notifications, qp.pageIndex]);
+    }, [data, qp.pageIndex]);
 
     const fetchMore = () => {
         if (!pagination) return;

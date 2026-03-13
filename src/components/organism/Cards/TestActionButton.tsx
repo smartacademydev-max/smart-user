@@ -57,31 +57,58 @@ const TestActionButton = ({ test, havePurchased, id }: { test: TestProps, status
             return;
         }
 
-        const path =
-            test.test_type === "mcq"
-                ? PATH.COURSE_MANAGEMENT.COURSES.VIEW_TEST.ROOT({
-                    courseId: Number(id),
-                    testId: Number(test?.id),
-                })
-                : PATH.COURSE_MANAGEMENT.COURSES.VIEW_TEST.SUBJECTIVE_TEST.ROOT({
-                    courseId: Number(id),
-                    testId: Number(test?.id),
-                });
+        let path;
+
+        if (id) {
+            path =
+                test.test_type === "mcq"
+                    ? PATH.COURSE_MANAGEMENT.COURSES.VIEW_TEST.ROOT({
+                        courseId: Number(id),
+                        testId: Number(test?.id),
+                    })
+                    : PATH.COURSE_MANAGEMENT.COURSES.VIEW_TEST.SUBJECTIVE_TEST.ROOT({
+                        courseId: Number(id),
+                        testId: Number(test?.id),
+                    });
+        } else {
+            // standalone test
+            path =
+                test.test_type === "mcq"
+                    ? PATH.TEST.VIEW_TEST.ROOT({
+                        testId: Number(test?.id),
+                    })
+                    : PATH.TEST.VIEW_TEST.SUBJECTIVE_TEST.ROOT({
+                        testId: Number(test?.id),
+                    });
+        }
 
         navigate(path);
     };
 
     const handleViewResult = () => {
-        const path =
-            test.test_type === "mcq"
-                ? PATH.COURSE_MANAGEMENT.COURSES.VIEW_TEST.REVIEW_TEST.ROOT({
-                    courseId: Number(id),
-                    testId: Number(test?.id),
-                })
-                : PATH.COURSE_MANAGEMENT.COURSES.VIEW_TEST.REVIEW_TEST.REVIEW_SUBJECTIVE_TEST.ROOT({
-                    courseId: Number(id),
-                    testId: Number(test?.id),
-                });
+        let path;
+
+        if (id) {
+            path =
+                test.test_type === "mcq"
+                    ? PATH.COURSE_MANAGEMENT.COURSES.VIEW_TEST.REVIEW_TEST.ROOT({
+                        courseId: Number(id),
+                        testId: Number(test?.id),
+                    })
+                    : PATH.COURSE_MANAGEMENT.COURSES.VIEW_TEST.REVIEW_TEST.REVIEW_SUBJECTIVE_TEST.ROOT({
+                        courseId: Number(id),
+                        testId: Number(test?.id),
+                    });
+        } else {
+            path =
+                test.test_type === "mcq"
+                    ? PATH.TEST.VIEW_TEST.REVIEW_TEST.ROOT({
+                        testId: Number(test?.id),
+                    })
+                    : PATH.TEST.VIEW_TEST.REVIEW_TEST.REVIEW_SUBJECTIVE_TEST.ROOT({
+                        testId: Number(test?.id),
+                    });
+        }
 
         navigate(path);
     };

@@ -1,4 +1,6 @@
-import { Box, Divider, Typography, useTheme } from '@mui/material';
+import { Download } from '@mui/icons-material';
+import { Box, Divider, IconButton, Typography, useTheme } from '@mui/material';
+import { TickCircle } from 'iconsax-reactjs';
 import { useParams } from 'react-router-dom';
 import { setPurchase } from '../../../slice/purchaseSlice';
 import { setReadingScreen, type ReadingScreenProps } from '../../../slice/ReadingScreenSlice';
@@ -124,16 +126,26 @@ export default function MediaCard({
             onClick={handleMediaClick}
         >
             <Box
-                className="min-w-12.5 h-12.5 rounded-md flex items-center justify-center"
+                className="min-w-12.5 h-12.5 rounded-md flex items-center justify-center relative"
                 sx={{ background: bgColor }}
             >
                 {config.icon}
+                {media.has_seen ? <Box className="absolute top-0 right-0" sx={{
+                    color: (theme) => theme.palette.success.main
+                }}>
+                    <TickCircle variant='Bold' size={12} />
+                </Box> : ""}
             </Box>
 
             <div className="content w-full">
-                <Typography variant='subtitle2' fontWeight={500} >
-                    {media.file_name}
-                </Typography>
+                <div className="flex justify-between items-stat">
+                    <Typography variant='subtitle2' fontWeight={500} >
+                        {media.file_name}
+                    </Typography>
+                    {media.is_downloadable ? <IconButton className='p-0! max-w-fit!' color='primary' >
+                        <Download fontSize='small' />
+                    </IconButton> : ""}
+                </div>
 
                 <Divider className='my-1.5!' />
 
@@ -141,6 +153,6 @@ export default function MediaCard({
                     {`${formatFileSize(media.size)}`}
                 </Typography>
             </div>
-        </Box>
+        </Box >
     );
 }
