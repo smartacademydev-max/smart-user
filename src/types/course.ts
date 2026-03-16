@@ -80,7 +80,7 @@ export interface CourseProps {
     started_from?: string;
     can_take_free_trial: boolean;
     course_completion_status: "completed" | "ongoing" | "not_started";
-    
+
 }
 
 export interface CourseList extends GlobalResponse {
@@ -132,6 +132,8 @@ export interface CurriculumMediaProps {
     url: string;
     size: number;
     type: CurriculumMediaType;
+    has_seen?: boolean;
+    is_downloadable?: boolean;
 }
 
 // Base props for all curriculum items
