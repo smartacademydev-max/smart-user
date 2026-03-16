@@ -69,9 +69,11 @@ export default function ReadingDialog() {
     const theme = useTheme();
     const dispatch = useAppDispatch();
 
-    const { open, type, media, title, isYouTube, mediaId, courseId, playlistId } = useAppSelector(
+    const { open, type, media, title, isYouTube, mediaId, courseId, playlistId, isDownloadable } = useAppSelector(
         state => state.readScreen
     );
+
+    console.log(isDownloadable)
 
     const playerRef = useRef<PlyrInstance | null>(null);
     const containerRef = useRef<HTMLDivElement | null>(null);
@@ -350,74 +352,9 @@ export default function ReadingDialog() {
                             iv_load_policy: 3,
                             cc_load_policy: 0,
                             playsinline: 1,
-                            // ❌ REMOVED: sho
-                            // winfo (deprecated)
-                            // ❌ REMOVED: modestbranding (deprecated)
-                            // ❌ REMOVED: controls: 0 (Plyr handles this)
-                            // ❌ REMOVED: disablekb (Plyr handles this)
-                            // ❌ REMOVED: fs (Plyr handles this)
-                            // ❌ REMOVED: autoplay (already set at top level)
-                            // ❌ REMOVED: origin (causes bot detection issues)
-                            // origin: window.location.origin
+
                         },
                     };
-
-
-                    // const youtubeEmbedUrl = `https://www.youtube-nocookie.com/embed/${mediaId}?rel=0`;
-
-                    // return (
-                    //     <div
-                    //         ref={containerRef}
-                    //         style={{
-                    //             position: "relative",
-                    //             width: "100%",
-                    //             paddingTop: "56.25%",
-                    //             backgroundColor: "#000",
-                    //             borderRadius: "8px",
-                    //             overflow: "hidden",
-                    //         }}
-                    //     >
-                    //         <iframe
-                    //             src={youtubeEmbedUrl}
-                    //             title="YouTube video player"
-                    //             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                    //             allowFullScreen
-                    //             style={{
-                    //                 position: "absolute",
-                    //                 top: 0,
-                    //                 left: 0,
-                    //                 width: "100%",
-                    //                 height: "100%",
-                    //                 border: "none",
-                    //             }}
-                    //         />
-                    //         <div
-                    //             style={{
-                    //                 position: "absolute",
-                    //                 width: "300px",
-                    //                 height: "40px",
-                    //                 bottom: 0,
-                    //                 right: 0,
-                    //                 pointerEvents: "auto",
-                    //                 zIndex: 10,
-                    //             }}
-                    //         />
-                    //         <Box
-                    //             sx={{
-                    //                 position: "absolute",
-                    //                 width: "100%",
-                    //                 height: { xs: "40px", lg: "100px" },
-                    //                 top: 0,
-                    //                 right: 0,
-                    //                 left: 0,
-                    //                 pointerEvents: "auto",
-                    //                 zIndex: 10,
-                    //             }}
-
-                    //         />
-
-                    //     </div>
-                    // );
 
 
                     return (
@@ -445,16 +382,9 @@ export default function ReadingDialog() {
 
             case 'temp_notes':
                 return mediaUrl ? (
-                    // <iframe
-                    //     className='h-full'
-                    //     src={`https://docs.google.com/viewer?url=${encodeURIComponent(mediaUrl)}&embedded=true`}
-                    //     style={{ width: '100%', border: 'none' }}
-                    // />
-
-                    // <DocumentReader fileUrl={mediaUrl} />
                     <iframe
                         className='h-full'
-                        src={`${mediaUrl}`}
+                        src={`${mediaUrl}${isDownloadable ? "" : "#toolbar=0&navpanes=0&scrollbar=0&statusbar=0&view=FitH"}`}
                         style={{ width: '100%', border: 'none' }}
                     />
                 ) : (

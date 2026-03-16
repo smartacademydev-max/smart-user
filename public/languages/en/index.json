@@ -1,5 +1,9 @@
 {
     "messages": {
+        "published_date": "Published Date",
+        "total_tests": "Total Tests",
+        "off": "Off",
+        "price": "Price",
         "sets": "Sets",
         "enrolled_courses": "Enrolled Courses",
         "transaction_information": "Transaction Information",
@@ -61,6 +65,10 @@
         "view_details": "View Details",
         "views": "Views",
         "notice": "Notice",
+        "my_test": "My Test",
+        "course_based_tests": "Course Based Tests",
+        "individually_purchased_tests": "Individually Purchased Tests",
+        "test_bundle": "Test Bundle",
         "empty_states": {
             "gorkhapatra": {
                 "title": "No Gorkhapatra Found",

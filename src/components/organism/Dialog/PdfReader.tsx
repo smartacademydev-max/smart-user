@@ -23,7 +23,6 @@ function getFileType(url: string): FileType {
     return "unknown";
 }
 
-// PDF Reader Component
 function PdfReader({ fileUrl }: { fileUrl: string }) {
     const [numPages, setNumPages] = useState<number>(0);
     const [loading, setLoading] = useState(true);
@@ -52,7 +51,7 @@ function PdfReader({ fileUrl }: { fileUrl: string }) {
                 </Typography>
             )}
             <Document
-                file={fileUrl}
+                file={`${fileUrl}`}
                 onLoadSuccess={onDocumentLoadSuccess}
                 onLoadError={onDocumentLoadError}
                 loading=""

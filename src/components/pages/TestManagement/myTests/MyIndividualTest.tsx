@@ -1,13 +1,13 @@
+
 import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { PATH } from "../../../../routes/PATH";
-import { useGetUserPurchasedCourseQuery } from "../../../../services/courseApi";
-import { useGetUserAllTestQuery } from "../../../../services/testApi";
+import { useGetUserIndividualTestQuery } from "../../../../services/testApi";
 import type { QueryParams } from "../../../../types";
-import type { TestProps } from "../../../../types/question";
+import type { QuestionTypeProps, TestProps } from "../../../../types/question";
 import { EmptyList } from "../../../molecules/EmptyList";
+import TabController from "../../../molecules/TabController";
 import TestCard from "../../../organism/Cards/TestCard";
 import PageHeader from "../../../organism/PageHeader";
 import TableFilter from "../../../organism/TableFilter";
@@ -22,36 +22,22 @@ const VideoSkeleton = () => (
     </div>
 );
 
-const CourseFilterSkeleton = () => (
-    <div className="animate-pulse space-y-4">
-        <div className="h-12 bg-gray-200 rounded-lg"></div>
-        <div className="h-10 bg-gray-200 rounded w-1/2"></div>
-    </div>
-);
-export default function AlltestList() {
+export default function MyIndividualTest() {
     const { t } = useTranslation();
 
-    const [qp, _setQp] = useState<QueryParams>({
-        pageIndex: 1,
-        pageSize: 12,
-        search: '',
-    });
+
     const [search, setSearch] = useState<string>("");
-    const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
     const [qpTest, setQpTest] = useState<QueryParams>({
         pageIndex: 1,
         pageSize: 15,
     });
+    const [activeTab, setActiveTab] = useState<QuestionTypeProps>("mcq");
     const [allTest, setAllTest] = useState<TestProps[]>([]);
 
-    const { data: myCourse, isLoading } = useGetUserPurchasedCourseQuery(qp);
-    const myCourses = myCourse?.data?.data || [];
-
-    const { data: tests, isLoading: loadingTest } = useGetUserAllTestQuery(
-        { ...qpTest },
+    const { data: tests, isLoading: loadingTest } = useGetUserIndividualTestQuery(
+        { ...qpTest, type: activeTab },
     );
 
-    const selectedCourse = myCourses.find(course => course.id === selectedCourseId);
     const testList = tests?.data?.data || [];
     const totalPages = tests?.data?.pagination?.total_pages || 0;
     const currentPage = qpTest.pageIndex;
@@ -73,10 +59,6 @@ export default function AlltestList() {
         }
     }, [testList, qpTest.pageIndex]);
 
-    useEffect(() => {
-        setQpTest(prev => ({ ...prev, pageIndex: 1 }));
-        setAllTest([]);
-    }, [selectedCourseId]);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -98,33 +80,6 @@ export default function AlltestList() {
 
     const hasMore = currentPage < totalPages;
 
-    if (isLoading) {
-        return (
-            <div className="all__video__listing">
-                <div className="mb-6">
-                    <CourseFilterSkeleton />
-                </div>
-                <div className="flex flex-col gap-4 md:grid grid-cols-2 xl:grid-cols-3 lg:gap-6">
-                    {[...Array(6)].map((_, idx) => (
-                        <VideoSkeleton key={idx} />
-                    ))}
-                </div>
-            </div>
-        );
-    }
-
-    if (!isLoading && !myCourses.length) {
-        return (
-            <EmptyList
-                title="You Haven't Purchased any course"
-                description="Please purchase a course to view the tests."
-                cta={{
-                    label: "Explore Course",
-                    url: PATH.COURSE_MANAGEMENT.COURSES.ROOT
-                }}
-            />
-        );
-    }
     return (
         <div className="all__note__listing h-full flex flex-col jsutify-between">
             <div className="flex flex-col mb-4">
@@ -133,38 +88,24 @@ export default function AlltestList() {
                         title: t("messages.all_test")
                     }]}
                 />
-                {/* <div className="mb-4">
+
+                <div className="flex items-center flex-wrap justify-between">
                     <TabController
                         options={[
-                            { label: "All", value: "" },
-                            { label: "Individual", value: "individual_test" }
+                            { label: "MCQs", value: "mcq" },
+                            { label: "Subjective", value: "subjective" },
+                            { label: "OMR", value: "omr" },
                         ]}
-                        setActiveTab={(newValue) => {
-                            setActiveTab(newValue), setQpTest({
-                                ...qpTest,
-                                pageIndex: 1
-                            })
-                        }}
                         currentActive={activeTab}
+                        setActiveTab={setActiveTab}
                     />
-                </div> */}
-
-                <TableFilter
-                    search={search || ""}
-                    setSearch={(search) => setSearch(search)}
-                    onFilter={() => { }}
-                    myCourses={myCourses}
-                    selectedCourseId={selectedCourseId}
-                    setSelectedCourseId={setSelectedCourseId}
-                />
-            </div>
-            {selectedCourse && (
-                <div className="mb-6 pb-4 border-b border-gray-200">
-                    <h2 className="text-2xl font-bold text-gray-800">
-                        {selectedCourse.name}
-                    </h2>
+                    <TableFilter
+                        search={search || ""}
+                        setSearch={(search) => setSearch(search)}
+                    />
                 </div>
-            )}
+            </div>
+
             {/* Media Listing */}
             <div className="media__listing__wrapper h-full overflow-auto">
                 <Box

@@ -1,5 +1,7 @@
+import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import {
   Box,
+  Collapse,
   Divider,
   List,
   ListItem,
@@ -10,6 +12,7 @@ import {
   useTheme
 } from "@mui/material";
 import { AudioSquare, Book, Bookmark, DocumentText, Element4, I24Support, Notepad2, Notification, PenAdd, SearchNormal, VideoOctagon, VideoPlay } from "iconsax-reactjs";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
 import { PATH } from "../../../../routes/PATH";
@@ -20,10 +23,16 @@ export default function PrimaryMenu() {
   const navigate = useNavigate();
   const theme = useTheme();
 
+  const [openTest, setOpenTest] = useState(false);
 
   const isActive = (path: string) =>
     location.pathname === path ||
     location.pathname.startsWith(path + "/");
+
+  const isTestManagementActive = () => {
+    return location.pathname.startsWith(PATH.TEST.ROOT) ||
+      location.pathname.startsWith(PATH.TEST.ROOT);
+  };
 
   return (
     <div className="primary__menu__wrapper relative">
@@ -128,14 +137,45 @@ export default function PrimaryMenu() {
           </ListItem>
           <ListItem disablePadding className="menu__item">
             <ListItemButton
-              onClick={() => navigate(PATH.TEST.ROOT)}
-              className={isActive(PATH.TEST.ROOT) ? "active" : ""}
-            >
+              onClick={() => setOpenTest((prev) => !prev)}
+              className={isTestManagementActive() ? "active" : ""}>
               <ListItemIcon>
                 <PenAdd size={20} />
               </ListItemIcon>
-              <ListItemText primary={t("menus.test")} />
+              <ListItemText primary={t("messages.my_test")} />
+              {openTest ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
+            <Collapse in={openTest} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding sx={{ pl: 3 }}>
+                <ListItem disablePadding className="menu__item">
+                  <ListItemButton
+                    onClick={() => navigate(PATH.TEST.MY_TEST.ROOT)}
+                    className={location.pathname.startsWith(PATH.TEST.MY_TEST.ROOT) ? "active-nested" : ""}>
+                    <ListItemText
+                      primary={t("messages.course_based_tests")}
+                    />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding className="menu__item">
+                  <ListItemButton
+                    onClick={() => navigate(PATH.TEST.MY_INDIVIDUAl_TEST.ROOT)}
+                    className={location.pathname.startsWith(PATH.TEST.MY_INDIVIDUAl_TEST.ROOT) ? "active-nested" : ""}>
+                    <ListItemText
+                      primary={t("messages.individually_purchased_tests")}
+                    />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding className="menu__item">
+                  <ListItemButton
+                    onClick={() => navigate(PATH.TEST.MY_BUNDLES.ROOT)}
+                    className={location.pathname.startsWith(PATH.TEST.MY_BUNDLES.ROOT) ? "active-nested" : ""}>
+                    <ListItemText
+                      primary={t("messages.test_bundle")}
+                    />
+                  </ListItemButton>
+                </ListItem>
+              </List>
+            </Collapse>
           </ListItem>
           <ListItem disablePadding className="menu__item">
             <ListItemButton

@@ -46,11 +46,13 @@ import SupportRoot from "../components/pages/Support";
 import TestManagementRoot from "../components/pages/TestManagement";
 import AllTestRoot from "../components/pages/TestManagement/allTest";
 import ExploreTestRoot from "../components/pages/TestManagement/exploreTest";
+import ExploreBundle from "../components/pages/TestManagement/exploreTest/bundles/ExploreBundle";
+import SingleBundle from "../components/pages/TestManagement/exploreTest/bundles/singleBundle";
 import ExploreAllTest from "../components/pages/TestManagement/exploreTest/ExploreAllTest";
-import ExploreBundle from "../components/pages/TestManagement/exploreTest/ExploreBundle";
 import ExploreIndividualTest from "../components/pages/TestManagement/exploreTest/ExploreIndividualTest";
 import ExploreOmr from "../components/pages/TestManagement/exploreTest/ExploreOmr";
-import SingleBundle from "../components/pages/TestManagement/exploreTest/SingleBundle";
+import MyBundles from "../components/pages/TestManagement/myTests/MyBundles";
+import MyIndividualTest from "../components/pages/TestManagement/myTests/MyIndividualTest";
 import ReviewTestRoot from "../components/pages/TestManagement/reviewTest";
 import ReviewSubjectTestRoot from "../components/pages/TestManagement/reviewTest/subjective";
 import SingleSubjectiveTest from "../components/pages/TestManagement/singleSubjectiveTest";
@@ -140,7 +142,9 @@ const router = createBrowserRouter([
             element:
               <TestManagementRoot />,
             children: [
-              { path: PATH.TEST.ROOT, element: <AllTestRoot /> },
+              { path: PATH.TEST.MY_TEST.ROOT, element: <AllTestRoot /> },
+              { path: PATH.TEST.MY_INDIVIDUAl_TEST.ROOT, element: <MyIndividualTest /> },
+              { path: PATH.TEST.MY_BUNDLES.ROOT, element: <MyBundles /> },
               { path: PATH.TEST.VIEW_TEST.ROOT({}), element: <SingleTestRoot /> },
               { path: PATH.TEST.VIEW_TEST.SUBJECTIVE_TEST.ROOT({}), element: <SingleSubjectiveTest /> },
               { path: PATH.TEST.VIEW_TEST.REVIEW_TEST.ROOT({}), element: <ReviewTestRoot /> },
@@ -153,10 +157,10 @@ const router = createBrowserRouter([
               { path: PATH.TEST.EXPLORE_TEST.ROOT, element: <ExploreAllTest /> },
               { path: PATH.TEST.EXPLORE_TEST.INDIVIDUAl_TEST.ROOT, element: <ExploreIndividualTest /> },
               { path: PATH.TEST.EXPLORE_TEST.BUNDLE_TEST.ROOT, element: <ExploreBundle /> },
-              { path: PATH.TEST.EXPLORE_TEST.BUNDLE_TEST.VIEW_BUNDLE.ROOT(), element: <SingleBundle /> },
               { path: PATH.TEST.EXPLORE_TEST.OMR.ROOT, element: <ExploreOmr /> },
             ]
           },
+          { path: PATH.TEST.EXPLORE_TEST.BUNDLE_TEST.VIEW_BUNDLE.ROOT(), element: <SingleBundle /> },
           {
             element:
               <PurchaseRoot />,

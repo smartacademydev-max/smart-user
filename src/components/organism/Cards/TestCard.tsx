@@ -1,14 +1,18 @@
-import { Box, Divider, Typography, useTheme } from "@mui/material";
+import { Box, Divider, Stack, Typography, useTheme } from "@mui/material";
+import { Calendar, Clock, Medal, Notepad2 } from "iconsax-reactjs";
 import { useParams } from "react-router-dom";
 import type { TestProps } from "../../../types/question";
 import { formatDateTime } from "../../../utils/dateFormat";
 import { getStatus } from "../../../utils/getStatus";
+import { getTestProgressStatus } from "../../../utils/statusMap";
+import StatusPillWithBorder from "../../atom/StatusPillWithBorder";
 import TestActionButton from "./TestActionButton";
 
 export default function TestCard({ test, havePurchased, }: { test: TestProps; havePurchased: boolean; }) {
   const theme = useTheme();
   const status = getStatus(test?.start_datetime, test?.end_datetime);
   const { id } = useParams();
+  const variant = getTestProgressStatus(test?.has_taken_test ? "completed" : "not_started");
   return (
     <Box
       className="test__card rounded-md p-4 flex flex-col justify-between"
@@ -16,112 +20,61 @@ export default function TestCard({ test, havePurchased, }: { test: TestProps; ha
         border: `1px solid ${theme.palette.separator.dark}`,
       }}
     >
-      <div className="top__wrapper">
-        <div className="test__card__top flex gap-3">
-          <Box className="w-full flex justify-between items-start gap-4">
-            <Typography variant="subtitle1" fontWeight={600} color="text.dark">
-              {test?.name}
-            </Typography>
 
-            <Typography
-              color="text.main"
-              bgcolor={"gray.gray1"}
-              className="text-[11px]! px-2.5 py-1.5 rounded-md ml-2 font-semibold! capitalize"
-            >
-              {status}
-            </Typography>
-          </Box>
+      <div className="card__top">
+        <div className="flex justify-between items-center mb-3">
+          <Typography variant="caption" fontWeight={500} sx={{
+            padding: "6px 10px",
+            borderRadius: "8px",
+            background: (theme) => theme.palette.primary.light,
+            color: (theme) => theme.palette.primary.main,
+          }}>{test?.selections?.mega_category[0] || "Loksewa"}</Typography>
+          <StatusPillWithBorder showIcon={true} variant={variant} status={!test?.has_taken_test ? "Not Started" : "Completed"} />
         </div>
-
-        <Divider className="my-3!" />
-
-        {/* Content Section */}
-        <div className="test__card__content flex flex-col gap-2">
-          <div className="flex gap-1 items-center">
-            <Typography variant="subtitle2" fontWeight={500} color="text.secondary" className="flex">
-              Exam Type:
-            </Typography>
-            <Typography variant="subtitle2" fontWeight={500} color="text.dark" >
-              {test?.test_type}
-            </Typography>
-          </div>
-          <div className="flex gap-1 items-center">
-            <Typography variant="subtitle2" color="text.secondary" className="flex">
+        <Typography variant="subtitle1" fontWeight={600} color="text.dark" className="mb-3!">
+          {test?.name}
+        </Typography>
+        {test?.start_datetime ?
+          <Stack gap={1} color="text.middle" className="mb-3" alignItems={"center"}>
+            <Box sx={{
+              color: (theme) => theme.palette.text.middle
+            }}>
+              <Calendar size={16} />
+            </Box>
+            <Typography variant="subtitle2" color="text.middle" className="flex">
               Start Date:
-            </Typography>
-            <Typography variant="subtitle2" fontWeight={600} color="text.dark" >
-              {formatDateTime(test?.start_datetime)}
-            </Typography>
-          </div>
-          <div className="flex gap-1 items-center">
-            <Typography variant="subtitle2" color="text.secondary" className="flex">
-              End Date:
-            </Typography>
-            <Typography variant="subtitle2" fontWeight={600} color="text.dark" >
-              {formatDateTime(test?.end_datetime)}
-            </Typography>
-          </div>
-        </div>
-      </div>
+          </Typography>
+            <Typography variant="subtitle2" color="text.dark" fontWeight={600}>{formatDateTime(test?.start_datetime)}</Typography>
+          </Stack>
+          : ""}
 
-      <div className="bottom__wrapper">
-        <Box
-          component="div"
-          bgcolor={"gray.gray1"}
-          px={3}
-          py={1.75}
-          borderRadius="6px"
-          my="12px"
-        >
-          <Box className="flex justify-between items-center gap-2">
-            <div className="flex items-center gap-2">
-              <Typography variant="subtitle2" color="text.secondary" className="inline-flex">
-                Questions:
-              </Typography>
-              <Typography variant="subtitle2" fontWeight={500} color="text.dark" >
-                {test?.total_questions}
-              </Typography>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Typography variant="subtitle2" color="text.secondary" className="inline-flex">
-                Duration:
-              </Typography>
-              <Typography
-                variant="subtitle2"
-                fontWeight={500}
-                color="text.dark"
-
-                sx={{ textWrap: "nowrap" }}
-              >
-                {test?.duration.hours} Hrs {test?.duration.minutes} Mins
-              </Typography>
-            </div>
-          </Box>
-
-          <Divider className="my-2!" />
-
-          <Box className="flex justify-between items-center gap-2">
-            <div className="flex gap-1 itesm-center">
-              <Typography variant="subtitle2" color="text.secondary" className="inline-flex">
-                Full marks:
-              </Typography>
-              <Typography variant="subtitle2" fontWeight={500} color="text.dark" >
-                {test?.full_mark}
-              </Typography>
-            </div>
-
-            <div className="flex gap-1 items-center">
-              <Typography variant="subtitle2" color="text.secondary" className="inline-flex">
-                Pass marks:
-              </Typography>
-              <Typography variant="subtitle2" fontWeight={500} color="text.dark" >
-                {test?.pass_mark}
-              </Typography>
-            </div>
-          </Box>
+        <Box className="flex justify-between items-center gap-2">
+          <Typography variant="caption" color="text.dark" className="flex items-center gap-1">
+            <Box sx={{ color: (theme) => theme.palette.info.main }}><Notepad2 size={16} variant="Bold" /></Box>  <strong>{test?.total_questions}</strong> Total Questions
+          </Typography>
+          <Typography variant="subtitle2" color="text.secondary" className="flex items-center gap-1">
+            <Box sx={{ color: (theme) => theme.palette.success.main }}><Clock variant="Bold" size={16} /></Box>
+            <strong>{test?.duration.hours}</strong> Hrs  <strong>: {test?.duration.minutes}</strong> Mins
+          </Typography>
         </Box>
 
+        <Divider className="my-1.5!" />
+
+        <Box className="flex justify-between items-center gap-2">
+          <Typography variant="subtitle2" color="text.secondary" className="flex items-center gap-1">
+            <Box sx={{ color: (theme) => theme.palette.error.main }}><Medal variant="Bold" size={16} /></Box>
+            <strong>{test?.full_mark}</strong> Total Marks
+          </Typography>
+
+
+          <Typography variant="subtitle2" color="text.secondary" className="flex items-center gap-1">
+            <Box sx={{ color: (theme) => theme.palette.warning.main }}><Medal variant="Bold" size={16} /></Box>
+            <strong> {test?.pass_mark}</strong> Pass marks
+          </Typography>
+
+        </Box>
+      </div>
+      <div className="bottom__wrapper mt-3">
 
         <TestActionButton
           test={test}
@@ -129,8 +82,6 @@ export default function TestCard({ test, havePurchased, }: { test: TestProps; ha
           havePurchased={havePurchased}
           id={test?.course_id ? Number(test?.course_id) : Number(id)}
         />
-
-
       </div>
     </Box>
   );

@@ -1,5 +1,5 @@
 import type { Pagination } from ".";
-import type { DiscountTypeProps } from "./course";
+import type { DiscountTypeProps, SelectionType } from "./course";
 import type { GlobalResponse } from "./user";
 
 export type QuestionTypeProps = "mcq" | "subjective" | "omr" | ""
@@ -61,7 +61,8 @@ export interface TestProps {
     is_graded?: boolean;
     has_expired?: boolean;
     marked_price?: string,
-    sale_price?: string,
+    sale_price?: string;
+    selections: SelectionType;
 }
 
 
@@ -148,11 +149,9 @@ export interface SetProps {
     status: "published" | "draft";
     marked_price?: string;
     sale_price?: string;
-    sets: {
-        objective: number;
-        subjective: number;
-        omr: number;
-    }
+    sets: { label: string; value: string }[]
+    selections: SelectionType;
+    created_at: string
 }
 
 
@@ -161,4 +160,8 @@ export interface SetList extends GlobalResponse {
         data: SetProps[];
         pagination: Pagination
     }
+}
+
+export interface SetOveriew extends SetProps {
+    total_questions: number;
 }

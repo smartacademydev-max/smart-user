@@ -8,7 +8,7 @@ export default function ExploreTestRoot() {
     const { t } = useTranslation();
 
     return (
-        <div className="explore__test__root h-full overflow-auto">
+        <>
             <div className="top__header">
                 <PageHeader
                     breadcrumb={[
@@ -29,6 +29,6 @@ export default function ExploreTestRoot() {
             </div>
 
             <Outlet />
-        </div>
+        </>
     )
 }

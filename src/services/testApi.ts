@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import type { CategoryFilterParams, QueryParams } from "../types";
-import type { McqReportData, McqSubmissionPayload, McqSubmissionResponse, QuestionTypeProps, SetList, SetProps, SingleMcqResponse, TestList, TestProps } from "../types/question";
+import type { McqReportData, McqSubmissionPayload, McqSubmissionResponse, QuestionTypeProps, SetList, SetOveriew, SetProps, SingleMcqResponse, TestList, TestProps } from "../types/question";
 import type { GlobalResponse } from "../types/user";
 import { buildQueryParams } from "../utils/buildQueryParams";
 import { baseQuery } from "./baseQuery";
@@ -16,6 +16,29 @@ export const testApi = createApi({
                     page: pageIndex, page_size: pageSize, search, course_id: id, start_date: startDate,
                     end_date: endDate,
                     status
+                })}`,
+                method: "GET",
+            }),
+            providesTags: (_result, _error, { id }) => [{ type: "Test" as const, id }],
+        }),
+        getUserIndividualTest: builder.query<TestList, QueryParams & { id?: number, status?: string, type: QuestionTypeProps }>({
+            query: ({ id, pageIndex, pageSize, search, startDate, endDate, status, type }) => ({
+                url: `my-individual?${buildQueryParams({
+                    page: pageIndex, page_size: pageSize, search, course_id: id, start_date: startDate,
+                    end_date: endDate,
+                    status, type
+                })}`,
+                method: "GET",
+            }),
+            providesTags: (_result, _error, { id }) => [{ type: "Test" as const, id }],
+        }),
+        getUserBundles: builder.query<SetList, QueryParams & { id?: number, status?: string, days: number | null }>({
+            query: ({ id, pageIndex, pageSize, search, startDate, endDate, status, days }) => ({
+                url: `my-bundle?${buildQueryParams({
+                    page: pageIndex, page_size: pageSize, search, course_id: id, start_date: startDate,
+                    end_date: endDate,
+                    status,
+                    days
                 })}`,
                 method: "GET",
             }),
@@ -113,12 +136,12 @@ export const testApi = createApi({
                 method: "GET",
             }),
         }),
-        getAllIndividualTest: builder.query<TestList, QueryParams>({
-            query: ({ pageIndex, pageSize, search }) => ({
+        getAllIndividualTest: builder.query<TestList, QueryParams & { type?: string }>({
+            query: ({ pageIndex, pageSize, search, type }) => ({
                 url: `/test?${buildQueryParams({
                     page: pageIndex,
                     page_size: pageSize,
-                    search: search
+                    search: search, type
                 })}`
             }),
             providesTags: [{ type: "Test", id: "LIST" }]
@@ -141,11 +164,31 @@ export const testApi = createApi({
             }),
             providesTags: (_result, _error, { id }) => [{ type: "Set", id }]
         }),
+        getBundleByOverview: builder.query<{ data: SetOveriew }, { id: number }>({
+            query: ({ id }) => ({
+                url: `/bundle/${id}/overview`,
+                method: "GET"
+            }),
+            providesTags: (_result, _error, { id }) => [{ type: "Set", id }]
+        }),
+        getTestRelatedToBundle: builder.query<TestList, QueryParams & { id: number, type: QuestionTypeProps }>({
+            query: ({ id, pageIndex, pageSize, type }) => ({
+                url: `/bundle/${id}/selected-test?${buildQueryParams({
+                    page: pageIndex,
+                    page_size: pageSize,
+                    type
+                })}`,
+                method: "GET",
+            }),
+            providesTags: (_result, _error, { id }) => [{ type: "Set", id }]
+        }),
     })
 })
 
 export const {
     useGetUserAllTestQuery,
+    useGetUserIndividualTestQuery,
+    useGetUserBundlesQuery,
     useGetTestByIdQuery,
     useSubmitMcqMutation,
     useReviewTestResultQuery,
@@ -159,5 +202,7 @@ export const {
     useGetAllIndividualTestQuery,
     useGetTestOverviewQuery,
     useGetAllBundleQuery,
-    useGetBundleByIdQuery
+    useGetBundleByIdQuery,
+    useGetBundleByOverviewQuery,
+    useGetTestRelatedToBundleQuery
 } = testApi;

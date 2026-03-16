@@ -80,7 +80,8 @@ export default function MediaCard({
                 type: type,
                 title: media.file_name,
                 courseId: courseId,
-                playlistId: playlistId
+                playlistId: playlistId,
+                isDownloadable: media.is_downloadable
             };
 
             switch (type) {

@@ -133,6 +133,15 @@ export const PATH = {
                         : `/test/:testId/subjective`,
             }
         },
+        MY_TEST: {
+            ROOT: "/test/my-tests",
+        },
+        MY_INDIVIDUAl_TEST: {
+            ROOT: "/test/my-individual-test"
+        },
+        MY_BUNDLES: {
+            ROOT: "/test/my-bundle-test"
+        }
     },
     VIDEOS: {
         ROOT: "/videos",

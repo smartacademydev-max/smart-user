@@ -12,6 +12,7 @@ export interface ReadingScreenProps {
     mediaId?: string;
     courseId?: number | null;
     playlistId?: number | null;
+    isDownloadable?:boolean;
 }
 
 const initialState: ReadingScreenProps = {
@@ -23,6 +24,7 @@ const initialState: ReadingScreenProps = {
     isYouTube: false,
     courseId: undefined,
     mediaId: undefined,
+    isDownloadable:false,
 };
 
 export const readingScreen = createSlice({
