@@ -1,10 +1,10 @@
 import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useGetUserBundlesQuery } from "../../../../../services/testApi";
 import TablePagination from "../../../../molecules/Pagination";
 import BundleCard from "../../../../organism/Cards/BundleCard";
 import EmptyRoute from "../../../../organism/EmptyRoute";
 import TableFilter from "../../../../organism/TableFilter";
+import { useGetAllBundleQuery } from "../../../../../services/testApi";
 
 export default function ExploreBundle() {
     const [search, setSearch] = useState("")
@@ -12,6 +12,7 @@ export default function ExploreBundle() {
         pageIndex: 1,
         pageSize: 12
     })
+    let placeholderIndex = 0;
 
     const [debouncedSearch, setDebouncedSearch] = useState<string>("");
 
@@ -21,9 +22,7 @@ export default function ExploreBundle() {
     });
     const [days, _setDays] = useState<number | null>(null);
 
-
-
-    const { data, isLoading } = useGetUserBundlesQuery({
+    const { data, isLoading } = useGetAllBundleQuery({
         ...qp, search: debouncedSearch,
         ...customRange,
         days,
@@ -53,9 +52,22 @@ export default function ExploreBundle() {
                         )}
                     /> : (
                         <Box className="overflow-auto flex flex-col gap-4 md:grid md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 py-2">
-                            {bundles.map((bundle) => (
-                                <BundleCard data={bundle} />
-                            ))}
+                            {bundles.map((item) => {
+                                let currentPlaceholderIndex = -1;
+
+                                if (!item.thumbnail_url) {
+                                    currentPlaceholderIndex = placeholderIndex;
+                                    placeholderIndex++;
+                                }
+
+                                return (
+                                    <BundleCard
+                                        key={item.id}
+                                        data={item}
+                                        placeholderIndex={currentPlaceholderIndex}
+                                    />
+                                );
+                            })}
                         </Box>
                     )}
             </div>

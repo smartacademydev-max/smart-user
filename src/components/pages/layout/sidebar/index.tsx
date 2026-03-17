@@ -7,6 +7,7 @@ import Toolbar from "@mui/material/Toolbar";
 import { Link, useLocation } from "react-router-dom";
 import CustomAppbar from "../appbar";
 import PrimaryMenu from "./PrimaryMenu";
+import { useAppSelector } from "../../../../store/hook";
 
 
 interface Props {
@@ -66,6 +67,8 @@ export default function ResponsiveDrawer(props: Props) {
 
     const isLargeScreen = useMediaQuery("(min-width:1440px)");
     const drawerWidth = isLargeScreen ? 356 : 320;
+    const { mode } = useAppSelector((state) => state.udaan_theme)
+
     return (
         <Box sx={{ display: "flex" }}>
             <CustomAppbar handleDrawerToggle={handleDrawerToggle} />
@@ -130,7 +133,7 @@ export default function ResponsiveDrawer(props: Props) {
                 <Box
                     className="content lg:rounded-2xl  flex flex-col overflow-hidden"
                     sx={{
-                        background: theme.palette.primary.contrastText,
+                        backgroundColor: (theme) => mode === "dark" ? theme.palette.background.paper : theme.palette.primary.contrastText,
                         height: {
                             xs: "calc(100vh - 80px)",
                             lg: "calc(100vh - 100px)"

@@ -63,11 +63,12 @@ export interface TestProps {
     marked_price?: string,
     sale_price?: string;
     selections: SelectionType;
+    mega_categories?: string[];
+    results: {
+        correct_answers: number;
+        score: number
+    }
 }
-
-
-
-
 export interface TestList {
     data: {
         data: TestProps[]
@@ -152,6 +153,7 @@ export interface SetProps {
     sets: { label: string; value: string }[]
     selections: SelectionType;
     created_at: string
+    mega_categories?: string[];
 }
 
 

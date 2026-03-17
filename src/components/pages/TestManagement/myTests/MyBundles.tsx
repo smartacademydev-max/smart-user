@@ -13,6 +13,7 @@ export default function MyBundles() {
         pageIndex: 1,
         pageSize: 12
     })
+    let placeholderIndex = 0;
 
     const [debouncedSearch, setDebouncedSearch] = useState<string>("");
 
@@ -54,9 +55,22 @@ export default function MyBundles() {
                         )}
                     /> : (
                         <Box className="overflow-auto flex flex-col gap-4 md:grid md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 py-2">
-                            {bundles.map((bundle) => (
-                                <BundleCard data={bundle} />
-                            ))}
+                            {bundles.map((item) => {
+                                let currentPlaceholderIndex = -1;
+
+                                if (!item.thumbnail_url) {
+                                    currentPlaceholderIndex = placeholderIndex;
+                                    placeholderIndex++;
+                                }
+
+                                return (
+                                    <BundleCard
+                                        key={item.id}
+                                        data={item}
+                                        placeholderIndex={currentPlaceholderIndex}
+                                    />
+                                );
+                            })}
                         </Box>
                     )}
             </div>

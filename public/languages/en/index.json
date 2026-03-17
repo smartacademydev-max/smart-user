@@ -19,7 +19,7 @@
         "expiry": "Expiry",
         "subscription": "Subscription",
         "free": "Free",
-        "npr": "NPR.",
+        "npr": "NRs.",
         "starting_from": "Starting From",
         "start_from": "Start From",
         "ends": "Ends",
@@ -69,6 +69,9 @@
         "course_based_tests": "Course Based Tests",
         "individually_purchased_tests": "Individually Purchased Tests",
         "test_bundle": "Test Bundle",
+        "tests_in_this_bundle": "Tests in this Bundle",
+        "offer": "Offer",
+        "load_more": "Load More",
         "empty_states": {
             "gorkhapatra": {
                 "title": "No Gorkhapatra Found",

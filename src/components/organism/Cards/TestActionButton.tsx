@@ -117,7 +117,7 @@ const TestActionButton = ({ test, havePurchased, id }: { test: TestProps, status
     if (test.has_taken_test) {
         if (test.is_scheduled) {
             return (
-                <Button variant="outlined" color="primary" fullWidth onClick={handleViewResult}>
+                <Button variant="outlined" color="primary" onClick={handleViewResult}>
                     {test.is_graded ? "View Result" : "Result Pending"}
                 </Button>
             )
@@ -125,10 +125,10 @@ const TestActionButton = ({ test, havePurchased, id }: { test: TestProps, status
         else {
             return (
                 <Stack flexDirection={"column"} gap={1}>
-                    <Button variant="contained" color="primary" fullWidth onClick={handleStartOrRetake}>
+                    <Button variant="contained" color="primary" onClick={handleStartOrRetake}>
                         Retake Test
                     </Button>
-                    <Button variant="outlined" color="primary" fullWidth onClick={handleViewResult}>
+                    <Button variant="outlined" color="primary" onClick={handleViewResult}>
                         View Result
                     </Button>
                 </Stack>
@@ -139,7 +139,7 @@ const TestActionButton = ({ test, havePurchased, id }: { test: TestProps, status
 
     if (test.has_expired && !test.has_taken_test) {
         return (
-            <Button variant="contained" color="primary" fullWidth onClick={() => id ? navigate(PATH.COURSE_MANAGEMENT.COURSES.VIEW_TEST.ROOT({
+            <Button variant="contained" color="primary" onClick={() => id ? navigate(PATH.COURSE_MANAGEMENT.COURSES.VIEW_TEST.ROOT({
                 courseId: Number(id),
                 testId: Number(test?.id),
             })) : navigate(PATH.TEST.VIEW_TEST.ROOT({
@@ -161,7 +161,7 @@ const TestActionButton = ({ test, havePurchased, id }: { test: TestProps, status
 
         if (!hasStarted) {
             return (
-                <Button variant="contained" color="primary" disabled fullWidth>
+                <Button variant="contained" color="primary" disabled >
                     {timeLeft
                         ? `Starts in ${formatCountdown(timeLeft)}`
                         : `Test Starts at ${formatDateTime(test.start_datetime)}`
@@ -171,8 +171,8 @@ const TestActionButton = ({ test, havePurchased, id }: { test: TestProps, status
         }
     }
 
-    return <Button variant="contained" color="primary" fullWidth onClick={handleStartOrRetake}>
-        Start Test
+    return <Button variant="contained" color="primary" onClick={handleStartOrRetake}>
+        Start Now
     </Button>;
 };
 

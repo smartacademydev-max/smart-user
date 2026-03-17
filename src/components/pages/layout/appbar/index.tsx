@@ -8,6 +8,7 @@ import {
     useTheme
 } from "@mui/material";
 import { HamburgerMenu } from "iconsax-reactjs";
+import { useAppSelector } from "../../../../store/hook";
 import NotificationModal from "./Notification";
 import ProfileMenu from "./Profile";
 import SettingMenu from "./Setting";
@@ -19,6 +20,7 @@ export default function CustomAppbar({
     handleDrawerToggle: () => void;
 }) {
     const theme = useTheme();
+    const { mode } = useAppSelector((state) => state.udaan_theme)
     const isLargeScreen = useMediaQuery("(min-width:1440px)");
     const drawerWidth = isLargeScreen ? 356 : 320;
     return (
@@ -30,7 +32,7 @@ export default function CustomAppbar({
                 borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
                 borderRadius: 0,
                 padding: { xs: "12px", lg: " 20px 24px" },
-                backgroundColor: (theme) => theme.palette.primary.contrastText,
+                backgroundColor: (theme) => mode === "dark" ? theme.palette.background.paper : theme.palette.primary.contrastText,
             }}
             color="default"
             elevation={0}

@@ -1,4 +1,5 @@
 
+import { Phone } from '@mui/icons-material';
 import { Button } from '@mui/material';
 import { useFormik } from 'formik';
 import { ArrowLeft } from 'iconsax-reactjs';
@@ -8,8 +9,10 @@ import { useGetBundleByIdQuery, useGetTestOverviewQuery } from '../../../service
 import { showToast } from '../../../slice/toastSlice';
 import { useAppDispatch } from '../../../store/hook';
 import type { PaymentOption, PurchaseFormValues, PurchaseModuleTypes } from "../../../types/purchase";
+import Quote from '../../molecules/Quote';
 import PageHeader from '../../organism/PageHeader';
 import CoursePaymentCard from './CoursePaymentCard';
+import PurchaseGuideLines from './PurchaseGuideLines';
 import PurchasePaymentOption from './PurchasePaymentOption';
 
 // eSewa Configuration
@@ -44,41 +47,42 @@ export default function PurchaseLayout() {
         { id: 2, label: "Khalti", value: "khalti", image: "/khalti.svg" },
     ];
 
-    const { data } = useGetCourseByIdQuery({ id: Number(id) }, { skip: !id || type !== "course" });
+    const { data: course } = useGetCourseByIdQuery({ id: Number(id) }, { skip: !id || type !== "course" });
     const { data: test } = useGetTestOverviewQuery({ id: Number(id) }, { skip: !id || type !== "test" });
     const { data: bundle } = useGetBundleByIdQuery({ id: Number(id) }, { skip: !id || type !== "bundle" })
     const [payViaEsewa, { isLoading: payingViaEsewa }] = usePurchaseCourseWithEsewaMutation();
     const [payViaKhalti, { isLoading: isKhaltiLoading }] = usePurchaseWithKhaltiMutation();
 
+    let data;
     let price = 0;
 
     switch (type) {
         case "course":
-            price = Number(data?.data?.sale_price) || 0;
+            data = course?.data;
+            price = Number(course?.data?.sale_price) || 0;
             break;
 
         case "test":
+            data = test?.data;
             price = Number(test?.data?.sale_price) || 0;
             break;
         case "bundle":
+            data = bundle?.data;
             price = Number(bundle?.data?.sale_price) || 0;
             break;
 
         default:
-            price = 0;
+            data = null;
     }
     // const vat = price * 0.13;
     const vat = 0;
-    const total = price + vat;
 
-    const baseUrl = window.location.origin;
-    const successUrl = `${baseUrl}/${type}/${id}/purchase/success`;
-    const failureUrl = `${baseUrl}/${type}/${id}/purchase/failure`;
+
 
     const formik = useFormik<PurchaseFormValues>({
         initialValues: {
             paymentOption: "esewa",
-            amount: total,
+            amount: vat + price,
         },
         enableReinitialize: true,
         onSubmit: async (values) => {
@@ -97,8 +101,8 @@ export default function PurchaseLayout() {
                             product_code: paymentData?.product_code,
                             product_service_charge: paymentData?.product_service_charge || "0",
                             product_delivery_charge: paymentData?.product_delivery_charge || "0",
-                            success_url: successUrl,
-                            failure_url: failureUrl,
+                            success_url: paymentData?.success_url,
+                            failure_url: paymentData?.failure_url,
                             signed_field_names: "total_amount,transaction_uuid,product_code",
                             signature: paymentData?.signature,
                         };
@@ -109,7 +113,7 @@ export default function PurchaseLayout() {
                         id: Number(id),
                         type: values.paymentOption,
                         moduleType: type as PurchaseModuleTypes,
-                        amount: total
+                        amount: vat + price
                     }).unwrap();
 
                     const paymentUrl = response?.data?.payment_url;
@@ -129,13 +133,13 @@ export default function PurchaseLayout() {
     });
 
     return (
-        <div className="purchase__options overflow-auto">
+        <div className="purchase__options overflow-auto pb-4 px-1">
             <Button
                 variant="text"
                 startIcon={<ArrowLeft />}
                 onClick={() => navigate(-1)}
             >
-                Back to Course Details
+                Back to {type} Details
             </Button>
 
             <PageHeader
@@ -145,18 +149,33 @@ export default function PurchaseLayout() {
 
             <form onSubmit={formik.handleSubmit}>
                 <div className="grid md:grid-cols-2 gap-10">
-                    <PurchasePaymentOption
-                        options={paymentOptions}
-                        selected={formik.values.paymentOption}
-                        onSelect={(value) => formik.setFieldValue("paymentOption", value)}
-                    />
+                    <div className="col-span-1">
+                        <PurchasePaymentOption
+                            options={paymentOptions}
+                            selected={formik.values.paymentOption}
+                            onSelect={(value) => formik.setFieldValue("paymentOption", value)}
+                        />
+                        <div className="mt-6 hidden lg:block">
+                            <PurchaseGuideLines />
+                            <div className="mt-4 lg:mt-6">
+                                <Quote icon={<Phone />} message='If you experience any issues during the payment process or have any questions, please feel free to contact our support team for assistance at ' phone='' />
+                            </div>
+                        </div>
+                    </div>
 
-                    <CoursePaymentCard
-                        price={price}
-                        vat={vat}
-                        total={total}
-                        isLoading={payingViaEsewa || isKhaltiLoading}
-                    />
+                    <div className="col-span-1">
+                        <CoursePaymentCard
+                            data={data}
+                            vat={vat}
+                            isLoading={payingViaEsewa || isKhaltiLoading}
+                        />
+                        <div className="mt-4 lg:mt-6 lg:hidden">
+                            <PurchaseGuideLines />
+                            <div className="mt-4 lg:mt-6">
+                                <Quote icon={<Phone />} message='If you experience any issues during the payment process or have any questions, please feel free to contact our support team for assistance at ' phone='' />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>

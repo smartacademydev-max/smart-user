@@ -11,7 +11,6 @@ import StatusPillWithBorder from "../../atom/StatusPillWithBorder";
 export default function ExploreTestCard({ test }: { test: TestProps; }) {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    // const status = getStatus(test?.start_datetime, test?.end_datetime);
 
     const variant = getTestProgressStatus(test?.has_taken_test ? "completed" : "not_started");
 

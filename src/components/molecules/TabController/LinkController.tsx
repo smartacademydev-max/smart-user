@@ -62,13 +62,17 @@ export default function LinkController({ options = [] }: LinkControllerProps) {
                                 onClick={() => navigate(tab.value)}
                                 className={isActive ? "active__tab__controller" : ""}
                             >
-                                <Typography
-                                    variant="subtitle2"
-                                    color="text.middle"
-                                    className="px-6 py-2 rounded-md cursor-pointer text-nowrap text-center"
-                                >
-                                    {tab.label}
-                                </Typography>
+                                <div className={
+                                    `px-6 py-2 rounded-md cursor-pointer flex  items-center gap-1.5 ${isActive ? "active__tab__controller" : ""}`
+                                }>
+                                    <Typography
+                                        variant="subtitle2"
+                                        color="text.middle"
+                                        className="text-nowrap text-center"
+                                    >
+                                        {tab.label}
+                                    </Typography>
+                                </div>
                             </div>
                         );
                     })}
@@ -91,15 +95,19 @@ export default function LinkController({ options = [] }: LinkControllerProps) {
                         <ListItem
                             key={tab.value}
                             onClick={() => navigate(tab.value)}
-                            className={isActive ? "active__tab__controller" : ""}
+
                         >
-                            <Typography
-                                variant="subtitle2"
-                                color="text.middle"
-                                className="px-6 py-2 rounded-md cursor-pointer text-nowrap"
-                            >
-                                {tab.label}
-                            </Typography>
+                            <div className={
+                                `px-6 py-2 rounded-md cursor-pointer flex  items-center gap-1.5 ${isActive ? "active__tab__controller" : ""}`
+                            }>
+                                <Typography
+                                    variant="subtitle2"
+                                    color="text.middle"
+                                    className=" text-nowrap"
+                                >
+                                    {tab.label}
+                                </Typography>
+                            </div>
                         </ListItem>
                     );
                 })}

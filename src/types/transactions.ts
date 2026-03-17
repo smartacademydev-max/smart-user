@@ -1,4 +1,5 @@
 import type { Pagination } from ".";
+import type { PaymentMethods } from "./purchase";
 import type { GlobalResponse } from "./user";
 
 export interface TransactionProps {
@@ -17,4 +18,17 @@ export interface TransactionsResponse extends GlobalResponse {
         data: TransactionProps[];
         pagination: Pagination;
     }
+}
+
+export interface ReciptProps {
+    amount: number;
+    thumbnail_url: string;
+    name: string;
+    published_date: string;
+    transaction_id: string;
+    created_at: string;
+    payment_method: PaymentMethods;
+    status: "success" | "failed" | "pending";
+    download_url: string;
+    mega_categories: string[]
 }

@@ -33,8 +33,8 @@ export default function PurchasePaymentOption({ options, selected, onSelect }: P
                                 transition: "0.2s",
                             }}
                         >
-                            <img src={option.image} alt={option.label} />
-                            <Typography variant="subtitle2" fontWeight={500}>
+                            <img src={option.image} alt={option.label} className="mb-3" />
+                            <Typography variant="subtitle2" fontWeight={400}>
                                 {option.label}
                             </Typography>
                         </Box>

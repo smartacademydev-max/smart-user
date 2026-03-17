@@ -16,18 +16,18 @@ export default function SingleBundleOverview({ data }: { data: SetOveriew }) {
             <Box className="col-span-9 overview__wrapper p-4 lg:rounded-tl-md lg:rounded-bl-md flex gap-2" sx={{
                 border: (theme) => `1px solid ${theme.palette.separator.dark}`
             }}>
-                {data?.thumbnail_url ? <div className="aspect-222/176 lg:max-w-[222px] rounded-md overflow-hidden">
+                {data?.thumbnail_url ? <div className="aspect-222/176 sm:max-w-[222px] rounded-md overflow-hidden">
                     <img src={data?.thumbnail_url} alt={data.name} className="w-full h-full object-cover " />
                 </div> : ""}
                 <div className="content w-full">
-                    <Typography variant="caption" fontWeight={500} sx={{
+                    <Typography variant="caption" className="mb-2!" fontWeight={500} sx={{
                         padding: "6px 10px",
                         borderRadius: "8px",
                         background: (theme) => theme.palette.primary.light,
                         color: (theme) => theme.palette.primary.main,
                         mb: "12px"
                     }}>{data?.selections?.mega_category[0] || "Loksewa"}</Typography>
-                    <Typography variant="h3" fontWeight={600} color="text.dark" className="mb-3!">
+                    <Typography variant="h3" fontWeight={600} color="text.dark" className="mb-3! ">
                         {data?.name}
                     </Typography>
                     <div className="general__content__box">
@@ -68,7 +68,7 @@ export default function SingleBundleOverview({ data }: { data: SetOveriew }) {
                 </div>
             </Box>
 
-            <div className="col-span-3 h-full purchase__wrapper lg:rounded-tr-md lg:rounded-br-md overflow-hidden">
+            <div className="col-span-3 h-full purchase__wrapper lg:rounded-tr-md lg:rounded-br-md overflow-hidden relative">
                 <Box sx={{
                     background: (theme) => theme.palette.primary.light,
                     padding: "16px 32px",
@@ -87,6 +87,11 @@ export default function SingleBundleOverview({ data }: { data: SetOveriew }) {
                     <Typography variant="subtitle2" color="error" className="line-through mt-1.5">{t("messages.npr")}{data.marked_price}</Typography>
                     <Typography variant="caption" color="text.middle">One time payment</Typography>
                     <Button fullWidth variant="contained" color="primary" onClick={() => navigate(PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.ROOT(Number(data.id), "bundle"))} className="mt-4!">{t("messages.purchase_now")}</Button>
+                    {data?.discount ? <Box className="absolute -top-15 -right-15 w-30! h-30! flex justify-center items-end rotate-45 pb-2" sx={{
+                        background: (theme) => theme.palette.error.main,
+                    }}>
+                        <Typography variant="h6" className="text-white font-medium" >{t("messages.offer")}</Typography>
+                    </Box> : ""}
                 </Box>
             </div>
         </div>

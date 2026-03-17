@@ -10,12 +10,13 @@ export const testApi = createApi({
     baseQuery: baseQuery,
     tagTypes: ["Test", "Set"],
     endpoints: (builder) => ({
-        getUserAllTest: builder.query<TestList, QueryParams & { id?: number, status?: string }>({
-            query: ({ id, pageIndex, pageSize, search, startDate, endDate, status }) => ({
+        getUserAllTest: builder.query<TestList, QueryParams & { id?: number, status?: string, type?: QuestionTypeProps }>({
+            query: ({ id, pageIndex, pageSize, search, startDate, endDate, status, type }) => ({
                 url: `my-test?${buildQueryParams({
                     page: pageIndex, page_size: pageSize, search, course_id: id, start_date: startDate,
                     end_date: endDate,
-                    status
+                    status,
+                    type
                 })}`,
                 method: "GET",
             }),

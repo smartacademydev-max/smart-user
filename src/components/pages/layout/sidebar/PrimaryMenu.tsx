@@ -11,7 +11,7 @@ import {
   Typography,
   useTheme
 } from "@mui/material";
-import { AudioSquare, Book, Bookmark, DocumentText, Element4, I24Support, Notepad2, Notification, PenAdd, SearchNormal, VideoOctagon, VideoPlay } from "iconsax-reactjs";
+import { AudioSquare, Book, Bookmark, Document, DocumentText, Element4, I24Support, Notepad2, Notification, PenAdd, SearchNormal, VideoOctagon, VideoPlay } from "iconsax-reactjs";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -85,7 +85,7 @@ export default function PrimaryMenu() {
               className={isActive(PATH.TEST.EXPLORE_TEST.ROOT) ? "active" : ""}
             >
               <ListItemIcon>
-                <SearchNormal size={20} />
+                <Document size={20} />
               </ListItemIcon>
               <ListItemText primary={t("menus.exploreTest")} />
             </ListItemButton>

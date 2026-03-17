@@ -5,7 +5,7 @@ import type { LiveClassList, LiveClassProps } from "../types/liveClass";
 import type { MediaList } from "../types/media";
 import type { EsewaPaymentPayload, PurchaseModuleTypes, PurchaseProps } from "../types/purchase";
 import type { TestList } from "../types/question";
-import type { TransactionsResponse } from "../types/transactions";
+import type { ReciptProps, TransactionsResponse } from "../types/transactions";
 import type { GlobalResponse } from "../types/user";
 import { buildQueryParams } from "../utils/buildQueryParams";
 import { baseQuery } from "./baseQuery";
@@ -133,7 +133,7 @@ export const courseApi = createApi({
                 method: "GET"
             })
         }),
-        purchaseCourse: builder.mutation<GlobalResponse, { body: PurchaseProps; id: number, moduleType: PurchaseModuleTypes }>({
+        purchaseCourse: builder.mutation<GlobalResponse & { data: ReciptProps }, { body: PurchaseProps; id: number, moduleType: PurchaseModuleTypes }>({
             query: ({ body, id, moduleType }) => ({
                 url: `/purchase`,
                 method: "POST",
@@ -261,8 +261,7 @@ export const courseApi = createApi({
                 url: `/user/admit-card`,
                 method: "GET",
             })
-        })
-
+        }),
     }),
 });
 
@@ -286,5 +285,5 @@ export const {
     usePurchaseCourseWithEsewaMutation,
     useTrackCourseProgressMutation,
     useGetAllUserTransacionsQuery,
-    useDownloadAdmitCardQuery
+    useDownloadAdmitCardQuery,
 } = courseApi;

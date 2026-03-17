@@ -438,8 +438,8 @@ const commonThemeOptions: ThemeOptions = {
           }
         },
         ".active__tab__controller": {
-          ".MuiTypography-root": {
-            background: theme.palette.primary.black,
+          background: theme.palette.primary.black,
+          "h6.MuiTypography-root": {
             color: theme.palette.primary.contrastText,
           },
         },
