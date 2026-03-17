@@ -1,7 +1,6 @@
 import { Box, Collapse, useTheme } from '@mui/material';
 import { useState } from 'react';
 import type { ChapterProps, ChildLessonProps, CurriculumMediaProps, CurriculumProps, LessonProps, UnitProps } from '../../../../../../types/course';
-import type { MediaProps } from '../../../../../../types/media';
 import CustomCollapseIcon from '../../../../../atom/CustomCollapseIcon';
 import MediaCard from '../../../../../organism/Cards/MediaCard';
 
@@ -151,7 +150,7 @@ const MobileChildLesson = ({ childLesson, havePurchased, courseId }: {
                     />
                     {childLesson?.media?.length ? (
                         <div className="flex flex-col gap-3">
-                            {childLesson.media.map((item: CurriculumMediaProps & MediaProps) => (
+                            {childLesson.media.map((item: CurriculumMediaProps) => (
                                 <MediaCard havePurchased={havePurchased} type={item.type} media={item} courseId={courseId} />
                             ))}
                         </div>
@@ -196,7 +195,7 @@ const MobileLesson = ({ lesson, havePurchased, courseId }: {
 
                     {lesson?.media?.length ? (
                         <div className="flex flex-col gap-3 mb-3">
-                            {lesson.media.map((item: CurriculumMediaProps & MediaProps) => (
+                            {lesson.media.map((item: CurriculumMediaProps) => (
                                 <MediaCard havePurchased={havePurchased} type={item.type} media={item} courseId={courseId} />
                             ))}
                         </div>
@@ -255,7 +254,7 @@ const MobileUnit = ({ unit, havePurchased, courseId }: {
 
                     {unit?.media?.length ? (
                         <div className="flex flex-col gap-3 mb-3">
-                            {unit.media.map((item: CurriculumMediaProps & MediaProps) => (
+                            {unit.media.map((item: CurriculumMediaProps) => (
                                 <MediaCard havePurchased={havePurchased} type={item.type} media={item} courseId={courseId} />
                             ))}
                         </div>
@@ -310,9 +309,8 @@ const MobileChapter = ({ chapter, havePurchased, courseId }: {
 
                     {chapter?.media?.length ? (
                         <div className="flex flex-col gap-3 mb-3">
-                            {chapter.media.map((item: CurriculumMediaProps & MediaProps) => (
+                            {chapter.media.map((item: CurriculumMediaProps) => (
                                 <MediaCard havePurchased={havePurchased} type={item.type} media={item} courseId={courseId} />
-
                             ))}
                         </div>
                     ) : null}

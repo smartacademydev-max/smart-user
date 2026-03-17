@@ -1,5 +1,6 @@
 
 import type { Pagination } from ".";
+import type { MediaProps } from "./media";
 import type { GlobalResponse } from "./user";
 
 export interface SelectionType {
@@ -126,14 +127,13 @@ export const CourseTabs: { label: string; value: courseTabType }[] = [
 // Media type for curriculum items
 export type CurriculumMediaType = "temp_audios" | "temp_video" | "temp_notes"
 
-export interface CurriculumMediaProps {
+export interface CurriculumMediaProps extends MediaProps {
     id: number;
     file_name: string;
     url: string;
     size: number;
     type: CurriculumMediaType;
-    has_seen?: boolean;
-    is_downloadable?: boolean;
+
 }
 
 // Base props for all curriculum items
