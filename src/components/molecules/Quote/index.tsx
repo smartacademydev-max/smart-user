@@ -2,7 +2,7 @@ import { Box, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useGetAppSettingsQuery } from "../../../services/settingApi";
 
-export default function Quote({ icon, message, phone }: { icon: React.ReactElement, message: string, phone: string }) {
+export default function Quote({ icon, message }: { icon: React.ReactElement, message: string, phone: string }) {
 
     const { data } = useGetAppSettingsQuery();
     return (

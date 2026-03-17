@@ -2,12 +2,12 @@ import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import * as React from "react";
 
-import { useMediaQuery, useTheme } from "@mui/material";
+import { useMediaQuery } from "@mui/material";
 import Toolbar from "@mui/material/Toolbar";
 import { Link, useLocation } from "react-router-dom";
+import { useAppSelector } from "../../../../store/hook";
 import CustomAppbar from "../appbar";
 import PrimaryMenu from "./PrimaryMenu";
-import { useAppSelector } from "../../../../store/hook";
 
 
 interface Props {
@@ -21,7 +21,6 @@ export default function ResponsiveDrawer(props: Props) {
     const [isClosing, setIsClosing] = React.useState(false);
     const location = useLocation();
 
-    const theme = useTheme();
     const handleDrawerClose = () => {
         setIsClosing(true);
         setMobileOpen(false);

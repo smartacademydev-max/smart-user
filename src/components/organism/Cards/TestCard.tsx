@@ -13,6 +13,7 @@ export default function TestCard({ test, havePurchased, status: testStatus }: { 
   const status = getStatus(test?.start_datetime, test?.end_datetime);
   const { id } = useParams();
   const variant = getTestProgressStatus(test?.has_taken_test ? "completed" : "not_started");
+  console.log(testStatus)
   return (
     <Box
       className="test__card rounded-md p-4 flex flex-col justify-between"
