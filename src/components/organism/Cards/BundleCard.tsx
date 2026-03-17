@@ -1,5 +1,5 @@
 import { Box, Button, Divider, Paper, Typography } from "@mui/material";
-import { DocumentText } from "iconsax-reactjs";
+import { ArrowRight, DocumentText } from "iconsax-reactjs";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { PATH } from "../../../routes/PATH";
@@ -9,11 +9,12 @@ import { renderHtml } from "../../../utils/renderHtml";
 import { getTestStatus } from "../../../utils/statusMap";
 import StatusPillWithBorder from "../../atom/StatusPillWithBorder";
 
+import MyProgress from "../../atom/MyProgress";
 import placeholder1 from "/blue-bg.png";
 import placeholder2 from "/green-bg.png";
 import placeholder3 from "/yellow-bg.png";
 
-export default function BundleCard({ data, placeholderIndex }: { data: SetProps; placeholderIndex: number; }) {
+export default function BundleCard({ data, placeholderIndex, havePurchased }: { data: SetProps; placeholderIndex: number; havePurchased?: boolean }) {
     const { t } = useTranslation();
     const navigate = useNavigate();
 
@@ -53,7 +54,7 @@ export default function BundleCard({ data, placeholderIndex }: { data: SetProps;
                     }}>{data?.discount}{data?.discount_type === "percentage" ? "%" : t("messages.npr")} {t("messages.off")}</Typography> : ""}
                 </Box>
                 <div className="content py-3 px-3.5">
-                    {data?.thumbnail_url ? <Typography variant="h6" fontWeight={600} className="line-clamp-2 mb-2!">{data?.name}</Typography> : <div className="line-clamp-2 mb-2.5 general__content__box">
+                    {data?.thumbnail_url ? <Typography variant="h6" fontWeight={600} className="line-clamp-2 mb-2!">{data?.name}</Typography> : <div className="line-clamp-2 mb-2.5 general__content__box [&_p]:m-0!">
                         {renderHtml(data?.description || "")}</div>}
                     <div className="flex flex-wrap items-center mb-2">
                         <div className="flex gap-1 items-center">
@@ -71,20 +72,34 @@ export default function BundleCard({ data, placeholderIndex }: { data: SetProps;
                     <div className="flex flex-wrap gap-2">
                         {data?.sets.length > 0 && data?.sets.map((item) => <StatusPillWithBorder status={`${item.label} (${item.value})`} variant={getTestStatus(item.label as QuestionTypeProps)} />)}
                     </div>
+                    {havePurchased ? <div className="">
+                        <div className="flex items-center justify-between">
+                            <Typography color="text.middle" sx={{
+                                fontSize: "10px !important"
+                            }}>Your Progress</Typography>
+                            <Typography color="text.dark" fontWeight={500} sx={{
+                                fontSize: "10px !important"
+                            }}>{data?.progress || 0} % Completed</Typography>
+                        </div>
+                        <MyProgress progress={data?.progress} />
+                    </div> : ""}
                 </div>
             </div>
             <Box className="card__bottom py-2.5 px-3.5 flex justify-between items-center flex-wrap gap-2" sx={{
                 background: (theme) => theme.palette.primary.light
             }}>
-                <div className="price__wrapper">
+                {havePurchased ? <div className="progress__wrapper">
+                    <Typography variant="overline" color="primary" fontWeight={500}>Test completed</Typography>
+                    <Typography variant="subtitle2" color="text.dark" fontWeight={600}>{data.completed_set || 0} out of {data.set_count} Tests</Typography>
+                </div> : <div className="price__wrapper">
                     <Typography variant="caption" color="primary" fontWeight={500}>{t("messages.price")}</Typography>
                     <div className="flex items-end gap-1">
                         <Typography variant="subtitle1" color="text.dark" fontWeight={600}>{t("messages.npr")}{data?.sale_price}</Typography>
                         <Typography variant="caption" color="text.middle" className="line-through">{t("messages.npr")}{data?.marked_price}</Typography>
                     </div>
-                </div>
-                <Button variant="contained" color="primary" onClick={() => navigate(PATH.TEST.EXPLORE_TEST.BUNDLE_TEST.VIEW_BUNDLE.ROOT(data.id))}>
-                    {t("messages.purchase_now")}
+                </div>}
+                <Button variant="contained" color="primary" onClick={() => navigate(PATH.TEST.EXPLORE_TEST.BUNDLE_TEST.VIEW_BUNDLE.ROOT(data.id))} endIcon={havePurchased ? <ArrowRight /> : ""}>
+                    {havePurchased ? t("messages.continue") : t("messages.purchase_now")}
                 </Button>
             </Box>
         </Paper>

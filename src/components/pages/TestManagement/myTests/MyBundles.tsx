@@ -68,6 +68,7 @@ export default function MyBundles() {
                                         key={item.id}
                                         data={item}
                                         placeholderIndex={currentPlaceholderIndex}
+                                        havePurchased={true}
                                     />
                                 );
                             })}

@@ -64,6 +64,7 @@ export interface TestProps {
     sale_price?: string;
     selections: SelectionType;
     mega_categories?: string[];
+    download_format_url?: string;
     results: {
         correct_answers: number;
         score: number
@@ -154,6 +155,12 @@ export interface SetProps {
     selections: SelectionType;
     created_at: string
     mega_categories?: string[];
+    completed_set: number;
+    enrolled: number;
+    avg_score: number;
+    progress:number;
+    completed:number;
+    has_purchased: boolean;
 }
 
 

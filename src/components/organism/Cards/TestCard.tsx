@@ -9,7 +9,7 @@ import StatusPillWithBorder from "../../atom/StatusPillWithBorder";
 import type { TestStatus } from "../../pages/TestManagement/allTest/AllTestList";
 import TestActionButton from "./TestActionButton";
 
-export default function TestCard({ test, havePurchased, status:testStatus }: { test: TestProps; havePurchased: boolean; status?: TestStatus }) {
+export default function TestCard({ test, havePurchased, status: testStatus }: { test: TestProps; havePurchased: boolean; status?: TestStatus }) {
   const status = getStatus(test?.start_datetime, test?.end_datetime);
   const { id } = useParams();
   const variant = getTestProgressStatus(test?.has_taken_test ? "completed" : "not_started");
@@ -71,7 +71,15 @@ export default function TestCard({ test, havePurchased, status:testStatus }: { t
       </div>
       <div className="bottom__wrapper mt-3">
         {havePurchased && test?.test_type === "omr" ? <div className="flex justify-end items-center gap-2 mt-5">
-          <Button variant="outlined" color="primary">Download Format</Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            component="a"
+            href={test?.download_format_url}
+            download
+          >
+            Download Format
+          </Button>
           <Button variant="contained" color="primary">Start Now</Button>
         </div> :
           <TestActionButton

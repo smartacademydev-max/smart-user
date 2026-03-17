@@ -148,11 +148,12 @@ export const testApi = createApi({
             providesTags: [{ type: "Test", id: "LIST" }]
         }),
         getAllBundle: builder.query<SetList, QueryParams & { type?: QuestionTypeProps; days?: number | null; categoryFilter?: CategoryFilterParams; }>({
-            query: ({ pageIndex, pageSize, search }) => ({
+            query: ({ pageIndex, pageSize, search, categoryFilter }) => ({
                 url: `/bundle?${buildQueryParams({
                     page: pageIndex,
                     page_size: pageSize,
-                    search
+                    search,
+                    mega_categories: categoryFilter?.mega_category,
                 })}`,
                 method: "GET",
             }),
@@ -172,12 +173,23 @@ export const testApi = createApi({
             }),
             providesTags: (_result, _error, { id }) => [{ type: "Set", id }]
         }),
-        getTestRelatedToBundle: builder.query<TestList, QueryParams & { id: number, type: QuestionTypeProps }>({
-            query: ({ id, pageIndex, pageSize, type }) => ({
+        getTestRelatedToBundle: builder.query<TestList, QueryParams & QueryParams & { id?: number, status?: string, type?: QuestionTypeProps }>({
+            query: ({ id, pageIndex, pageSize, type, status }) => ({
                 url: `/bundle/${id}/selected-test?${buildQueryParams({
                     page: pageIndex,
                     page_size: pageSize,
-                    type
+                    type, status
+                })}`,
+                method: "GET",
+            }),
+            providesTags: (_result, _error, { id }) => [{ type: "Set", id }]
+        }),
+        getUserPurchasedTestRelatedToBundle: builder.query<TestList, QueryParams & QueryParams & { id?: number, status?: string, type?: QuestionTypeProps }>({
+            query: ({ id, pageIndex, pageSize, type, status }) => ({
+                url: `/my-bundle/${id}/test?${buildQueryParams({
+                    page: pageIndex,
+                    page_size: pageSize,
+                    type, status
                 })}`,
                 method: "GET",
             }),
@@ -205,5 +217,6 @@ export const {
     useGetAllBundleQuery,
     useGetBundleByIdQuery,
     useGetBundleByOverviewQuery,
-    useGetTestRelatedToBundleQuery
+    useGetTestRelatedToBundleQuery,
+    useGetUserPurchasedTestRelatedToBundleQuery
 } = testApi;

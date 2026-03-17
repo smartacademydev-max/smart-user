@@ -1,10 +1,12 @@
 import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
+import { useGetAllCategoryQuery } from "../../../../../services/categoryApi";
+import { useGetAllBundleQuery } from "../../../../../services/testApi";
 import TablePagination from "../../../../molecules/Pagination";
+import TabController from "../../../../molecules/TabController";
 import BundleCard from "../../../../organism/Cards/BundleCard";
 import EmptyRoute from "../../../../organism/EmptyRoute";
 import TableFilter from "../../../../organism/TableFilter";
-import { useGetAllBundleQuery } from "../../../../../services/testApi";
 
 export default function ExploreBundle() {
     const [search, setSearch] = useState("")
@@ -20,12 +22,22 @@ export default function ExploreBundle() {
         startDate: "",
         endDate: ""
     });
+    const { data: categories } = useGetAllCategoryQuery({ pageIndex: 1, pageSize: 10 });
+
     const [days, _setDays] = useState<number | null>(null);
+    const [options, setOptions] = useState<{ label: string; value: number }[]>([]);
+    const [activeCategory, setActiveCategory] = useState(0);
+
 
     const { data, isLoading } = useGetAllBundleQuery({
         ...qp, search: debouncedSearch,
         ...customRange,
         days,
+        ...(activeCategory !== 0 && {
+            categoryFilter: {
+                mega_category: [activeCategory],
+            },
+        })
     });
 
     const bundles = data?.data?.data || [];
@@ -34,10 +46,32 @@ export default function ExploreBundle() {
         const timer = setTimeout(() => setDebouncedSearch(search), 1000);
         return () => clearTimeout(timer);
     }, [search]);
+
+    useEffect(() => {
+        const list = categories?.data || [];
+
+        const formatted = list.map((category) => ({
+            label: category.name,
+            value: Number(category?.id),
+        }));
+
+        setOptions([{ label: "All", value: 0 }, ...formatted]);
+    }, [categories]);
+
     return (
         <>
-            <div className="top__header mt-4 pb-1">
-                <TableFilter search={search} setSearch={setSearch} />
+            <div className="top__header mt-4 pb-1 flex flex-col gap-4 md:grid md:grid-cols-12">
+                <div className="col-span-7">
+                    <TabController
+                        options={options}
+                        currentActive={activeCategory}
+                        setActiveTab={(val) => setActiveCategory(val)}
+                    />
+                </div>
+                <div className="col-span-1"></div>
+                <div className="col-span-4">
+                    <TableFilter search={search} setSearch={setSearch} />
+                </div>
             </div>
             <div className="individual__root h-full overflow-auto pr-2">
                 {!isLoading && !bundles.length ?

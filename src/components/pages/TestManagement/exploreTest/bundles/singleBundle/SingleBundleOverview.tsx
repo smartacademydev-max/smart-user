@@ -56,20 +56,31 @@ export default function SingleBundleOverview({ data }: { data: SetOveriew }) {
                             color: (theme) => theme.palette.separator.darkest
                         }} />
                         <Typography variant="subtitle1" color="text.dark" className="flex items-center gap-1">
-                            <Box sx={{ color: (theme) => theme.palette.error.main }}><Profile2User size={20} variant="Bold" /></Box>  <strong>{data?.total_questions}</strong> Enrolled
+                            <Box sx={{ color: (theme) => theme.palette.error.main }}><Profile2User size={20} variant="Bold" /></Box>  <strong>{data?.enrolled}</strong> Enrolled
                         </Typography>
                         <Divider orientation="vertical" className="h-4!" sx={{
                             color: (theme) => theme.palette.separator.darkest
                         }} />
                         <Typography variant="subtitle1" color="text.dark" className="flex items-center gap-1">
-                            <Box sx={{ color: (theme) => theme.palette.success.main }}><StatusUp size={20} variant="Bold" /></Box>  <strong>{data?.total_questions}</strong> Avg. Score
+                            <Box sx={{ color: (theme) => theme.palette.success.main }}><StatusUp size={20} variant="Bold" /></Box>  <strong>{data?.avg_score}</strong> Avg. Score
                         </Typography>
                     </div>
                 </div>
             </Box>
 
             <div className="col-span-3 h-full purchase__wrapper lg:rounded-tr-md lg:rounded-br-md overflow-hidden relative">
-                <Box sx={{
+                {data?.has_purchased ? <Box sx={{
+                    background: (theme) => theme.palette.success.light,
+                    padding: "16px 32px",
+                    height: "100%"
+                }}>
+                    <div className="flex">
+                        <div className="brief">
+                            <Typography variant="h6" fontWeight={500}>Test in progress</Typography>
+                            <Typography variant="subtitle2" color="text.middle">Your test is still in progress.</Typography>
+                        </div>
+                    </div>
+                </Box> : <Box sx={{
                     background: (theme) => theme.palette.primary.light,
                     padding: "16px 32px",
                     height: "100%"
@@ -92,7 +103,7 @@ export default function SingleBundleOverview({ data }: { data: SetOveriew }) {
                     }}>
                         <Typography variant="h6" className="text-white font-medium" >{t("messages.offer")}</Typography>
                     </Box> : ""}
-                </Box>
+                </Box>}
             </div>
         </div>
     )

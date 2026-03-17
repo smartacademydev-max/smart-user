@@ -9,7 +9,7 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
     },
     [`& .${linearProgressClasses.bar}`]: {
         borderRadius: 5,
-        backgroundColor: "#22c55e", // GREEN (same as Tailwind's green-500)
+        backgroundColor: "#22c55e",
     },
 }));
 
