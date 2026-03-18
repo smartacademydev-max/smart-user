@@ -1,9 +1,12 @@
-import { Box } from "@mui/material";
+import { Box, Divider, IconButton, Typography } from "@mui/material";
+import { DocumentCopy, Medal, MedalStar, TickCircle } from "iconsax-reactjs";
 import { useEffect, useState } from "react";
-import { useGetUserBundlesQuery } from "../../../../services/testApi";
+import { useTranslation } from "react-i18next";
+import { useGetUserBundlesQuery, useGetUserBunldeAnalyticsQuery } from "../../../../services/testApi";
 import TablePagination from "../../../molecules/Pagination";
 import BundleCard from "../../../organism/Cards/BundleCard";
 import EmptyRoute from "../../../organism/EmptyRoute";
+import PageHeader from "../../../organism/PageHeader";
 import TableFilter from "../../../organism/TableFilter";
 
 
@@ -13,6 +16,7 @@ export default function MyBundles() {
         pageIndex: 1,
         pageSize: 12
     })
+    const { t } = useTranslation();
     let placeholderIndex = 0;
 
     const [debouncedSearch, setDebouncedSearch] = useState<string>("");
@@ -31,15 +35,52 @@ export default function MyBundles() {
         days,
     });
 
+    const { data: analytics } = useGetUserBunldeAnalyticsQuery();
+
     const bundles = data?.data?.data || [];
 
     useEffect(() => {
         const timer = setTimeout(() => setDebouncedSearch(search), 1000);
         return () => clearTimeout(timer);
     }, [search]);
+
+    const variant = "primary"
     return (
         <>
             <div className="top__header mt-4 pb-1">
+                <PageHeader
+                    breadcrumb={[
+                        { title: t("messages.my_bundles") }
+                    ]}
+                />
+            </div>
+            {analytics && analytics?.data.length > 0 ? <div className="bunlde__analytics flex flex-col gap-4 sm:grid sm:grid-cols-2 xl:grid-cols-4 mb-6 lg:mb-8">
+                {analytics?.data?.map((analytic) => (
+                    <div className="col-span-1 h-full" key={analytic.title}>
+                        <Box sx={{
+                            height: "100%",
+                            borderRadius: "8px",
+                            padding: "16px 24px",
+                            border: (theme) => `1px solid ${theme.palette[analytic.type].main}`,
+                            borderLeft: (theme) => `4px solid ${theme.palette[analytic.type].main}`,
+                        }}>
+                            <Typography variant="h5" fontWeight={500}>{analytic.title}</Typography>
+                            <Divider className="my-3!" />
+                            <div className="flex justify-between">
+                                <div className="content">
+                                    <Typography variant="h3" fontWeight={500}>{analytic.value}</Typography>
+                                    <Typography variant="subtitle2" color={analytic.type}>{analytic.description}</Typography>
+                                </div>
+                                <IconButton color={analytic.type}>
+                                    {analytic.type == "info" ? <DocumentCopy /> : analytic.type === "warning" ? <Medal /> : analytic.type === "success" ? <TickCircle /> : <MedalStar />}
+                                </IconButton>
+                            </div>
+                        </Box>
+                    </div>
+                ))}
+            </div> : ""}
+
+            <div className="filter flex flex-col gap-4 md:grid grid-cols-2">
                 <TableFilter search={search} setSearch={setSearch} />
             </div>
             <div className="individual__root h-full overflow-auto pr-2">

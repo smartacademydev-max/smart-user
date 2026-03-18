@@ -1,5 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import type { CategoryFilterParams, QueryParams } from "../types";
+import type { AnalyticsList } from "../types/dashboard";
 import type { McqReportData, McqSubmissionPayload, McqSubmissionResponse, QuestionTypeProps, SetList, SetOveriew, SetProps, SingleMcqResponse, TestList, TestProps } from "../types/question";
 import type { GlobalResponse } from "../types/user";
 import { buildQueryParams } from "../utils/buildQueryParams";
@@ -195,6 +196,12 @@ export const testApi = createApi({
             }),
             providesTags: (_result, _error, { id }) => [{ type: "Set", id }]
         }),
+        getUserBunldeAnalytics: builder.query<AnalyticsList, void>({
+            query: () => ({
+                url: `/my-bundle/analytics`,
+                method: "GET"
+            })
+        }),
     })
 })
 
@@ -218,5 +225,6 @@ export const {
     useGetBundleByIdQuery,
     useGetBundleByOverviewQuery,
     useGetTestRelatedToBundleQuery,
-    useGetUserPurchasedTestRelatedToBundleQuery
+    useGetUserPurchasedTestRelatedToBundleQuery,
+    useGetUserBunldeAnalyticsQuery
 } = testApi;

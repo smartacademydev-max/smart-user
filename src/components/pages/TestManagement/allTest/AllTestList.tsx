@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PATH } from "../../../../routes/PATH";
 import { useGetUserPurchasedCourseQuery } from "../../../../services/courseApi";
 import type { QueryParams } from "../../../../types";
@@ -41,12 +41,12 @@ export default function AlltestList() {
 
     const resetKey = `${activeTab}__${selectedCourseId}__${search}`;
 
-    const baseParams: QueryParams = {
+    const baseParams: QueryParams = useMemo(() => ({
         pageIndex: 1,
         pageSize: 8,
         search,
         ...(selectedCourseId ? { courseId: selectedCourseId } : {}),
-    };
+    }), [search, selectedCourseId]);
 
     const notStarted = usePaginatedTests(baseParams, activeTab, "not_started", resetKey);
     const completed = usePaginatedTests(baseParams, activeTab, "completed", resetKey);

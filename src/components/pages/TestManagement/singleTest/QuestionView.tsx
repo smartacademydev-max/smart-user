@@ -6,9 +6,10 @@ interface Props {
     currentQuestion: QuestionProps | null;
     setAttendedQuestion: (newValue: Answers) => void;
     attendedQuestion: Answers[];
+    disabled?: boolean;
 }
 
-export default function QuestionView({ currentQuestion, setAttendedQuestion, attendedQuestion }: Props) {
+export default function QuestionView({ currentQuestion, setAttendedQuestion, attendedQuestion, disabled = false }: Props) {
     const theme = useTheme();
 
     // Find if current question has been attended
@@ -59,7 +60,10 @@ export default function QuestionView({ currentQuestion, setAttendedQuestion, att
             </Typography>
             <RadioGroup
                 value={selectedOptionId || ""}
-                onChange={(e) => handleOptionChange(Number(e.target.value))}
+                onChange={(e) => {
+                    if (disabled) return;
+                    handleOptionChange(Number(e.target.value));
+                }}
             >
                 <div className="flex flex-col gap-4 md:gap-6 md:grid md:grid-cols-2">
                     {currentQuestion?.options ? currentQuestion.options.map((option) => {
@@ -76,7 +80,9 @@ export default function QuestionView({ currentQuestion, setAttendedQuestion, att
                                             : theme.palette.separator.dark,
                                         backgroundColor: isAttended
                                             ? theme.palette.primary.light
-                                            : ""
+                                            : "",
+                                        opacity: disabled ? 0.6 : 1,
+                                        pointerEvents: disabled ? "none" : "auto"
                                     }}
                                 >
                                     <FormControlLabel

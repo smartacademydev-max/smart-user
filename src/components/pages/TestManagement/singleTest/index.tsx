@@ -132,14 +132,16 @@ export default function SingleTestRoot() {
         const timeRemainingFromEnd = endTime ? Math.max(endTime - currentTime, 0) : null;
 
         if (timeRemainingFromEnd !== null && timeRemainingFromEnd <= 0) {
-            dispatch(
-                showToast({
-                    message: "This test has already ended.",
-                    severity: "error",
-                })
-            );
+            // dispatch(
+            //     showToast({
+            //         message: "This test has already ended.",
+            //         severity: "error",
+            //     })
+            // );
             localStorage.removeItem(STORAGE_KEY);
-            navigate(PATH.TEST.ROOT);
+            setCurrentQuestion(data.data[0]);
+            setTimeLeft(0);
+            // navigate(PATH.TEST.ROOT);
             return;
         }
 
@@ -225,7 +227,9 @@ export default function SingleTestRoot() {
     useEffect(() => {
         if (timeLeft === 0 && !timerPaused) {
             setTimerPaused(true);
-            handleSubmit("timer");
+            if (!isExpired) {
+                handleSubmit("timer");
+            }
         }
     }, [timeLeft, timerPaused]);
 
@@ -290,10 +294,15 @@ export default function SingleTestRoot() {
     const isReady = !!data && !isLoading && !isFetching;
     const isMCQ = data?.overview?.test_type === "mcq";
     const questions = data?.data ?? [];
-
+    const endTime = data?.overview?.end_datetime
+        ? new Date(data.overview.end_datetime).getTime()
+        : null;
+    const isExpired = timeLeft === 0 || (endTime !== null && Date.now() >= endTime);
     const isFirst = currentIndex === 0;
     const isLast = currentIndex === questions.length - 1;
 
+
+    console.log("expired", isExpired)
 
     if (!isReady) {
         return (
@@ -312,9 +321,11 @@ export default function SingleTestRoot() {
         return (
             <div className="subject__test_view h-full flex flex-col overflow-hidden">
                 <WaterMark />
-                <Button startIcon={<ArrowLeft />} onClick={() => navigate(-1)}>
-                    Back to Test
-                </Button>
+                <div className="text-left">
+                    <Button startIcon={<ArrowLeft />} onClick={() => navigate(-1)}>
+                        Back to Test
+                    </Button>
+                </div>
 
                 <Divider className="my-4!" />
                 <div className="mb-4">
@@ -345,7 +356,7 @@ export default function SingleTestRoot() {
     }
 
     return (
-        <div className="single__test__wrapper">
+        <div className="single__test__wrapper overflow-auto">
             <Button startIcon={<ArrowLeft />} onClick={() => setCancelModal(true)}>
                 Back to Test
             </Button>
@@ -368,6 +379,7 @@ export default function SingleTestRoot() {
                 currentQuestion={currentQuestion}
                 attendedQuestion={attendedQuestion}
                 setAttendedQuestion={handleAnswer}
+                disabled={isExpired}
             />
 
             <div className="flex justify-between my-6">
@@ -386,13 +398,14 @@ export default function SingleTestRoot() {
                     variant="contained"
                     onClick={() =>
                         isLast
-                            ? setSubmitModal({ open: true, type: "submit" })
+                            ? !isExpired && setSubmitModal({ open: true, type: "submit" })
                             : (() => {
                                 const next = currentIndex + 1;
                                 setCurrentIndex(next);
                                 setCurrentQuestion(questions[next]);
                             })()
                     }
+                    disabled={isLast && isExpired}
                 >
                     {isLast ? "Submit" : "Next"}
                 </Button>
@@ -417,7 +430,8 @@ export default function SingleTestRoot() {
             <TestResultDialog
                 open={resultOpen}
                 result={result}
-                onReview={() =>
+                onReview={() => {
+                    localStorage.removeItem(RESULT_KEY);
                     navigate(
                         PATH.COURSE_MANAGEMENT.COURSES.VIEW_TEST.REVIEW_TEST.ROOT({
                             courseId: numericCourseId,
@@ -425,12 +439,15 @@ export default function SingleTestRoot() {
                         })
                     )
                 }
-                onBack={() =>
+                }
+                onBack={() => {
+                    localStorage.removeItem(RESULT_KEY);
                     navigate(
                         PATH.COURSE_MANAGEMENT.COURSES.VIEW_COURSE.ROOT(
                             numericCourseId
                         )
                     )
+                }
                 }
             />
         </div>

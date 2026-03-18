@@ -1,6 +1,6 @@
 import { Box, Divider, Tab, Tabs, Typography, useTheme } from "@mui/material";
 import { Book1, Calendar1, Clock, CloseCircle, TickCircle, Timer1 } from "iconsax-reactjs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useGetTestResultQuery, useReviewTestResultQuery } from "../../../../services/testApi";
 import { formatDateCustom, formatDateTime } from "../../../../utils/dateFormat";
@@ -15,6 +15,13 @@ export default function ReviewTestRoot() {
     const [tabIndex, setTabIndex] = useState(0);
 
     const handleTabChange = (_: any, newValue: number) => setTabIndex(newValue);
+
+    useEffect(() => {
+        const RESULT_KEY = `mcq_test_result_${courseId}_${testId}`;
+        const STORAGE_KEY = `mcq_test_progress_${courseId}_${testId}`;
+        localStorage.removeItem(RESULT_KEY);
+        localStorage.removeItem(STORAGE_KEY);
+    }, [courseId, testId]);
 
     const items = [
         { icon: Book1, label: "Total Questions:", value: `${data?.data?.total_questions} Questions` },

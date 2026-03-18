@@ -118,8 +118,33 @@ export default function PurchaseSuccess() {
         verifyPayment();
     }, []);
 
+    useEffect(() => {
+        const style = document.createElement('style');
+        style.id = 'receipt-print-style';
+        style.innerHTML = `
+        @media print {
+            body * { visibility: hidden !important; }
+            #receipt-print-area, #receipt-print-area * { visibility: visible !important; }
+            #receipt-print-area {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                padding: 32px !important;
+                box-shadow: none !important;
+            }
+        }
+    `;
+        document.head.appendChild(style);
+
+        return () => {
+            document.getElementById('receipt-print-style')?.remove();
+        };
+    }, []);
+
     const handleReciptDownload = async () => {
         try {
+            window.print();
             dispatch(showToast({
                 message: "Recipt Downloaded Successfully",
                 severity: "error"
@@ -168,7 +193,7 @@ export default function PurchaseSuccess() {
                     </Typography>
                 </div>
 
-                <Box className="rounded-md py-6 px-4" sx={{
+                <Box className="rounded-md py-6 px-4" id="receipt-print-area" sx={{
                     border: (theme) => `1px solid ${theme.palette.separator.dark}`,
                 }} >
                     <Box

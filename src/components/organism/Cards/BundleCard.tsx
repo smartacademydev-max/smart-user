@@ -90,7 +90,7 @@ export default function BundleCard({ data, placeholderIndex, havePurchased }: { 
             }}>
                 {havePurchased ? <div className="progress__wrapper">
                     <Typography variant="overline" color="primary" fontWeight={500}>Test completed</Typography>
-                    <Typography variant="subtitle2" color="text.dark" fontWeight={600}>{data.completed_set || 0} out of {data.set_count} Tests</Typography>
+                    <Typography variant="subtitle2" color="text.dark" fontWeight={600}>{data.completed || 0} out of {data.set_count} Tests</Typography>
                 </div> : <div className="price__wrapper">
                     <Typography variant="caption" color="primary" fontWeight={500}>{t("messages.price")}</Typography>
                     <div className="flex items-end gap-1">

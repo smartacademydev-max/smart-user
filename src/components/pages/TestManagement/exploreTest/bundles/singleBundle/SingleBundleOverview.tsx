@@ -1,19 +1,20 @@
-import { Box, Button, Divider, Typography } from "@mui/material";
-import { Notepad2, Profile2User, StatusUp } from "iconsax-reactjs";
+import { Box, Button, Divider, IconButton, Typography } from "@mui/material";
+import { Notepad2, PlayCircle, Profile2User, StatusUp, TickCircle, Timer } from "iconsax-reactjs";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { PATH } from "../../../../../../routes/PATH";
 import type { QuestionTypeProps, SetOveriew } from "../../../../../../types/question";
 import { renderHtml } from "../../../../../../utils/renderHtml";
 import { getTestStatus } from "../../../../../../utils/statusMap";
+import Donut from "../../../../../atom/Donut";
 import StatusPillWithBorder from "../../../../../atom/StatusPillWithBorder";
 
 export default function SingleBundleOverview({ data }: { data: SetOveriew }) {
     const { t } = useTranslation();
     const navigate = useNavigate();
     return (
-        <div className="flex flex-col gap-4 lg:gap-0 lg:grid lg:grid-cols-12 items-stretch">
-            <Box className="col-span-9 overview__wrapper p-4 lg:rounded-tl-md lg:rounded-bl-md flex gap-2" sx={{
+        <div className="flex flex-col gap-4 lg:gap-0 2xl:grid lg:grid-cols-12 items-stretch">
+            <Box className=" 2xl:col-span-8 overview__wrapper p-4 lg:rounded-tl-md lg:rounded-bl-md flex gap-2" sx={{
                 border: (theme) => `1px solid ${theme.palette.separator.dark}`
             }}>
                 {data?.thumbnail_url ? <div className="aspect-222/176 sm:max-w-[222px] rounded-md overflow-hidden">
@@ -68,17 +69,25 @@ export default function SingleBundleOverview({ data }: { data: SetOveriew }) {
                 </div>
             </Box>
 
-            <div className="col-span-3 h-full purchase__wrapper lg:rounded-tr-md lg:rounded-br-md overflow-hidden relative">
+            <div className=" 2xl:col-span-4 h-full purchase__wrapper lg:rounded-tr-md lg:rounded-br-md overflow-hidden relative">
                 {data?.has_purchased ? <Box sx={{
                     background: (theme) => theme.palette.success.light,
                     padding: "16px 32px",
                     height: "100%"
                 }}>
-                    <div className="flex">
+                    <div className="flex items-center gap-4 ">
+                        <Donut progress={data?.progress} size={80} thickness={9} />
                         <div className="brief">
-                            <Typography variant="h6" fontWeight={500}>Test in progress</Typography>
+                            <Typography variant="h6" fontWeight={600}>Test in progress</Typography>
                             <Typography variant="subtitle2" color="text.middle">Your test is still in progress.</Typography>
                         </div>
+                    </div>
+                    <Divider className="my-4! lg:my-5!" />
+                    <Typography variant="caption" color="text.light">Test Overview</Typography>
+                    <div className="flex">
+                        <Typography variant="subtitle2" className="flex items-center gap-1" fontWeight={500}><IconButton color="success"><TickCircle variant="Bold" size={20} /></IconButton>{data?.completed} Completed</Typography>
+                        <Typography variant="subtitle2" className="flex items-center gap-1" fontWeight={500}><IconButton color="info"><PlayCircle variant="Bold" size={20} /></IconButton>{data?.in_progress_count} in Progress</Typography>
+                        <Typography variant="subtitle2" className="flex items-center gap-1" fontWeight={500}><IconButton color="error"><Timer variant="Bold" size={20} /></IconButton>{data?.not_started_count} Not Started</Typography>
                     </div>
                 </Box> : <Box sx={{
                     background: (theme) => theme.palette.primary.light,

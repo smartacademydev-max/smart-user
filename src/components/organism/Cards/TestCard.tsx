@@ -5,6 +5,7 @@ import type { TestProps } from "../../../types/question";
 import { formatDateTime } from "../../../utils/dateFormat";
 import { getStatus } from "../../../utils/getStatus";
 import { getTestProgressStatus } from "../../../utils/statusMap";
+import Donut from "../../atom/Donut";
 import StatusPillWithBorder from "../../atom/StatusPillWithBorder";
 import type { TestStatus } from "../../pages/TestManagement/allTest/AllTestList";
 import TestActionButton from "./TestActionButton";
@@ -12,8 +13,7 @@ import TestActionButton from "./TestActionButton";
 export default function TestCard({ test, havePurchased, status: testStatus }: { test: TestProps; havePurchased: boolean; status?: TestStatus }) {
   const status = getStatus(test?.start_datetime, test?.end_datetime);
   const { id } = useParams();
-  const variant = getTestProgressStatus(test?.has_taken_test ? "completed" : "not_started");
-  console.log(testStatus)
+  const variant = getTestProgressStatus(!test?.has_taken_test ? "not_started" : !test?.is_graded ? "awaiting_review" : "completed");
   return (
     <Box
       className="test__card rounded-md p-4 flex flex-col justify-between"
@@ -30,7 +30,7 @@ export default function TestCard({ test, havePurchased, status: testStatus }: { 
             background: (theme) => theme.palette.primary.light,
             color: (theme) => theme.palette.primary.main,
           }}>{test?.selections?.mega_category[0] || "Loksewa"}</Typography>
-          <StatusPillWithBorder showIcon={true} variant={variant} status={!test?.has_taken_test ? "Not Started" : "Completed"} />
+          <StatusPillWithBorder showIcon={true} variant={variant} status={!test?.has_taken_test ? "Not Started" : !test?.is_graded ? "Awaiting" : "Completed"} />
         </div>
         <Typography variant="subtitle1" fontWeight={600} color="text.dark" className="mb-3!">
           {test?.name}
@@ -69,6 +69,17 @@ export default function TestCard({ test, havePurchased, status: testStatus }: { 
             <strong> {test?.pass_mark}</strong> Pass marks
           </Typography>
         </Box>
+        {testStatus === "awaiting" ? <Box sx={{
+          marginTop: "12px",
+          marginBottom: "16px",
+          padding: "6px 12px",
+          borderRadius: "8px",
+          background: (theme) => theme.palette.warning.light
+        }}>
+          <Typography color="warning" sx={{
+            fontSize: "10px !important",
+          }}>Your submission is complete and pending review; you'll be notified once graded.</Typography>
+        </Box> : ""}
       </div>
       <div className="bottom__wrapper mt-3">
         {havePurchased && test?.test_type === "omr" ? <div className="flex justify-end items-center gap-2 mt-5">
@@ -83,12 +94,26 @@ export default function TestCard({ test, havePurchased, status: testStatus }: { 
           </Button>
           <Button variant="contained" color="primary">Start Now</Button>
         </div> :
-          <TestActionButton
-            test={test}
-            status={status}
-            havePurchased={havePurchased}
-            id={test?.course_id ? Number(test?.course_id) : Number(id)}
-          />}
+          <div className="flex items-center justify-between">
+            <TestActionButton
+              test={test}
+              status={status}
+              havePurchased={havePurchased}
+              id={test?.course_id ? Number(test?.course_id) : Number(id)}
+            />
+            {testStatus === "completed" ? <div className="flex items-center gap-2">
+              <Donut
+                progress={test?.results?.score || 0}
+                size={60}
+                thickness={6}
+              />
+              <div className="content">
+                <strong className="block text-[12px] leading-1">Your Score</strong>
+                <p className="text-[14px]"><strong>{test?.results?.attempted || 0}</strong>/{test?.total_questions}</p>
+              </div>
+            </div> : ""}
+          </div>
+        }
       </div>
     </Box>
   );

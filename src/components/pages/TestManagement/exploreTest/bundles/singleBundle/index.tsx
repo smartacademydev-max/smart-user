@@ -52,7 +52,7 @@ export default function SingleBundle() {
                     { title: overview?.data?.name || "" }
                 ]}
             />
-            <div className="h-full overflow-auto">
+            <div className="h-full overflow-auto pr-2">
                 {overview ? <SingleBundleOverview data={overview.data} /> : ""}
 
                 <Typography variant="h4" className="mt-4! lg:mt-8!" fontWeight={600}>{t("messages.tests_in_this_bundle")}</Typography>

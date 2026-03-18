@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material'
-import { Lock, PlayCircle, TickCircle } from 'iconsax-reactjs'
+import { Clock, Lock, PlayCircle, TickCircle } from 'iconsax-reactjs'
 import type { StatusVariant } from '../../utils/statusMap'
 
 export default function StatusPillWithBorder({ status, variant, showIcon = false }: { variant: StatusVariant, status: string, showIcon?: boolean }) {
@@ -18,7 +18,7 @@ export default function StatusPillWithBorder({ status, variant, showIcon = false
                     <PlayCircle variant="Bold" />
                 ) : variant === "success" ? (
                     <TickCircle variant="Bold" />
-                ) : null
+                ) : <Clock variant='Bold' />
             )}
             <Typography variant='caption' className='text-center w-full text-nowrap capitalize'>{status}</Typography>
         </Box>

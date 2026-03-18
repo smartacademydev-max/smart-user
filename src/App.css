@@ -4,6 +4,40 @@
     --breakpoint-3xl: 120rem;
 }
 
+@font-face {
+    font-family: "HelveticaNeueCyr";
+    src: url("/fonts/HelveticaNeueCyr-Light.woff2") format("woff2");
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "HelveticaNeueCyr";
+    src: url("/fonts/HelveticaNeueCyr-Roman.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "HelveticaNeueCyr";
+    src: url("/fonts/HelveticaNeueCyr-Medium.woff2") format("woff2");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "HelveticaNeueCyr";
+    src: url("/fonts/HelveticaNeueCyr-Bold.woff2") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+
+
 button.plyr__control.plyr__control--overlaid {
     width: 120px !important;
     height: 120px !important;

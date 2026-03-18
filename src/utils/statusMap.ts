@@ -44,5 +44,5 @@ export const getTestProgressStatus = statusMap<ProgressStatusProps>({
     completed: "success",
     in_progress: "warning",
     not_started: "error",
-    awaiting_review: "error",
+    awaiting_review: "info",
 });

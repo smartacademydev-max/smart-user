@@ -72,6 +72,7 @@
         "tests_in_this_bundle": "Tests in this Bundle",
         "offer": "Offer",
         "load_more": "Load More",
+        "my_bundles": "My Bundles",
         "empty_states": {
             "gorkhapatra": {
                 "title": "No Gorkhapatra Found",

@@ -1,5 +1,5 @@
 import type { ThemeOptions } from "@mui/material/styles";
-import { createTheme } from "@mui/material/styles";
+import { createTheme, responsiveFontSizes } from "@mui/material/styles";
 import { darkPalette } from "./palette/darkPalette";
 import { lightPalette } from "./palette/lightPalette";
 
@@ -121,159 +121,47 @@ declare module "@mui/material/styles" {
 // Common theme options
 const commonThemeOptions: ThemeOptions = {
   typography: {
-    fontFamily: '"Noto Sans", sans-serif',
+    fontFamily: '"HelveticaNeueCyr", "Noto Sans", sans-serif',
 
     h1: {
-      fontSize: "48px",
-      lineHeight: "67px",
-      [`@media (min-width:600px)`]: {
-        fontSize: "56px",
-        lineHeight: "80px",
-      },
-      [`@media (min-width:1200px)`]: {
-        fontSize: "64px",
-        lineHeight: "90px",
-      },
+      fontSize: "64px",
+      lineHeight: 1.41
     },
-
     h2: {
-      fontSize: "24px",
-      lineHeight: "32px",
-      [`@media (min-width:600px)`]: {
-        fontSize: "42px",
-        lineHeight: "60px",
-      },
-      [`@media (min-width:1200px)`]: {
-        fontSize: "48px",
-        lineHeight: "67px",
-      },
+      fontSize: "48px", lineHeight: 1.4
     },
 
     h3: {
-      fontSize: "24px",
-      lineHeight: "34px",
-      [`@media (min-width:600px)`]: {
-        fontSize: "28px",
-        lineHeight: "40px",
-      },
-      [`@media (min-width:1200px)`]: {
-        fontSize: "32px",
-        lineHeight: "45px",
-      },
+      fontSize: "32px", lineHeight: 1.41
     },
     h4: {
-      fontSize: "14px",
-      lineHeight: "24px",
-      [`@media (min-width:600px)`]: {
-        fontSize: "22px",
-        lineHeight: "32px",
-      },
-      [`@media (min-width:1200px)`]: {
-        fontSize: "24px",
-        lineHeight: "34px",
-      },
+      fontSize: "24px", lineHeight: 1.42
     },
     h5: {
-      fontSize: "16px",
-      lineHeight: "26px",
-      [`@media (min-width:600px)`]: {
-        fontSize: "18px",
-        lineHeight: "28px",
-      },
-      [`@media (min-width:1200px)`]: {
-        fontSize: "20px",
-        lineHeight: "30px",
-      },
+      fontSize: "20px", lineHeight: 1.5
     },
     h6: {
-      fontSize: "14px",
-      lineHeight: "24px",
-      [`@media (min-width:600px)`]: {
-        fontSize: "16px",
-        lineHeight: "26px",
-      },
-      [`@media (min-width:1200px)`]: {
-        fontSize: "18px",
-        lineHeight: "28px",
-      },
+      fontSize: "18px", lineHeight: 1.56
     },
-
     body1: {
-      fontSize: "16px",
-      lineHeight: "24px",
-      [`@media (min-width:600px)`]: {
-        fontSize: "18px",
-        lineHeight: "26px",
-      },
-      [`@media (min-width:1200px)`]: {
-        fontSize: "20px",
-        lineHeight: "28px",
-      },
+      fontSize: "20px", lineHeight: 1.4
     },
 
     body2: {
-      fontSize: "14px",
-      lineHeight: "20px",
-      [`@media (min-width:600px)`]: {
-        fontSize: "16px",
-        lineHeight: "22px",
-      },
-      [`@media (min-width:1200px)`]: {
-        fontSize: "18px",
-        lineHeight: "26px",
-      },
+      fontSize: "18px", lineHeight: 1.44
     },
-
     subtitle1: {
-      fontSize: "14px",
-      lineHeight: "20px",
-      [`@media (min-width:600px)`]: {
-        fontSize: "15px",
-        lineHeight: "22px",
-      },
-      [`@media (min-width:1200px)`]: {
-        fontSize: "16px",
-        lineHeight: "24px",
-      },
+      fontSize: "16px", lineHeight: 1.5
     },
-
     subtitle2: {
-      fontSize: "12px",
-      lineHeight: "16px",
-      [`@media (min-width:600px)`]: {
-        fontSize: "13px",
-        lineHeight: "18px",
-      },
-      [`@media (min-width:1200px)`]: {
-        fontSize: "14px",
-        lineHeight: "19px",
-      },
+      fontSize: "14px", lineHeight: 1.36
     },
-
     caption: {
-      fontSize: "10px",
-      lineHeight: "14px",
-      [`@media (min-width:600px)`]: {
-        fontSize: "11px",
-        lineHeight: "15px",
-      },
-      [`@media (min-width:1200px)`]: {
-        fontSize: "12px",
-        lineHeight: "16px",
-      },
+      fontSize: "12px", lineHeight: 1.33
     },
 
     overline: {
-      fontSize: "6px",
-      lineHeight: "9px",
-      [`@media (min-width:600px)`]: {
-        fontSize: "7px",
-        lineHeight: "10px",
-      },
-      [`@media (min-width:1200px)`]: {
-        fontSize: "8px",
-        lineHeight: "11px",
-      },
+      fontSize: "8px", lineHeight: 1.38
     },
   },
   shape: {
@@ -283,7 +171,8 @@ const commonThemeOptions: ThemeOptions = {
     MuiCssBaseline: {
       styleOverrides: (theme) => ({
         body: {
-          background: theme.palette.primary.contrastText
+          background: theme.palette.primary.contrastText,
+          fontFamily: '"HelveticaNeueCyr", "Noto Sans", sans-serif',
         },
         ".slick-dots li.slick-active ": {
           backgroundColor: theme.palette.primary.contrastText
@@ -582,7 +471,7 @@ const commonThemeOptions: ThemeOptions = {
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-            ...theme.typography.subtitle1
+            ...theme.typography.subtitle2
           },
 
           "&.menu__item.action__item": {
@@ -824,11 +713,16 @@ const commonThemeOptions: ThemeOptions = {
 
 // Create theme function
 export const createAppTheme = (mode: "light" | "dark") => {
-  return createTheme({
+
+  let theme;
+
+  theme = createTheme({
     ...commonThemeOptions,
     palette: {
       mode,
       ...(mode === "light" ? lightPalette : darkPalette),
     },
   });
+
+  return responsiveFontSizes(theme);
 };
