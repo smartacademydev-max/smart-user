@@ -4,7 +4,6 @@ import * as React from "react";
 
 import Toolbar from "@mui/material/Toolbar";
 import { Link, useLocation } from "react-router-dom";
-import { useAppSelector } from "../../../../store/hook";
 import CustomAppbar from "../appbar";
 import PrimaryMenu from "./PrimaryMenu";
 
@@ -63,7 +62,6 @@ export default function ResponsiveDrawer(props: Props) {
         window !== undefined ? () => window().document.body : undefined;
 
     const drawerWidth = 252;
-    const { mode } = useAppSelector((state) => state.smart_theme)
 
     return (
         <Box sx={{ display: "flex" }}>

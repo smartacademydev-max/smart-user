@@ -78,9 +78,9 @@ export const lightPalette = {
 
   tab: {
     main: "#1A2B57",
-    background: "#F4F5FB",
-    backgroundHover: "#EDE8EC",
-    border: "#E5E7EB",
+    background: "#E5E7EB",
+    backgroundHover: "#D6DBE9",
+    border: "#D1D5DB",
     text: "#6B7280",
     textHover: "#AA2132",
   },
