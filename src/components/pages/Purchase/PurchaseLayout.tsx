@@ -5,7 +5,7 @@ import { useFormik } from 'formik';
 import { ArrowLeft } from 'iconsax-reactjs';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGetCourseByIdQuery, usePurchaseCourseWithEsewaMutation, usePurchaseWithKhaltiMutation } from "../../../services/courseApi";
-import { useGetBundleByIdQuery, useGetTestOverviewQuery } from '../../../services/testApi';
+import { useGetBundleByIdQuery, useGetBundleByOverviewQuery, useGetTestOverviewQuery } from '../../../services/testApi';
 import { showToast } from '../../../slice/toastSlice';
 import { useAppDispatch } from '../../../store/hook';
 import type { PaymentOption, PurchaseFormValues, PurchaseModuleTypes } from "../../../types/purchase";
@@ -49,7 +49,7 @@ export default function PurchaseLayout() {
 
     const { data: course } = useGetCourseByIdQuery({ id: Number(id) }, { skip: !id || type !== "course" });
     const { data: test } = useGetTestOverviewQuery({ id: Number(id) }, { skip: !id || type !== "test" });
-    const { data: bundle } = useGetBundleByIdQuery({ id: Number(id) }, { skip: !id || type !== "bundle" })
+    const { data: bundle } = useGetBundleByOverviewQuery({ id: Number(id) }, { skip: !id || type !== "bundle" })
     const [payViaEsewa, { isLoading: payingViaEsewa }] = usePurchaseCourseWithEsewaMutation();
     const [payViaKhalti, { isLoading: isKhaltiLoading }] = usePurchaseWithKhaltiMutation();
 
