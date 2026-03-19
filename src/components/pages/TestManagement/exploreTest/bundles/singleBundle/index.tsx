@@ -107,6 +107,7 @@ export default function SingleBundle() {
                                     <ExploreTestCard
                                         test={test}
                                         key={test.id}
+                                        showAction={false}
                                     />
                                 ))}
                             </div>

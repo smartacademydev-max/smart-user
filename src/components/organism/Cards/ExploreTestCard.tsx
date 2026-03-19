@@ -8,7 +8,7 @@ import { formatDateTime } from "../../../utils/dateFormat";
 import { getTestProgressStatus } from "../../../utils/statusMap";
 import StatusPillWithBorder from "../../atom/StatusPillWithBorder";
 
-export default function ExploreTestCard({ test }: { test: TestProps; }) {
+export default function ExploreTestCard({ test, showAction = true }: { test: TestProps;  showAction?: boolean }) {
     const { t } = useTranslation();
     const navigate = useNavigate();
 
@@ -83,9 +83,9 @@ export default function ExploreTestCard({ test }: { test: TestProps; }) {
                     {sellingPrice ? <Typography variant='subtitle1' fontWeight={600} className='text-nowrap'>{t("messages.npr")} {sellingPrice}</Typography> : ""}
                     {markedPrice ? <Typography variant='caption' color='text.middle' className='text-nowrap'><del>{t("messages.npr")} {markedPrice}</del></Typography> : ""}
                 </div>
-                <Button variant="contained" color="primary" onClick={() => navigate(PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.ROOT(test?.id ? Number(test.id) : undefined, "test"))}>
+                {showAction ? <Button variant="contained" color="primary" onClick={() => navigate(PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.ROOT(test?.id ? Number(test.id) : undefined, "test"))}>
                     Buy Now
-                </Button>
+                </Button> : ""}
             </div>
         </Box>
 
