@@ -255,12 +255,12 @@ export default function DashboardCalendar({ onDateSelect }: DashboardCalendarPro
         setViewMode('month');
     };
 
-    const handleToday = () => {
-        setCurrentYear(todayBS.year);
-        setCurrentMonth(todayBS.month);
-        setSelectedDate(todayBS);
-        setViewMode('month');
-    };
+    // const handleToday = () => {
+    //     setCurrentYear(todayBS.year);
+    //     setCurrentMonth(todayBS.month);
+    //     setSelectedDate(todayBS);
+    //     setViewMode('month');
+    // };
 
     const isToday = (day: number) => {
         return todayBS.year === currentYear &&

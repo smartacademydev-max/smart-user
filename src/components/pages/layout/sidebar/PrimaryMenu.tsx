@@ -8,8 +8,7 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Typography,
-  useTheme
+  Typography
 } from "@mui/material";
 import { AudioSquare, Book, Bookmark, Document, DocumentText, Element4, I24Support, Notepad2, Notification, PenAdd, SearchNormal, VideoOctagon, VideoPlay } from "iconsax-reactjs";
 import { useState } from "react";
@@ -21,7 +20,6 @@ export default function PrimaryMenu() {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
-  const theme = useTheme();
 
   const [openTest, setOpenTest] = useState(false);
 
