@@ -5,7 +5,7 @@ import { useFormik } from 'formik';
 import { ArrowLeft } from 'iconsax-reactjs';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGetCourseByIdQuery, usePurchaseCourseWithEsewaMutation, usePurchaseWithKhaltiMutation } from "../../../services/courseApi";
-import { useGetBundleByIdQuery, useGetBundleByOverviewQuery, useGetTestOverviewQuery } from '../../../services/testApi';
+import { useGetBundleByOverviewQuery, useGetTestOverviewQuery } from '../../../services/testApi';
 import { showToast } from '../../../slice/toastSlice';
 import { useAppDispatch } from '../../../store/hook';
 import type { PaymentOption, PurchaseFormValues, PurchaseModuleTypes } from "../../../types/purchase";
