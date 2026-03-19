@@ -53,7 +53,7 @@ export default function ResponsiveDrawer(props: Props) {
                     justifyContent: "center",
                 }}>
                 <Link to={"/"}>
-                    <img src="/logo-light.svg" alt="" width={137} height={73} />
+                    <img src="/logo.svg" alt="" width={137} height={73} />
                 </Link>
             </Toolbar>
             <PrimaryMenu />

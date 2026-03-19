@@ -23,7 +23,7 @@ export default function SelectPreferedLanguage() {
         },
     ]
 
-    const { lang: selectedLanguage } = useAppSelector((state) => state.udaan_theme);
+    const { lang: selectedLanguage } = useAppSelector((state) => state.smart_theme);
 
     const handleLanguageSelect = (lang: "en" | "np") => {
         dispatch(setLanguage(lang));

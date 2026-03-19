@@ -3,8 +3,7 @@ import { Outlet } from "react-router-dom";
 import { useAppSelector } from "../../../store/hook";
 
 export default function AuthLayout() {
-	const { mode } = useAppSelector((state) => state.smart_theme)
-
+	const { mode } = useAppSelector((state) => state.theme)
 	return (
 		<Box
 			// sx={{
