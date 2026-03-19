@@ -1,78 +1,87 @@
 export const darkPalette = {
     primary: {
-        main: "#3B9AFF", // Changed from 'default' to 'main'
-        hover: "#5AAEFF",
-        light: "#1A3A52",
+        main: "#D94F5C",
+        hover: "#E0707A",
+        light: "#3D1A1E",
+        dark: "#AA2132",
         black: "#FFFFFF",
         white: "#0F1419",
+        contrastText: "#FFFFFF",
+    },
+    secondary: {
+        main: "#3D5A9E",
+        light: "#1A2540",
+        dark: "#1A2B57",
+        hover: "#4A6AB8",
+        contrastText: "#FFFFFF",
     },
     button: {
-        main: "#3B9AFF", // Changed from 'default' to 'main'
+        main: "#D94F5C",
         gray: "#9CA3AF",
-        hover: "#5AAEFF",
-        light: "#1A3A52",
-        lightest: "#1A3A52",
+        hover: "#E0707A",
+        light: "#3D1A1E",
+        lightest: "#3D1A1E",
         contrastText: "#FFFFFF",
     },
     error: {
-        main: "#F43F5E", // Changed from 'default' to 'main'
+        main: "#F43F5E",
         hover: "#FB7185",
         light: "#2D1215",
         contrastText: "#FFFFFF",
     },
     gray: {
-        main: "#3B9AFF",
+        main: "#D94F5C",
         gray1: "#374151",
         gray2: "#2D1215",
         gray3: "#6B7280",
     },
     icon: {
-        main: "#3B9AFF",
+        main: "#3D5A9E",
         black: "#F9FAFB",
-        dark: "#3B9AFF",
+        dark: "#D94F5C",
         light: "#9CA3AF",
     },
     info: {
-        main: "#FBBF24", // Changed from 'default' to 'main'
+        main: "#FBBF24",
         hover: "#FCD34D",
         light: "#2D2410",
         contrastText: "#111827",
     },
     separator: {
-        main: "#3B9AFF",
+        main: "#D94F5C",
         dark: "#374151",
         darker: "#4B5563",
         darkest: "#6B7280",
     },
     success: {
-        main: "#10B981", // Changed from 'default' to 'main'
+        main: "#10B981",
         hover: "#34D399",
         light: "#0C2D24",
         contrastText: "#FFFFFF",
     },
     warning: {
-        main: "#FB923C", // Changed from 'default' to 'main'
+        main: "#FB923C",
         hover: "#FDBA74",
         light: "#2D1A0F",
         contrastText: "#111827",
     },
     tab: {
-        main: "#3B9AFF",
+        main: "#3D5A9E",
         background: "#1F2937",
-        backgroundHover: "#1A3A52",
+        backgroundHover: "#1A2540",
         border: "#374151",
         text: "#9CA3AF",
-        textHover: "#3B9AFF",
+        textHover: "#D94F5C",
     },
     text: {
-        main: "#3B9AFF",
+        main: "#C8D0E0",
         dark: "#F9FAFB",
         light: "#9CA3AF",
         lightest: "#6B7280",
         middle: "#D1D5DB",
     },
     textField: {
-        main: "#3B9AFF",
+        main: "#C8D0E0",
         border: "#374151",
         error: "#F43F5E",
         placeholder: "#6B7280",

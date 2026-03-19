@@ -36,14 +36,17 @@ export default function PrimaryMenu() {
 
   return (
     <div className="primary__menu__wrapper relative">
-      <Box sx={{ padding: "0 32px 32px", maxHeight: "calc(100vh - 162px)", overflow: "auto" }} className="primary__menu  relative">
+      <Box sx={{ padding: "16px 10px 32px", maxHeight: "calc(100vh - 72px)", overflow: "auto" }} className="primary__menu  relative">
         <div className="flex items-center gap-2 overflow-hidden mb-1">
-          <Typography variant='caption' mb={1} sx={{
-            color: theme.palette.text.light
+          <Typography variant='overline' mb={1} sx={{
+            color: "rgba(156,163,176,0.55)",
+            fontWeight: 600,
+            letterSpacing: "1px",
+            textTransform: "uppercase",
+            paddingLeft: "8px",
+            whiteSpace: "nowrap",
           }}>{t("messages.main")}</Typography>
-          <Divider sx={{
-            borderColor: "#4B4B4B"
-          }} className="w-full" />
+          <Divider sx={{ borderColor: "rgba(255,255,255,0.07)" }} className="w-full" />
         </div>
         <List>
           <ListItem disablePadding className="menu__item">
@@ -103,13 +106,16 @@ export default function PrimaryMenu() {
           </ListItem>
         </List>
 
-        <div className="flex items-center gap-2 overflow-hidden mb-1 mt-8">
-          <Typography variant='caption' mb={1} sx={{
-            color: theme.palette.text.light
+        <div className="flex items-center gap-2 overflow-hidden mb-1 mt-6">
+          <Typography variant='overline' mb={1} sx={{
+            color: "rgba(156,163,176,0.55)",
+            fontWeight: 600,
+            letterSpacing: "1px",
+            textTransform: "uppercase",
+            paddingLeft: "8px",
+            whiteSpace: "nowrap",
           }}>{t("messages.learning")}</Typography>
-          <Divider sx={{
-            borderColor: "#4B4B4B"
-          }} className="w-full" />
+          <Divider sx={{ borderColor: "rgba(255,255,255,0.07)" }} className="w-full" />
         </div>
 
         <List>
@@ -202,13 +208,16 @@ export default function PrimaryMenu() {
 
         </List>
 
-        <div className="flex items-center gap-2 overflow-hidden mb-1 mt-8 text-nowrap">
-          <Typography variant='caption' mb={1} sx={{
-            color: theme.palette.text.light
+        <div className="flex items-center gap-2 overflow-hidden mb-1 mt-6 text-nowrap">
+          <Typography variant='overline' mb={1} sx={{
+            color: "rgba(156,163,176,0.55)",
+            fontWeight: 600,
+            letterSpacing: "1px",
+            textTransform: "uppercase",
+            paddingLeft: "8px",
+            whiteSpace: "nowrap",
           }}>{t("messages.news_updates")}</Typography>
-          <Divider sx={{
-            borderColor: "#4B4B4B"
-          }} className="w-full" />
+          <Divider sx={{ borderColor: "rgba(255,255,255,0.07)" }} className="w-full" />
         </div>
         <List>
           <ListItem disablePadding className="menu__item">
@@ -267,13 +276,16 @@ export default function PrimaryMenu() {
           </ListItemButton>
         </ListItem>
       </List> */}
-        <div className="flex items-center gap-2 overflow-hidden mb-1 mt-8">
-          <Typography variant='caption' mb={1} sx={{
-            color: theme.palette.text.light
+        <div className="flex items-center gap-2 overflow-hidden mb-1 mt-6">
+          <Typography variant='overline' mb={1} sx={{
+            color: "rgba(156,163,176,0.55)",
+            fontWeight: 600,
+            letterSpacing: "1px",
+            textTransform: "uppercase",
+            paddingLeft: "8px",
+            whiteSpace: "nowrap",
           }}>{t("messages.others")}</Typography>
-          <Divider sx={{
-            borderColor: "#4B4B4B"
-          }} className="w-full" />
+          <Divider sx={{ borderColor: "rgba(255,255,255,0.07)" }} className="w-full" />
         </div>
 
         <List>

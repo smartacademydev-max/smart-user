@@ -2,7 +2,6 @@ import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import * as React from "react";
 
-import { useMediaQuery } from "@mui/material";
 import Toolbar from "@mui/material/Toolbar";
 import { Link, useLocation } from "react-router-dom";
 import { useAppSelector } from "../../../../store/hook";
@@ -46,14 +45,13 @@ export default function ResponsiveDrawer(props: Props) {
         <div>
             <Toolbar
                 sx={{
-                    padding: {
-                        xs: "16px 16px 32px",
-                        md: "32px 32px 56px",
-                    },
-                    justifyContent: "center",
+                    padding: "20px 18px 18px",
+                    justifyContent: "flex-start",
+                    borderBottom: "1px solid rgba(255,255,255,0.07)",
+                    minHeight: "72px !important",
                 }}>
                 <Link to={"/"}>
-                    <img src="/logo.svg" alt="" width={137} height={73} />
+                    <img src="/logo.svg" alt="" style={{ height: 40, width: "auto" }} />
                 </Link>
             </Toolbar>
             <PrimaryMenu />
@@ -64,8 +62,7 @@ export default function ResponsiveDrawer(props: Props) {
     const container =
         window !== undefined ? () => window().document.body : undefined;
 
-    const isLargeScreen = useMediaQuery("(min-width:1440px)");
-    const drawerWidth = isLargeScreen ? 356 : 320;
+    const drawerWidth = 252;
     const { mode } = useAppSelector((state) => state.smart_theme)
 
     return (
@@ -118,29 +115,32 @@ export default function ResponsiveDrawer(props: Props) {
                         lg: `calc(100% - ${drawerWidth}px)`
                     },
                     padding: {
-                        xs: "16px 0 0",
-                        lg: "32px 0 0"
+                        xs: "0",
+                        lg: "0"
                     },
-                    overflow: "hidden"
+                    overflow: "hidden",
+                    backgroundColor: (theme) => theme.palette.background.default,
                 }}>
                 <Toolbar sx={{
                     height: {
-                        xs: 48,
-                        xl: 48
-                    }
+                        xs: 58,
+                        xl: 58
+                    },
+                    minHeight: "58px !important",
                 }} />
                 <Box
-                    className="content lg:rounded-2xl  flex flex-col overflow-hidden"
+                    className="content flex flex-col overflow-hidden"
                     sx={{
-                        backgroundColor: (theme) => mode === "dark" ? theme.palette.background.paper : theme.palette.primary.contrastText,
+                        backgroundColor: (theme) => theme.palette.background.default,
                         height: {
-                            xs: "calc(100vh - 80px)",
-                            lg: "calc(100vh - 100px)"
+                            xs: "calc(100vh - 58px)",
+                            lg: "calc(100vh - 58px)"
                         },
                         padding: {
-                            xs: "32px 16px 0",
-                            lg: "32px 24px 0"
+                            xs: "20px 16px 0",
+                            lg: "20px 24px 0"
                         },
+                        overflowY: "auto",
                     }}>
                     {props.children}
                 </Box>

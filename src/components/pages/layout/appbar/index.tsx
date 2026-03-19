@@ -4,7 +4,6 @@ import {
     IconButton,
     Stack,
     Toolbar,
-    useMediaQuery,
     useTheme
 } from "@mui/material";
 import { HamburgerMenu } from "iconsax-reactjs";
@@ -21,8 +20,7 @@ export default function CustomAppbar({
 }) {
     const theme = useTheme();
     const { mode } = useAppSelector((state) => state.smart_theme)
-    const isLargeScreen = useMediaQuery("(min-width:1440px)");
-    const drawerWidth = isLargeScreen ? 356 : 320;
+    const drawerWidth = 252;
     return (
         <AppBar
             position="fixed"
@@ -31,7 +29,9 @@ export default function CustomAppbar({
                 ml: { lg: `${drawerWidth}px` },
                 borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
                 borderRadius: 0,
-                padding: { xs: "12px", lg: " 20px 24px" },
+                height: 58,
+                justifyContent: "center",
+                padding: { xs: "0 12px", lg: "0 24px" },
                 backgroundColor: (theme) => mode === "dark" ? theme.palette.background.paper : theme.palette.primary.contrastText,
             }}
             color="default"
