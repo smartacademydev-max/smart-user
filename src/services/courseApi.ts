@@ -1,10 +1,11 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import type { CategoryFilterParams, QueryParams } from "../types";
-import type { CourseList, CourseProps, courseTabType, CurriculumList } from "../types/course";
+import type { CourseList, CourseProps, courseTabType, CurriculumList, PlaylistListing } from "../types/course";
 import type { LiveClassList, LiveClassProps } from "../types/liveClass";
 import type { MediaList } from "../types/media";
-import type { EsewaPaymentPayload, PurchaseProps } from "../types/purchase";
+import type { EsewaPaymentPayload, PurchaseModuleTypes, PurchaseProps } from "../types/purchase";
 import type { TestList } from "../types/question";
+import type { ReciptProps, TransactionsResponse } from "../types/transactions";
 import type { GlobalResponse } from "../types/user";
 import { buildQueryParams } from "../utils/buildQueryParams";
 import { baseQuery } from "./baseQuery";
@@ -81,6 +82,37 @@ export const courseApi = createApi({
                     ]
                     : [{ type: "Media" as const, id: "LIST" }],
         }),
+        getCourseMediaPlaylist: builder.query<PlaylistListing, { id: number | null; type: courseTabType; qp: QueryParams }>({
+            query: ({ id, type, qp }) => {
+                return ({
+                    url: `/course/${id}/playlist?${buildQueryParams({
+                        type, page: qp.pageIndex,
+                        page_size: qp.pageSize,
+                        search: qp.search
+                    })}`,
+                    method: "GET",
+                })
+            },
+            providesTags: (result) =>
+                result?.data?.data
+                    ? [
+                        ...result.data.data.map((media) => ({ type: "Media" as const, id: media.chapter_id })),
+                        { type: "Media" as const, id: "LIST" },
+                    ]
+                    : [{ type: "Media" as const, id: "LIST" }],
+        }),
+        getSinglePlaylist: builder.query<MediaList, QueryParams & { id: number, playlistId?: number, type: courseTabType }>({
+            query: ({ id, playlistId, type, pageIndex, pageSize, search }) => ({
+                url: `/course/${id}/playlist/${playlistId}?${buildQueryParams({
+                    type: type,
+                    search: search,
+                    page_size: pageSize,
+                    page: pageIndex
+                })}`,
+                method: "GET"
+            }),
+            providesTags: (_result, _error, { id }) => [{ type: "Media" as const, id }],
+        }),
         getCourseTest: builder.query<TestList, QueryParams & { id: number }>({
             query: ({ id, pageIndex, pageSize, search }) => ({
                 url: `/course/${id}/test?${buildQueryParams({ page: pageIndex, page_size: pageSize, search })}`,
@@ -101,33 +133,43 @@ export const courseApi = createApi({
                 method: "GET"
             })
         }),
-        purchaseCourse: builder.mutation<GlobalResponse, { body: PurchaseProps; id: number }>({
-            query: ({ body, id }) => ({
-                url: `/course/${id}/purchase`,
+        purchaseCourse: builder.mutation<GlobalResponse & { data: ReciptProps }, { body: PurchaseProps; id: number, moduleType: PurchaseModuleTypes }>({
+            query: ({ body, id, moduleType }) => ({
+                url: `/purchase`,
                 method: "POST",
-                body,
+                body: {
+                    ...body,
+                    module_id: id,
+                    module_type: moduleType
+                },
             }),
             invalidatesTags: (_result, _error, { id }) => [
-                { type: "Course" as const, id },          // refetch this course
-                { type: "Course" as const, id: "LIST" },  // refetch course list
-                { type: "Curriculum" as const, id: "LIST" }, // refetch all curriculum
-                { type: "Media" as const, id: "LIST" },   // refetch all media
+                { type: "Course" as const, id },
+                { type: "Course" as const, id: "LIST" },
+                { type: "Curriculum" as const, id: "LIST" },
+                { type: "Media" as const, id: "LIST" },
             ],
         }),
-        purchaseCourseWithEsewa: builder.mutation<GlobalResponse & { data: EsewaPaymentPayload }, { id: number }>({
-            query: ({ id }) => ({
-                url: `/course/${id}/payment/esewa`,
+        purchaseCourseWithEsewa: builder.mutation<GlobalResponse & { data: EsewaPaymentPayload }, { id: number, moduleType: PurchaseModuleTypes }>({
+            query: ({ id, moduleType }) => ({
+                url: `/payment/esewa`,
                 method: "POST",
+                body: {
+                    module_type: moduleType,
+                    module_id: id,
+                },
             }),
             invalidatesTags: (_result, _error, { id }) => [{ type: "Course" as const, id }],
         }),
-        purchaseWithKhalti: builder.mutation<GlobalResponse & { data: { payment_url: string; pidx: string; order_id: string } }, { id: number, type: string, amount: number }>({
-            query: ({ id, type, amount }) => ({
-                url: `/course/${id}/payment/khalti`,
+        purchaseWithKhalti: builder.mutation<GlobalResponse & { data: { payment_url: string; pidx: string; order_id: string } }, { id: number, type: string, amount: number, moduleType: PurchaseModuleTypes }>({
+            query: ({ id, type, amount, moduleType }) => ({
+                url: `/payment/khalti`,
                 method: "POST",
                 body: {
                     type,
-                    amount
+                    amount,
+                    module_id: id,
+                    module_type: moduleType
                 }
             }),
             invalidatesTags: (_result, _error, { id }) => [
@@ -135,12 +177,13 @@ export const courseApi = createApi({
                 { type: "Course" as const, id: "LIST" },
             ],
         }),
-        getUserPurchasedCourse: builder.query<CourseList, QueryParams>({
-            query: ({ pageIndex, pageSize, search, }) => {
+        getUserPurchasedCourse: builder.query<CourseList, QueryParams & { type?: "trial" | "purchased" | "free" }>({
+            query: ({ pageIndex, pageSize, search, type }) => {
                 const queryString = buildQueryParams({
                     page: pageIndex,
                     page_size: pageSize,
                     search,
+                    type: type
                 });
                 return {
                     url: `/my-course?${queryString}`,
@@ -194,6 +237,31 @@ export const courseApi = createApi({
                 }
             })
         }),
+        trackCourseProgress: builder.mutation<GlobalResponse, { id: number; body: { media_id: number; type: courseTabType } }>({
+            query: ({ id, body }) => ({
+                url: `/course/${id}/progress`,
+                method: "POST",
+                body,
+            }),
+            invalidatesTags: (_result, _error, { id }) => [{ type: "Course" as const, id }],
+        }),
+        getAllUserTransacions: builder.query<TransactionsResponse, QueryParams>({
+            query: ({ pageIndex, pageSize, search }) => ({
+                url: `/user/transactions?${buildQueryParams({ page: pageIndex, page_size: pageSize, search })}`,
+                method: "GET",
+            })
+        }),
+        downloadAdmitCard: builder.query<GlobalResponse & {
+            data: {
+                preview_url: string;
+                download_url: string;
+            }
+        }, void>({
+            query: () => ({
+                url: `/user/admit-card`,
+                method: "GET",
+            })
+        }),
     }),
 });
 
@@ -203,6 +271,8 @@ export const {
     useGetCourseOverviewByIdQuery,
     useGetCourseCurriculumByIdQuery,
     useGetCourseMediaByTypeQuery,
+    useGetCourseMediaPlaylistQuery,
+    useGetSinglePlaylistQuery,
     useGetCourseTestQuery,
     useGetCourseLiveClassQuery,
     usePurchaseCourseMutation,
@@ -212,6 +282,8 @@ export const {
     useGetSingleLiveClassQuery,
     useGetMeetingSignatureMutation,
     usePurchaseWithKhaltiMutation,
-    usePurchaseCourseWithEsewaMutation
-
+    usePurchaseCourseWithEsewaMutation,
+    useTrackCourseProgressMutation,
+    useGetAllUserTransacionsQuery,
+    useDownloadAdmitCardQuery,
 } = courseApi;

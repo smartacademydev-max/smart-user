@@ -1,5 +1,10 @@
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Button, Divider, Typography, useTheme } from "@mui/material";
+import { Calendar } from "iconsax-reactjs";
+import { useTranslation } from "react-i18next";
+import { setPurchase } from "../../../slice/purchaseSlice";
+import { useAppDispatch } from "../../../store/hook";
 import type { CourseProps } from "../../../types/course";
+import { formatDateCustom } from "../../../utils/dateFormat";
 import { renderHtml } from "../../../utils/renderHtml";
 import MyProgress from "../../atom/MyProgress";
 import BannerCourseTypeModule from "./BannerCourseTypeModule";
@@ -7,15 +12,21 @@ import BannerCourseTypeModule from "./BannerCourseTypeModule";
 
 export default function CourseBanner({ data, havePurchased }: { data?: CourseProps; isLoading: boolean, havePurchased: boolean }) {
     const theme = useTheme();
-
+    const { t } = useTranslation();
+    const dispatch = useAppDispatch();
 
     const course = data || null;
+
+    const endDate = formatDateCustom(course?.course_expiry?.end_date || "", { shortMonth: true });
+    const startDate = formatDateCustom(course?.course_expiry?.start_date || "", { shortMonth: true });
+    const day = endDate.split(' ')[0];
+    const monthAndYear = endDate.split(' ').slice(1).join(' ');
     return (
         <Box className="rounded-md lg:rounded-4xl p-6 lg:py-11.5  lg:px-16" sx={{
             background: `url(/banner-bg.svg) no-repeat center/cover, ${theme.palette.primary.main}`
         }}>
             <div className="flex flex-col lg:grid grid-cols-20 gap-6">
-                <div className="col-span-4 hidden lg:block">
+                <div className="lg:col-span-8 xl:col-span-4 hidden lg:block">
                     <Box className=" thumbnail aspect-264/210 rounded-2xl lg:flex items-center overflow-hidden" sx={{
                         background: theme.palette.primary.contrastText
                     }}>
@@ -23,7 +34,7 @@ export default function CourseBanner({ data, havePurchased }: { data?: CoursePro
                     </Box>
                 </div>
 
-                <div className="col-span-10">
+                <div className="lg:col-span-12 xl:col-span-10 ">
                     <div className="flex flex-col gap-3.5 ">
                         {course?.mega_categories?.length ? (
                             <div className="flex gap-2 flex-wrap">
@@ -80,29 +91,49 @@ export default function CourseBanner({ data, havePurchased }: { data?: CoursePro
                     </div>
                 </div>
 
-                <div className="col-span-6">
+                <div className="lg:col-span-20 xl:col-span-6 ">
                     {havePurchased ?
-                        <Box className="rounded-md p-4 bg-[rgba(255,255,255,0.12)] flex flex-col gap-4" sx={{
+                        <Box className="rounded-md p-4 bg-[rgba(255,255,255,0.12)] flex flex-col gap-4 w-full" sx={{
                             color: theme.palette.primary.contrastText
                         }}>
-                            <Typography variant="body2">Progress</Typography>
-                            {/* <Divider />
-                            <Typography variant="subtitle2">Started from</Typography>
-                            <div className="flex justify-between items-center">
-                                <Typography variant="caption">Progress</Typography>
-                                <Typography variant="subtitle1" fontWeight={500}>{data?.progress}%</Typography>
-                            </div> */}
+                            <div className="top">
+                                <Typography variant="body2">Progress</Typography>
+                                <Divider color={theme.palette.primary.contrastText} />
+                            </div>
+                            {course?.course_type !== "free" ? <div className="middle">
+                                <Typography variant="caption">Validity</Typography>
+                                <div className="flex items-center gap-1.5">
+                                    <Typography variant="h4">{day}</Typography>
+                                    <div className="date flex flex-col items-start justify-end">
+                                        <Calendar size={12} />
+                                        <Typography variant="caption">{monthAndYear}</Typography>
+                                    </div>
+                                </div>
+                            </div> : ""}
+                            <div className="bottom">
+                                <div className="flex justify-between items-center">
+                                    <Typography variant="caption">Progress</Typography>
+                                    <Typography variant="subtitle1" fontWeight={500}>{data?.progress}%</Typography>
+                                </div>
 
-                            <MyProgress progress={data?.progress || 0} />
-                            {/* <div className="flex justify-between items-center">
-                                <Typography variant="caption">Nov 20</Typography>
-                                <Typography variant="subtitle1" >-</Typography>
-                            </div> */}
+                                <MyProgress progress={data?.progress || 0} />
+                                {course?.course_type !== "free" ? <div className="flex justify-between items-center">
+                                    <Typography variant="caption">{startDate.split(",")[0]}</Typography>
+                                    <Typography variant="subtitle1" >-</Typography>
+                                </div> : ""}
+                                {course?.user?.has_taken_freetrial ? <Button variant="contained" className="black__btn mt-4!" fullWidth onClick={() => dispatch(
+                                    setPurchase({
+                                        courseId: Number(course?.id),
+                                        open: true
+                                    })
+                                )}>{t("messages.purchase_now")}</Button> : ""}
+                            </div>
                         </Box> : <BannerCourseTypeModule
                             courseType={course?.course_type}
                             courseExpiry={course?.course_expiry}
                             courseSubscription={course?.subscriptions || []}
                             purchaseStatus={course?.user}
+                            canTakeFreeTrial={course?.can_take_free_trial}
                         />}
                 </div>
             </div>

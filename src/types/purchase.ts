@@ -6,6 +6,8 @@ export interface PaymentOption {
     image: string;
 }
 
+export type PurchaseModuleTypes = "course" | "test" | "bundle";
+
 export type PaymentMethods = "esewa" | "khalti" | "free"
 
 export interface PurchaseFormValues {

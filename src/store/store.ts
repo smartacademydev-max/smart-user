@@ -2,7 +2,10 @@ import { configureStore } from '@reduxjs/toolkit';
 import { authApi } from '../services/authApi';
 import { categoryApi } from '../services/categoryApi';
 import { contentApi } from '../services/contentApi';
+import { countryApi } from '../services/countryApi';
 import { courseApi } from '../services/courseApi';
+import { dashboardApi } from '../services/dashboardApi';
+import { gorkhapatraApi } from '../services/gorkhapatraApi';
 import { liveClassApi } from '../services/liveApi';
 import { mediaApi } from '../services/mediaApi';
 import { notificationApi } from '../services/notificationApi';
@@ -31,6 +34,10 @@ export const store = configureStore({
         [liveClassApi.reducerPath]: liveClassApi.reducer,
         [contentApi.reducerPath]: contentApi.reducer,
         [settingApi.reducerPath]: settingApi.reducer,
+        [gorkhapatraApi.reducerPath]: gorkhapatraApi.reducer,
+        [dashboardApi.reducerPath]: dashboardApi.reducer,
+        [countryApi.reducerPath]: countryApi.reducer,
+
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(authApi.middleware)
@@ -42,6 +49,9 @@ export const store = configureStore({
             .concat(liveClassApi.middleware)
             .concat(contentApi.middleware)
             .concat(settingApi.middleware)
+            .concat(gorkhapatraApi.middleware)
+            .concat(dashboardApi.middleware)
+            .concat(countryApi.middleware)
 })
 
 export type RootState = ReturnType<typeof store.getState>

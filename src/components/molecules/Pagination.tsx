@@ -56,9 +56,9 @@ export default function TablePagination({
 
     return (
         <Box
-            sx={{
-                background: (theme) => theme.palette.primary.contrastText
-            }}
+            // sx={{
+            //     background: (theme) => theme.palette.primary.contrastText
+            // }}
             className="sticky bottom-0 left-0 right-0 flex justify-between items-center gap-2 flex-wrap pb-4 lg:py-4"
         >
             {/* Page Size Selector */}

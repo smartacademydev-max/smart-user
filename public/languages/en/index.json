@@ -1,5 +1,13 @@
 {
     "messages": {
+        "published_date": "Published Date",
+        "total_tests": "Total Tests",
+        "off": "Off",
+        "price": "Price",
+        "sets": "Sets",
+        "enrolled_courses": "Enrolled Courses",
+        "transaction_information": "Transaction Information",
+        "download_admin_card": "Download Admin Card",
         "main": "Main",
         "learning": "Learning",
         "communication": "Communication",
@@ -11,7 +19,7 @@
         "expiry": "Expiry",
         "subscription": "Subscription",
         "free": "Free",
-        "npr": "NPR.",
+        "npr": "NRs.",
         "starting_from": "Starting From",
         "start_from": "Start From",
         "ends": "Ends",
@@ -38,12 +46,49 @@
         "saving": "Saving",
         "course": "Course",
         "select_your_interest": "Select your Interests ",
-        "select_your_interest_message": "Let us help you to find course you are looking for."
+        "select_your_interest_message": "Let us help you to find course you are looking for.",
+        "profile": "Profile",
+        "linked_devices": "Linked Devices",
+        "settings": "Settings",
+        "morning": "Good Morning",
+        "afternoon": "Good Afternoon",
+        "evening": "Good Evening",
+        "welcome": "Welcome",
+        "mark_as_completed": "Mark as Completed",
+        "completed": "Completed",
+        "marking_as_completed": "Marking as Completed",
+        "subjects": "Subjects",
+        "browse_this_course": " Browse this Course",
+        "continue": "Continue",
+        "gorkhapatra": "Gorkhapatra",
+        "news_updates": "News & Updates",
+        "view_details": "View Details",
+        "views": "Views",
+        "notice": "Notice",
+        "my_test": "My Test",
+        "course_based_tests": "Course Based Tests",
+        "individually_purchased_tests": "Individually Purchased Tests",
+        "test_bundle": "Test Bundle",
+        "tests_in_this_bundle": "Tests in this Bundle",
+        "offer": "Offer",
+        "load_more": "Load More",
+        "my_bundles": "My Bundles",
+        "empty_states": {
+            "gorkhapatra": {
+                "title": "No Gorkhapatra Found",
+                "description": "No Gorkhapatra available yet. Click the button below to create a new Gorkhapatra."
+            },
+            "notification": {
+                "title": "No Notice Found",
+                "description": "No Notice available yet. Click the button below to create a new Notice."
+            }
+        }
     },
     "menus": {
         "dashboard": "Dashboard",
         "myCourse": "My Course",
         "exploreCourse": "Explore Course",
+        "exploreTest": "Explore Test",
         "savedCourse": "Saved Course",
         "liveClasses": "Live Classes",
         "notes": "Notes",
@@ -55,5 +100,10 @@
         "alumni": "Alumni",
         "feedback": "Feedback",
         "support": "Support"
+    },
+    "actions": {
+        "cancel": "Cancel",
+        "view_all": "View All",
+        "view": "View"
     }
 }

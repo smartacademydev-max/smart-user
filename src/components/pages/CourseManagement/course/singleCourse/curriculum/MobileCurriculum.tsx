@@ -311,7 +311,6 @@ const MobileChapter = ({ chapter, havePurchased, courseId }: {
                         <div className="flex flex-col gap-3 mb-3">
                             {chapter.media.map((item: CurriculumMediaProps) => (
                                 <MediaCard havePurchased={havePurchased} type={item.type} media={item} courseId={courseId} />
-
                             ))}
                         </div>
                     ) : null}

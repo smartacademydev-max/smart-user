@@ -15,3 +15,19 @@ export interface OnboardingPage {
     items: OnboardingPageItems[]
 }
 
+
+export interface BannerProps {
+    title: string;
+    status: boolean;
+    media_id: number;
+    btn_title: string;
+    image_url: string;
+    sub_title: string;
+    description: string;
+    notifiable_id: string;
+    notifiable_type: "live_class" | "general" | "test"
+}
+
+export interface BannerList {
+    data: BannerProps[];
+}

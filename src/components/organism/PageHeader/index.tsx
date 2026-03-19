@@ -19,7 +19,7 @@ export default function PageHeader(props: Props) {
   const { breadcrumb, cta, description, handleOpenPopup } = props;
   return (
     <Box
-      className="page__header lg:grid lg:grid-cols-12  pb-2 mb-4 lg:mb-8 items-center"
+      className="page__header lg:grid lg:grid-cols-12  pb-2 mb-4  items-center"
       sx={{
         borderBottom: `1px solid ${theme.palette.separator.dark}`,
       }}
@@ -94,7 +94,7 @@ export default function PageHeader(props: Props) {
             ))}
         </Stack>
         {description ? (
-          <Typography variant="subtitle2" color="text.middle">{description}</Typography>
+          <Typography variant="subtitle2" color="text.middle" fontWeight={400}>{description}</Typography>
         ) : (
           ""
         )}

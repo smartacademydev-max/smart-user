@@ -1,129 +1,119 @@
-import { Box, Divider, Typography, useTheme } from "@mui/material";
+import { Box, Button, Divider, Stack, Typography } from "@mui/material";
+import { Calendar, Clock, Medal, Notepad2 } from "iconsax-reactjs";
 import { useParams } from "react-router-dom";
 import type { TestProps } from "../../../types/question";
-import { formatDateCustom } from "../../../utils/dateFormat";
+import { formatDateTime } from "../../../utils/dateFormat";
 import { getStatus } from "../../../utils/getStatus";
+import { getTestProgressStatus } from "../../../utils/statusMap";
+import Donut from "../../atom/Donut";
+import StatusPillWithBorder from "../../atom/StatusPillWithBorder";
+import type { TestStatus } from "../../pages/TestManagement/allTest/AllTestList";
 import TestActionButton from "./TestActionButton";
 
-export default function TestCard({ test, havePurchased, }: { test: TestProps; havePurchased: boolean; }) {
-  const theme = useTheme();
+export default function TestCard({ test, havePurchased, status: testStatus }: { test: TestProps; havePurchased: boolean; status?: TestStatus }) {
   const status = getStatus(test?.start_datetime, test?.end_datetime);
   const { id } = useParams();
+  const variant = getTestProgressStatus(!test?.has_taken_test ? "not_started" : !test?.is_graded ? "awaiting_review" : "completed");
   return (
     <Box
       className="test__card rounded-md p-4 flex flex-col justify-between"
       sx={{
-        border: `1px solid ${theme.palette.separator.dark}`,
+        border: (theme) => `1px solid ${theme.palette[variant].main}`,
+        borderTop: (theme) => `4px solid ${theme.palette[variant].main}`,
       }}
     >
-      <div className="top__wrapper">
-        {/* Top Section */}
-        <div className="test__card__top flex gap-3">
-          <Box className="w-full flex justify-between items-start gap-4">
-            <Typography variant="subtitle1" fontWeight={600} color="text.dark">
-              {test?.name}
-            </Typography>
-
-            <Typography
-              color="text.main"
-              bgcolor={"gray.gray1"}
-              className="text-[11px]! px-2.5 py-1.5 rounded-md ml-2 font-semibold! capitalize"
-            >
-              {status}
-            </Typography>
-          </Box>
+      <div className="card__top">
+        <div className="flex justify-between items-center mb-3">
+          <Typography variant="caption" fontWeight={500} sx={{
+            padding: "6px 10px",
+            borderRadius: "8px",
+            background: (theme) => theme.palette.primary.light,
+            color: (theme) => theme.palette.primary.main,
+          }}>{test?.selections?.mega_category[0] || "Loksewa"}</Typography>
+          <StatusPillWithBorder showIcon={true} variant={variant} status={!test?.has_taken_test ? "Not Started" : !test?.is_graded ? "Awaiting" : "Completed"} />
         </div>
-
-        <Divider className="my-3!" />
-
-        {/* Content Section */}
-        <div className="test__card__content flex flex-col gap-2">
-          <div className="flex gap-1 items-center">
-            <Typography variant="subtitle2" fontWeight={500} color="text.secondary" className="flex">
-              Exam Type:
+        <Typography variant="subtitle1" fontWeight={600} color="text.dark" className="mb-3!">
+          {test?.name}
+        </Typography>
+        {test?.start_datetime ?
+          <Stack gap={1} color="text.middle" className="mb-3" alignItems={"center"}>
+            <Box sx={{
+              color: (theme) => theme.palette.text.middle
+            }}>
+              <Calendar size={16} />
+            </Box>
+            <Typography variant="subtitle2" color="text.middle" className="flex">
+              Start Date:
             </Typography>
-            <Typography variant="subtitle2" fontWeight={500} color="text.dark" >
-              {test?.test_type}
-            </Typography>
-          </div>
-          <div className="flex gap-1 items-center">
-            <Typography variant="subtitle2" color="text.secondary" className="flex">
-              Date:
-            </Typography>
-            <Typography variant="subtitle2" fontWeight={600} color="text.dark" >
-              {formatDateCustom(test?.start_datetime, { shortMonth: true })}
-            </Typography>
-          </div>
-        </div>
-      </div>
+            <Typography variant="subtitle2" color="text.dark" fontWeight={600}>{formatDateTime(test?.start_datetime)}</Typography>
+          </Stack>
+          : ""}
 
-      <div className="bottom__wrapper">
-        <Box
-          component="div"
-          bgcolor={"gray.gray1"}
-          px={3}
-          py={1.75}
-          borderRadius="6px"
-          my="12px"
-        >
-          <Box className="flex justify-between items-center gap-2">
-            <div className="flex items-center gap-2">
-              <Typography variant="subtitle2" color="text.secondary" className="inline-flex">
-                Questions:
-              </Typography>
-              <Typography variant="subtitle2" fontWeight={500} color="text.dark" >
-                {test?.total_questions}
-              </Typography>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Typography variant="subtitle2" color="text.secondary" className="inline-flex">
-                Duration:
-              </Typography>
-              <Typography
-                variant="subtitle2"
-                fontWeight={500}
-                color="text.dark"
-
-                sx={{ textWrap: "nowrap" }}
-              >
-                {test?.duration.hours} Hrs {test?.duration.minutes} Mins
-              </Typography>
-            </div>
-          </Box>
-
-          <Divider className="my-2!" />
-
-          <Box className="flex justify-between items-center gap-2">
-            <div className="flex gap-1 itesm-center">
-              <Typography variant="subtitle2" color="text.secondary" className="inline-flex">
-                Full marks:
-              </Typography>
-              <Typography variant="subtitle2" fontWeight={500} color="text.dark" >
-                {test?.full_mark}
-              </Typography>
-            </div>
-
-            <div className="flex gap-1 items-center">
-              <Typography variant="subtitle2" color="text.secondary" className="inline-flex">
-                Pass marks:
-              </Typography>
-              <Typography variant="subtitle2" fontWeight={500} color="text.dark" >
-                {test?.pass_mark}
-              </Typography>
-            </div>
-          </Box>
+        <Box className="flex justify-between items-center gap-2">
+          <Typography variant="caption" color="text.dark" className="flex items-center gap-1">
+            <Box sx={{ color: (theme) => theme.palette.info.main }}><Notepad2 size={16} variant="Bold" /></Box>  <strong>{test?.total_questions}</strong> Total Questions
+          </Typography>
+          <Typography variant="caption" color="text.dark" className="flex items-center gap-1">
+            <Box sx={{ color: (theme) => theme.palette.success.main }}><Clock variant="Bold" size={16} /></Box>
+            <strong>{test?.duration.hours}</strong> Hrs  <strong>: {test?.duration.minutes}</strong> Mins
+          </Typography>
         </Box>
-
-
-        <TestActionButton
-          test={test}
-          status={status}
-          havePurchased={havePurchased}
-          id={test?.course_id ? Number(test?.course_id) : Number(id)}
-        />
-
-
+        <Divider className="my-1.5!" />
+        <Box className="flex justify-between items-center gap-2">
+          <Typography variant="caption" color="text.dark" className="flex items-center gap-1">
+            <Box sx={{ color: (theme) => theme.palette.error.main }}><Medal variant="Bold" size={16} /></Box>
+            <strong>{test?.full_mark}</strong> Total Marks
+          </Typography>
+          <Typography variant="caption" color="text.dark" className="flex items-center gap-1">
+            <Box sx={{ color: (theme) => theme.palette.warning.main }}><Medal variant="Bold" size={16} /></Box>
+            <strong> {test?.pass_mark}</strong> Pass marks
+          </Typography>
+        </Box>
+        {testStatus === "awaiting" ? <Box sx={{
+          marginTop: "12px",
+          marginBottom: "16px",
+          padding: "6px 12px",
+          borderRadius: "8px",
+          background: (theme) => theme.palette.warning.light
+        }}>
+          <Typography color="warning" sx={{
+            fontSize: "10px !important",
+          }}>Your submission is complete and pending review; you'll be notified once graded.</Typography>
+        </Box> : ""}
+      </div>
+      <div className="bottom__wrapper mt-3">
+        {havePurchased && test?.test_type === "omr" ? <div className="flex justify-end items-center gap-2 mt-5">
+          <Button
+            variant="outlined"
+            color="primary"
+            component="a"
+            href={test?.download_format_url}
+            download
+          >
+            Download Format
+          </Button>
+          <Button variant="contained" color="primary">Start Now</Button>
+        </div> :
+          <div className="flex items-center justify-between">
+            <TestActionButton
+              test={test}
+              status={status}
+              havePurchased={havePurchased}
+              id={test?.course_id ? Number(test?.course_id) : Number(id)}
+            />
+            {testStatus === "completed" ? <div className="flex items-center gap-2">
+              <Donut
+                progress={test?.results?.score || 0}
+                size={60}
+                thickness={6}
+              />
+              <div className="content">
+                <strong className="block text-[12px] leading-1">Your Score</strong>
+                <p className="text-[14px]"><strong>{test?.results?.attempted || 0}</strong>/{test?.total_questions}</p>
+              </div>
+            </div> : ""}
+          </div>
+        }
       </div>
     </Box>
   );

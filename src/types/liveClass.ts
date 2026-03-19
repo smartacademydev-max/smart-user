@@ -22,7 +22,7 @@ export interface LiveClassProps {
     teachers: Array<{
         id: number;
         name: string;
-        profile_url: string | null;
+        thumbnail_url: string | null;
         role: string;
     }>;
     teacher_ids: number[];

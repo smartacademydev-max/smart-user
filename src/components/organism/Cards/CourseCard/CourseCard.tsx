@@ -70,11 +70,14 @@ export default function CourseCard({ course, havePurchased = false }: { course: 
                         sellingPrice={course?.sale_price}
                         markedPrice={course?.marked_price}
                         to={PATH.COURSE_MANAGEMENT.COURSES.VIEW_COURSE.ROOT(course.id)}
-                        havePurchased={havePurchased || false}
+                        havePurchased={havePurchased || course?.user?.has_purchased}
+                        freeTrialCount={course?.user?.free_trial_count}
                     />
                 </div>
             </Box>
-            <CourseStatus status={course.course_type} />
+            <div className="absolute! top-1.5 left-1.5">
+                <CourseStatus status={course.course_type} />
+            </div>
         </Box>
     )
 }

@@ -17,11 +17,12 @@ interface Props {
         is_free_trial_valid: false,
         has_purchased: false
     }
+    canTakeFreeTrial?: boolean;
 }
 
 
 
-export default function BannerCourseTypeModule({ courseType, courseExpiry, courseSubscription, purchaseStatus }: Props) {
+export default function BannerCourseTypeModule({ courseType, courseExpiry, courseSubscription, purchaseStatus, canTakeFreeTrial }: Props) {
     const { t } = useTranslation();
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
@@ -55,7 +56,8 @@ export default function BannerCourseTypeModule({ courseType, courseExpiry, cours
                             reference_id: `UDAAN-INVOICE-${new Date()}-${user?.id}-${id}`,
                             is_trial: false,
                         },
-                        id: Number(id)
+                        id: Number(id),
+                        moduleType: "course"
                     });
                     dispatch(
                         showToast({
@@ -85,7 +87,7 @@ export default function BannerCourseTypeModule({ courseType, courseExpiry, cours
                         open: true
                     })
                 )}>{t("messages.purchase_now")}</Button>}
-                <Button variant="contained" fullWidth className={`white__btn ${!purchaseStatus?.is_free_trial_valid && purchaseStatus?.has_taken_freetrial ? "opacity-60 pointer-events-none" : ""}`} disabled={!purchaseStatus?.is_free_trial_valid && purchaseStatus?.has_taken_freetrial}
+                {canTakeFreeTrial ? <Button variant="contained" fullWidth className={`white__btn ${!purchaseStatus?.is_free_trial_valid && purchaseStatus?.has_taken_freetrial ? "opacity-60 pointer-events-none" : ""}`} disabled={!purchaseStatus?.is_free_trial_valid && purchaseStatus?.has_taken_freetrial}
                     onClick={async () => {
                         try {
                             const response = await purchaseCourse({
@@ -97,7 +99,8 @@ export default function BannerCourseTypeModule({ courseType, courseExpiry, cours
                                     reference_id: `RFF-FREE-${user?.id}-${id}`,
                                     is_trial: true,
                                 },
-                                id: Number(id)
+                                id: Number(id),
+                                moduleType: "course"
                             }).unwrap();
                             dispatch(
                                 showToast({
@@ -115,7 +118,7 @@ export default function BannerCourseTypeModule({ courseType, courseExpiry, cours
                             )
                         }
                     }}
-                >{getFreeTrialLabel()}</Button>
+                >{getFreeTrialLabel()}</Button> : ""}
             </div>
         );
     };

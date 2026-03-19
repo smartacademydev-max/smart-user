@@ -1,15 +1,16 @@
-import { Box, Button, CircularProgress, Dialog, DialogContent, useTheme } from '@mui/material';
-import { DocumentDownload, Maximize2 } from 'iconsax-reactjs';
+import { Box, Button, CircularProgress, Dialog, DialogContent, Tooltip, Typography, useTheme } from '@mui/material';
+import { t } from 'i18next';
+import { Maximize2 } from 'iconsax-reactjs';
 import Plyr, { type APITypes, type PlyrProps } from "plyr-react";
 import "plyr-react/plyr.css";
 import { useEffect, useRef, useState } from 'react';
-import { useGetCourseMediaByTypeQuery } from '../../../services/courseApi';
-import { useGetPlayableUrlMutation } from '../../../services/mediaApi';
-import { resetReadingScreen } from '../../../slice/ReadingScreenSlice';
+import { useGetCourseMediaByTypeQuery, useGetSinglePlaylistQuery, useTrackCourseProgressMutation } from '../../../services/courseApi';
+import { resetReadingScreen, setReadingScreen } from '../../../slice/ReadingScreenSlice';
 import { showToast } from '../../../slice/toastSlice';
 import { useAppDispatch, useAppSelector } from '../../../store/hook';
 import type { courseTabType, CurriculumMediaType } from '../../../types/course';
 import type { MediaProps } from '../../../types/media';
+import { extractYouTubeVideoId, getYouTubeThumbnail } from '../../../utils/extractYoutubeVideoId';
 import WaterMark from '../../../Watermark';
 
 interface PlyrInstance {
@@ -67,13 +68,16 @@ const SpotifyAudioPlayer = ({ audioUrl, imageUrl, title }: { audioUrl: string, i
 export default function ReadingDialog() {
     const theme = useTheme();
     const dispatch = useAppDispatch();
-    const { open, type, media, title, isYouTube, mediaId, courseId } = useAppSelector(
+
+    const { open, type, media, title, isYouTube, mediaId, courseId, playlistId, isDownloadable } = useAppSelector(
         state => state.readScreen
     );
 
+    console.log(isDownloadable)
+
     const playerRef = useRef<PlyrInstance | null>(null);
     const containerRef = useRef<HTMLDivElement | null>(null);
-    const [_isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(true);
     const [qp, setQp] = useState({
         pageIndex: 1,
         pageSize: 15,
@@ -102,35 +106,16 @@ export default function ReadingDialog() {
         { id: courseId!, type: switchType(type as CurriculumMediaType), qp: qp },
         { skip: !courseId || !open }
     );
+    const { data: playlistVideos } = useGetSinglePlaylistQuery(
+        { id: courseId!, type: switchType(type as CurriculumMediaType), ...qp, playlistId: Number(playlistId) },
+        { skip: !courseId || !open || !playlistId }
+    );
+    const [updateProgress, { isLoading: markingAsCompleted }] = useTrackCourseProgressMutation();
 
-    const [getPlayableUrl, { isLoading: loadingVideoUrl }] = useGetPlayableUrlMutation();
-    const [playableUrl, setPlayableUrl] = useState<string | null>(null);
-    const handleGetPlayableUrl = async () => {
-        try {
-            setPlayableUrl(null);
-            const response = await getPlayableUrl({ url: media?.url }).unwrap();
-            // dispatch(showToast({
-            //     message: "Successfully fetched the url",
-            //     severity: "success",
-            // }))
-            setPlayableUrl(response?.data?.url);
+    const mediaList = playlistId
+        ? playlistVideos?.data?.data ?? []
+        : data?.data?.data ?? [];
 
-        } catch (e: any) {
-            dispatch(showToast({
-                message: e?.data?.message || "Error Getting URL",
-                severity: "error",
-            }))
-        }
-    }
-
-    useEffect(() => {
-        if (media?.id) {
-            handleGetPlayableUrl();
-        }
-    }, [media?.id, media?.url])
-
-
-    const mediaList = data?.data?.data || [];
     const totalPages = data?.data?.pagination?.total_pages || 0;
     const currentPage = qp.pageIndex;
     const hasMore = currentPage < totalPages;
@@ -152,7 +137,6 @@ export default function ReadingDialog() {
     useEffect(() => {
         if (open) {
             setQp({ pageIndex: 1, pageSize: 15 });
-            setAllMedia([]);
         }
     }, [open, courseId, type]);
 
@@ -300,24 +284,38 @@ export default function ReadingDialog() {
         };
     }, []);
 
-    // const handleRelatedVideoClick = (relatedVideo: MediaProps) => {
-    //     const isYoutube = relatedVideo.url.includes('youtube.com') || relatedVideo.url.includes('youtu.be');
-    //     const vidId = isYoutube ? extractYouTubeVideoId(relatedVideo.url) : null;
+    const handleRelatedVideoClick = (relatedVideo: MediaProps) => {
+        const isYoutube = relatedVideo.url.includes('youtube.com') || relatedVideo.url.includes('youtu.be');
+        const vidId = isYoutube ? extractYouTubeVideoId(relatedVideo.url) : null;
 
-    //     dispatch(
-    //         setReadingScreen({
-    //             isYouTube: isYoutube,
-    //             mediaId: vidId || undefined,
-    //             media: relatedVideo,
-    //             title: relatedVideo.file_name
-    //         })
-    //     );
-    // };
+        dispatch(
+            setReadingScreen({
+                isYouTube: isYoutube,
+                mediaId: vidId || undefined,
+                media: relatedVideo,
+                title: relatedVideo.file_name
+            })
+        );
+    };
 
     const renderContent = () => {
         switch (type) {
             case 'temp_video':
                 if (isYouTube && mediaId) {
+                    if (isLoading || !mediaId) {
+                        return (
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                minHeight: '400px',
+                                height: "100%",
+                                backgroundColor: '#000',
+                            }}>
+                                <CircularProgress size={60} />
+                            </div>
+                        );
+                    }
 
                     const plyrSource: PlyrProps['source'] = {
                         type: "video",
@@ -328,40 +326,6 @@ export default function ReadingDialog() {
                             },
                         ],
                     };
-
-                    // const plyrOptions: PlyrProps['options'] = {
-                    //     autoplay: false,
-                    //     controls: [
-                    //         'play-large',
-                    //         'play',
-                    //         'rewind',
-                    //         'progress',
-                    //         'fast-forward',
-                    //         'current-time',
-                    //         'duration',
-                    //         'mute',
-                    //         'volume',
-                    //         'settings',
-                    //     ],
-                    //     keyboard: { focused: true, global: false },
-                    //     clickToPlay: true,
-                    //     disableContextMenu: true,
-                    //     fullscreen: { enabled: true },
-                    //     seekTime: 10,
-                    //     youtube: {
-                    //         noCookie: false,
-                    //         rel: 0,
-                    //         showinfo: 0,
-                    //         iv_load_policy: 3,
-                    //         modestbranding: 1,
-                    //         controls: 0,
-                    //         disablekb: 0,
-                    //         fs: 1,
-                    //         cc_load_policy: 0,
-                    //         autoplay: 0,
-                    //         origin: window.location.origin
-                    //     },
-                    // };
 
                     const plyrOptions: PlyrProps['options'] = {
                         autoplay: false,
@@ -391,59 +355,19 @@ export default function ReadingDialog() {
 
                         },
                     };
+
+
                     return (
-                        <div className='h-full min-h-[400px] flex justify-center items-center' ref={containerRef}>
-                            <div className="hidden">
-                                <Plyr
-                                    ref={playerRef as any}
-                                    source={plyrSource}
-                                    options={plyrOptions}
-                                />
-                            </div>
-                            {/* {responseStatus === 422 ? <div className='w-full' style={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                minHeight: '400px',
-                            }}>
-                                <Button >Retry</Button>
-                            </div> : ""} */}
-                            {loadingVideoUrl ? <div className='w-full' style={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                minHeight: '400px',
-                                backgroundColor: '#000',
-                            }}>
-                                <CircularProgress size={60} />
-                            </div> :
-                                playableUrl ? <Plyr
-                                    source={{
-                                        type: "video",
-                                        sources: [
-                                            {
-                                                src: playableUrl,
-                                                type: "video/mp4",
-                                            },
-                                        ],
-                                    }}
-                                    options={{
-                                        controls: [
-                                            "play",
-                                            "progress",
-                                            "current-time",
-                                            "mute",
-                                            "volume",
-                                            // "fullscreen",
-                                        ],
-                                        hideControls: false,
-                                    }}
-                                /> : <Button variant='contained' color="primary" onClick={handleGetPlayableUrl}>Retry</Button>
-                            }
+                        <div className='h-full' ref={containerRef}>
+                            <Plyr
+                                ref={playerRef as any}
+                                source={plyrSource}
+                                options={plyrOptions}
+                            />
                         </div>
                     );
                 } else if (mediaUrl) {
-                    return <video controls src={mediaUrl} style={{ width: '100%' }} controlsList="nodownload" />;
+                    return <video controls src={mediaUrl} style={{ width: '100%' }} />;
                 }
                 return <p>No video available</p>;
 
@@ -458,16 +382,9 @@ export default function ReadingDialog() {
 
             case 'temp_notes':
                 return mediaUrl ? (
-                    // <iframe
-                    //     className='h-full'
-                    //     src={`https://docs.google.com/viewer?url=${encodeURIComponent(mediaUrl)}&embedded=true`}
-                    //     style={{ width: '100%', border: 'none' }}
-                    // />
-
-                    // <DocumentReader fileUrl={mediaUrl} />
                     <iframe
                         className='h-full'
-                        src={`${mediaUrl}`}
+                        src={`${mediaUrl}${isDownloadable ? "" : "#toolbar=0&navpanes=0&scrollbar=0&statusbar=0&view=FitH"}`}
                         style={{ width: '100%', border: 'none' }}
                     />
                 ) : (
@@ -479,42 +396,48 @@ export default function ReadingDialog() {
         }
     };
 
-    // const getUpcomingMedia = () => {
-    //     if (!media?.id || allMedia.length === 0) return [];
+    const getUpcomingMedia = () => {
+        if (!media?.id || allMedia.length === 0) return [];
 
-    //     const currentIndex = allMedia.findIndex(v => v.id === media?.id);
-    //     if (currentIndex === -1) return allMedia.slice(0, 6);
+        const currentIndex = allMedia.findIndex(v => v.id === media?.id);
+        if (currentIndex === -1) return allMedia.slice(0, 6);
 
-    //     const upcomingItems = allMedia.slice(currentIndex + 1, currentIndex + 7);
+        const upcomingItems = allMedia.slice(currentIndex + 1, currentIndex + 7);
 
-    //     if (upcomingItems.length < 6 && !hasMore) {
-    //         return allMedia.slice(-6);
-    //     }
+        if (upcomingItems.length < 6 && !hasMore) {
+            return allMedia.slice(-6);
+        }
 
-    //     return upcomingItems;
-    // };
+        return upcomingItems;
+    };
 
     if (!open) {
         return null;
     }
 
-    // const upcomingMedia = getUpcomingMedia();
-    // const currentMediaId = media?.id;
+    const upcomingMedia = getUpcomingMedia();
+    const currentMediaId = media?.id;
 
-    const handleDownloadNote = async () => {
-        if (!mediaUrl) return;
+    const handleMarkAsCompleted = async () => {
+        try {
+            await updateProgress({
+                id: courseId!,
+                body: {
+                    media_id: media?.id!,
+                    type: switchType(type as CurriculumMediaType),
+                }
+            });
 
-        const link = document.createElement("a");
-        link.href = mediaUrl;
-        link.setAttribute("download", title ? `${title}.pdf` : "note.pdf");
-        link.style.display = "none";
+        } catch (e: any) {
+            dispatch(
+                showToast({
+                    message: e?.data?.message || 'Failed to mark as completed',
+                    severity: 'error'
+                })
+            )
+        }
+    }
 
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
-
-    console.log(playableUrl)
     return (
         <Dialog
             open={open}
@@ -529,7 +452,7 @@ export default function ReadingDialog() {
             }}
         >
             <DialogContent sx={{ padding: '24px' }}>
-                <div className='mb-4 flex justify-between items-end'>
+                <div className='mb-4 flex flex-wrap justify-between items-end'>
                     <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 600 }}>
                         {title || 'Media Viewer'}
                     </h2>
@@ -537,22 +460,17 @@ export default function ReadingDialog() {
                         <Button variant="contained" onClick={handleFullscreen} startIcon={<Maximize2 />}>
                             Fullscreen Zoom
                         </Button>
-                        {type === "temp_notes" &&
-                            <Button variant="contained" startIcon={<DocumentDownload />} onClick={handleDownloadNote}>
-                                Download Note
-                            </Button>
-                        }
                     </div>
                 </div>
 
                 <div className="lg:grid lg:grid-cols-12 gap-4">
-                    <div className="col-span-12 max-h-[500px] overflow-auto">
+                    <div className="col-span-9 max-h-[500px] overflow-auto">
                         <div className="h-full overflow-auto" ref={videoRef}>
                             <WaterMark />
                             {renderContent()}
                         </div>
                     </div>
-                    {/* <div className="hidden lg:block col-span-3">
+                    <div className="hidden lg:block col-span-3">
                         <Typography variant='subtitle1' className='block! mb-3!' sx={{ fontWeight: 600 }}>
                             Up Next
                         </Typography>
@@ -638,15 +556,15 @@ export default function ReadingDialog() {
                                 </Typography>
                             )}
                         </Box>
-                    </div> */}
+                    </div>
                 </div>
 
                 <div className='flex flex-col gap-4 md:flex md:flex-row-reverse mt-4'>
-                    <Button variant='contained' className='primary__btn'>
-                        Mark as Completed
+                    <Button variant='contained' className='primary__btn' onClick={handleMarkAsCompleted} disabled={markingAsCompleted}  >
+                        {markingAsCompleted ? t("messages.marking_as_completed") : t("messages.mark_as_completed")}
                     </Button>
                     <Button variant='contained' onClick={handleClose} className='cancel__btn'>
-                        Cancel
+                        {t("actions.cancel")}
                     </Button>
                 </div>
             </DialogContent>

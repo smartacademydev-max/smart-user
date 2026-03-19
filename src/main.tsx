@@ -13,6 +13,7 @@ import Toast from "./components/organism/Toast/index.tsx";
 import Loading from "./Loading.tsx";
 import GlobalRoutes from "./routes/Routes.tsx";
 import { store } from "./store/store.ts";
+import "./style.scss";
 import UdaanThemeProvider from "./ThemeProvider.tsx";
 
 i18n

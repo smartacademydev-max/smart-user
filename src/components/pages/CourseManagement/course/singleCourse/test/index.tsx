@@ -1,20 +1,25 @@
-import type { TestList } from "../../../../../../types/question";
 
 import { Box } from "@mui/material";
-import type { QueryParams } from "../../../../../../types";
+import { useState } from "react";
+import { useParams } from "react-router-dom";
+import { useGetCourseTestQuery } from "../../../../../../services/courseApi";
 import { EmptyList } from "../../../../../molecules/EmptyList";
 import TablePagination from "../../../../../molecules/Pagination";
 import TestCard from "../../../../../organism/Cards/TestCard";
 
 interface Props {
-    data?: TestList;
-    isLoading: boolean;
-    qp: QueryParams;
-    setQp: (qp: QueryParams) => void;
-    totalPages: number;
+
     havePurchased: boolean;
 }
-export default function SinlgeCourseTest({ data, isLoading, totalPages, qp, setQp, havePurchased }: Props) {
+export default function SinlgeCourseTest({ havePurchased }: Props) {
+    const { id } = useParams();
+    const [qp, setQp] = useState({
+        pageIndex: 1,
+        pageSize: 1
+    })
+    const { data, isLoading } = useGetCourseTestQuery({ id: Number(id), ...qp }, { skip: !id });
+
+
     if (!isLoading && !data?.data?.data?.length) {
         return <EmptyList
             title="No Test Found"
@@ -29,7 +34,7 @@ export default function SinlgeCourseTest({ data, isLoading, totalPages, qp, setQ
                         <TestCard key={index} test={test} havePurchased={havePurchased} />
                     ))}
                 </div>
-                {totalPages > 1 ? <TablePagination qp={qp} setQp={setQp} totalPages={totalPages} /> : ""}
+                {data?.data?.pagination?.total_pages && data?.data?.pagination?.total_pages > 1 ? <TablePagination qp={qp} setQp={setQp} totalPages={data?.data?.pagination?.total_pages || 0} /> : ""}
             </Box>
         </div>
     );

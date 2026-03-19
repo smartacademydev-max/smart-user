@@ -1,3 +1,5 @@
+import type { PurchaseModuleTypes } from "../types/purchase";
+
 export const PATH = {
     AUTH: {
         LOGIN: {
@@ -42,13 +44,15 @@ export const PATH = {
                 ROOT: (courseId?: number, liveId?: number) => (courseId && liveId ? `/courses/${courseId}/live/${liveId}` : "/courses/:courseId/live/:liveId"),
             },
             PURCHASE: {
-                ROOT: (id?: number) => (id ? `/courses/${id}/purchase` : "/courses/:id/purchase"),
+                ROOT: (id?: number, moduleType?: PurchaseModuleTypes) => (id ? `/${moduleType}/${id}/purchase` : "/:type/:id/purchase"),
                 SUCCESS: {
-                    ROOT: "/courses/:id/purchase/success"
+                    ROOT: (id?: number, moduleType?: PurchaseModuleTypes) =>
+                        (id ? `/${moduleType}/${id}/purchase/success` : "/:type/:id/purchase/success"),
                 },
                 FAILURE: {
-                    ROOT: "/courses/:id/purchase/failure"
-                }
+                    ROOT: (id?: number, moduleType?: PurchaseModuleTypes) =>
+                        (id ? `/${moduleType}/${id}/purchase/failure` : "/:type/:id/purchase/failure"),
+                },
             },
             PLANS: {
                 ROOT: `/courses/:id/plans`
@@ -90,9 +94,60 @@ export const PATH = {
     },
     TEST: {
         ROOT: "/test",
+        EXPLORE_TEST: {
+            ROOT: "/explore-test",
+            INDIVIDUAl_TEST: {
+                ROOT: "/explore-test/individual-test"
+            },
+            BUNDLE_TEST: {
+                ROOT: "/explore-test/bundle-test",
+                VIEW_BUNDLE: {
+                    ROOT: (id?: number) => (id ? `/explore-test/bundle-test/${id}` : "/explore-test/bundle-test/:id")
+                }
+            },
+            OMR: {
+                ROOT: "/explore-test/omr-test"
+            }
+        },
+        VIEW_TEST: {
+            ROOT: ({ testId }: { testId?: number }) =>
+                testId
+                    ? `/test/${testId}`
+                    : `/test/:testId`,
+            REVIEW_TEST: {
+                ROOT: ({ testId }: { testId?: number }) =>
+                    testId
+                        ? `/test/${testId}/review`
+                        : `/test/:testId/review`,
+                REVIEW_SUBJECTIVE_TEST: {
+                    ROOT: ({ testId }: { testId?: number }) =>
+                        testId
+                            ? `/test/${testId}/review/subjective`
+                            : `/test/:testId/review/subjective`,
+                }
+            },
+            SUBJECTIVE_TEST: {
+                ROOT: ({ testId }: { testId?: number }) =>
+                    testId
+                        ? `/test/${testId}/subjective`
+                        : `/test/:testId/subjective`,
+            }
+        },
+        MY_TEST: {
+            ROOT: "/test/my-tests",
+        },
+        MY_INDIVIDUAl_TEST: {
+            ROOT: "/test/my-individual-test"
+        },
+        MY_BUNDLES: {
+            ROOT: "/test/my-bundle-test"
+        }
     },
     VIDEOS: {
-        ROOT: "/videos"
+        ROOT: "/videos",
+        VIEW_PLAYLIST: {
+            ROOT: (playlistId?: number, id?: number) => id && playlistId ? `/videos/playlist/${playlistId}/course/${id}` : "/videos/playlist/:playlistId/course/:id"
+        }
     },
     AUDIOS: {
         ROOT: "/audios"
@@ -103,9 +158,24 @@ export const PATH = {
     MY_COURSE: {
         ROOT: "/my-course"
     },
-    USER: {
-        MY_ACCOUNT: {
-            ROOT: "/my-account"
+    GORKHAPATRA: {
+        ROOT: "/gorkhapatra",
+        VIEW_GORKHAPATRA: {
+            ROOT: (id?: number) => id ? `/gorkhapatra/${id}` : "/gorkhapatra/:id"
+        }
+    },
+    NOTICE: {
+        ROOT: "/notice",
+        VIEW_NOTICE: {
+            ROOT: (id?: number) => id ? `/notice/${id}` : "/notice/:id"
+        }
+    },
+    SETTINGS: {
+        PROFILE: {
+            ROOT: "/profile"
+        },
+        LINKED_DEVICES: {
+            ROOT: "/linked-devices"
         }
     },
     SUPPORT: {

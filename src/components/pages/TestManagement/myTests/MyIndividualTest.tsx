@@ -1,0 +1,156 @@
+
+import { Box } from "@mui/material";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { useGetUserIndividualTestQuery } from "../../../../services/testApi";
+import type { QueryParams } from "../../../../types";
+import type { QuestionTypeProps, TestProps } from "../../../../types/question";
+import { EmptyList } from "../../../molecules/EmptyList";
+import TabController from "../../../molecules/TabController";
+import TestCard from "../../../organism/Cards/TestCard";
+import PageHeader from "../../../organism/PageHeader";
+import TableFilter from "../../../organism/TableFilter";
+
+const VideoSkeleton = () => (
+    <div className="col-span-1 animate-pulse">
+        <div className="bg-gray-200 rounded-xl h-48 w-full"></div>
+        <div className="mt-3 space-y-2">
+            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+        </div>
+    </div>
+);
+
+export default function MyIndividualTest() {
+    const { t } = useTranslation();
+
+
+    const [search, setSearch] = useState<string>("");
+    const [qpTest, setQpTest] = useState<QueryParams>({
+        pageIndex: 1,
+        pageSize: 15,
+    });
+    const [activeTab, setActiveTab] = useState<QuestionTypeProps>("mcq");
+    const [allTest, setAllTest] = useState<TestProps[]>([]);
+
+    const { data: tests, isLoading: loadingTest } = useGetUserIndividualTestQuery(
+        { ...qpTest, type: activeTab },
+    );
+
+    const testList = tests?.data?.data || [];
+    const totalPages = tests?.data?.pagination?.total_pages || 0;
+    const currentPage = qpTest.pageIndex;
+
+
+    useEffect(() => {
+        if (testList.length > 0) {
+            if (qpTest.pageIndex === 1) {
+                setAllTest(testList);
+            } else {
+                setAllTest(prev => {
+                    const existingIds = new Set(prev.map(v => v.id));
+                    const newVideos = testList.filter(v => !existingIds.has(v.id));
+                    return [...prev, ...newVideos];
+                });
+            }
+        } else if (qpTest.pageIndex === 1) {
+            setAllTest([]);
+        }
+    }, [testList, qpTest.pageIndex]);
+
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setQpTest(prev => ({ ...prev, search, pageIndex: 1 }));
+            setAllTest([]);
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [search]);
+
+    const fetchMoreTest = () => {
+        if (!loadingTest && currentPage < totalPages) {
+            setQpTest(prev => ({
+                ...prev,
+                pageIndex: prev.pageIndex + 1
+            }));
+        }
+    };
+
+    const hasMore = currentPage < totalPages;
+
+    return (
+        <div className="all__note__listing h-full flex flex-col jsutify-between">
+            <div className="flex flex-col mb-4">
+                <PageHeader
+                    breadcrumb={[{
+                        title: t("messages.all_test")
+                    }]}
+                />
+
+                <div className="flex items-center flex-wrap justify-between">
+                    <TabController
+                        options={[
+                            { label: "MCQs", value: "mcq" },
+                            { label: "Subjective", value: "subjective" },
+                            { label: "OMR", value: "omr" },
+                        ]}
+                        currentActive={activeTab}
+                        setActiveTab={setActiveTab}
+                    />
+                    <TableFilter
+                        search={search || ""}
+                        setSearch={(search) => setSearch(search)}
+                    />
+                </div>
+            </div>
+
+            {/* Media Listing */}
+            <div className="media__listing__wrapper h-full overflow-auto">
+                <Box
+                    id="video__listing__wrapper"
+                    sx={{
+                        maxHeight: "100%",
+                        overflow: "auto",
+                    }}
+                >
+                    {loadingTest ? (
+                        <div className="flex flex-col gap-4 md:grid grid-cols-2 2xl:grid-cols-3 lg:gap-6">
+                            {[...Array(6)].map((_, idx) => (
+                                <VideoSkeleton key={idx} />
+                            ))}
+                        </div>
+                    ) : testList.length > 0 ? (
+                        <InfiniteScroll
+                            dataLength={allTest.length}
+                            next={fetchMoreTest}
+                            hasMore={hasMore}
+                            scrollableTarget="video__listing__wrapper"
+                            loader={
+                                <div className="flex flex-col gap-4 md:grid grid-cols-2 xl:grid-cols-3 lg:gap-6 mt-4 lg:mt-6">
+                                    {Array.from({ length: 3 }).map((_, idx) => <VideoSkeleton key={idx} />)}
+                                </div>
+                            }
+                        >
+                            <div className="flex flex-col gap-4 md:grid grid-cols-2 xl:grid-cols-3 lg:gap-6">
+                                {allTest.map((test) => (
+                                    <TestCard
+                                        test={test}
+                                        key={test.id}
+                                        havePurchased={true}
+                                    />
+                                ))}
+                            </div>
+                        </InfiniteScroll>
+                    ) : (
+                        <EmptyList
+                            title="No Test Found"
+                            description="There are no tests available for the selected course."
+                        />
+                    )}
+                </Box>
+            </div>
+        </div>
+    )
+}

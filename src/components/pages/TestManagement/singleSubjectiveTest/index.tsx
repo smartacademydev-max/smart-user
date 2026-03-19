@@ -12,7 +12,8 @@ import FileDragDrop from "../../../molecules/FileDragDrop";
 import TestCancelDialog from "../../../organism/Dialog/TestCancelDialog";
 import type { SubmissionType } from "../../../organism/Dialog/TestSubmissionDialog";
 import TestSubmissionDialog from "../../../organism/Dialog/TestSubmissionDialog";
-
+import TwoMinAudio from "/audios/subjective-2-min-warning.mp3";
+import FiveMinAudio from "/audios/subjective-5-min-warning.mp3";
 export default function SingleSubjectiveTest() {
     const theme = useTheme();
     const navigate = useNavigate();
@@ -33,11 +34,23 @@ export default function SingleSubjectiveTest() {
     const [isTimerPaused, setIsTimerPaused] = useState(false);
     const initialTimeRef = useRef<number | undefined>(undefined);
 
+    const fiveMinPlayedRef = useRef(false);
+    const twoMinPlayedRef = useRef(false);
+
+    const fiveMinAudioRef = useRef<HTMLAudioElement | null>(null);
+    const twoMinAudioRef = useRef<HTMLAudioElement | null>(null);
+
+    useEffect(() => {
+        fiveMinAudioRef.current = new Audio(FiveMinAudio);
+        twoMinAudioRef.current = new Audio(TwoMinAudio);
+    }, []);
+
+
     const storageKey = `test_${courseId}_${testId}`;
 
     const { data } = useGetTestByIdQuery(
         { courseId: Number(courseId), testId: Number(testId) },
-        { skip: !courseId || !testId }
+        { skip: !testId }
     );
 
     const { data: subjectiveAnswer, refetch: refetchAnswer } = useGetSubjectiveAnswerQuery(
@@ -70,7 +83,6 @@ export default function SingleSubjectiveTest() {
         }
     }, [storageKey]);
 
-    // Save only timer and current question index to localStorage
     useEffect(() => {
         const dataToSave = {
             timeLeft,
@@ -80,15 +92,32 @@ export default function SingleSubjectiveTest() {
     }, [timeLeft, currentQuestionIndex, storageKey]);
 
     useEffect(() => {
-        if (data?.overview?.time !== undefined && initialTimeRef.current === undefined) {
-            initialTimeRef.current = data.overview.time;
-            // Only set initial time if not loaded from localStorage
+        if (data?.overview?.time !== undefined && data?.overview?.end_datetime && initialTimeRef.current === undefined) {
+            const endTime = new Date(data.overview.end_datetime).getTime();
+            const currentTime = Date.now();
+            const timeRemainingFromEnd = Math.max(endTime - currentTime, 0);
+
+            if (timeRemainingFromEnd <= 0) {
+                dispatch(
+                    showToast({
+                        message: "This test has already ended.",
+                        severity: "error",
+                    })
+                );
+                localStorage.removeItem(storageKey);
+                navigate(PATH.TEST.ROOT);
+                return;
+            }
+
+            const actualTimeLeft = Math.min(data.overview.time, timeRemainingFromEnd);
+
+            initialTimeRef.current = actualTimeLeft;
             const savedData = localStorage.getItem(storageKey);
             if (!savedData || !JSON.parse(savedData).timeLeft) {
-                setTimeLeft(data.overview.time);
+                setTimeLeft(actualTimeLeft);
             }
         }
-    }, [data?.overview?.time, storageKey]);
+    }, [data?.overview?.time, data?.overview?.end_datetime, storageKey, dispatch, navigate]);
 
     useEffect(() => {
         if (data?.data?.length) {
@@ -120,12 +149,34 @@ export default function SingleSubjectiveTest() {
     }, [timeLeft, isTimerPaused]);
 
     useEffect(() => {
+        if (timeLeft === undefined || isTimerPaused) return;
+
+        const fiveMinutesInMs = 5 * 60 * 1000;
+        const twoMinutesInMs = 2 * 60 * 1000;
+
+        if (timeLeft <= fiveMinutesInMs && timeLeft > fiveMinutesInMs - 1000 && !fiveMinPlayedRef.current) {
+            fiveMinPlayedRef.current = true;
+            if (fiveMinAudioRef.current) {
+                fiveMinAudioRef.current.play().catch((error) => {
+                    console.error("Failed to play 5-minute warning audio:", error);
+                });
+            }
+        }
+
+        if (timeLeft <= twoMinutesInMs && timeLeft > twoMinutesInMs - 1000 && !twoMinPlayedRef.current) {
+            twoMinPlayedRef.current = true;
+            if (twoMinAudioRef.current) {
+                twoMinAudioRef.current.play().catch((error) => {
+                    console.error("Failed to play 2-minute warning audio:", error);
+                });
+            }
+        }
+    }, [timeLeft, isTimerPaused]);
+
+    useEffect(() => {
         if (timeLeft === 0 && !isTimerPaused) {
             setIsTimerPaused(true);
-            setSubmitModal({
-                open: true,
-                type: "timer"
-            });
+            handleSubmitSubjective();
         }
     }, [timeLeft, isTimerPaused]);
 
@@ -159,6 +210,7 @@ export default function SingleSubjectiveTest() {
     const handleFileUpload = async (files: File[]) => {
         if (!files.length || !currentQuestion) return;
 
+        console.log("file is uploaded", { files })
         try {
             const formData = new FormData();
             files.forEach((file, index) => {
@@ -252,37 +304,31 @@ export default function SingleSubjectiveTest() {
         return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
     };
 
-    const percentageLeft = useMemo(() => {
-        return initialTimeRef.current !== undefined && timeLeft !== undefined && initialTimeRef.current > 0
-            ? timeLeft / initialTimeRef.current
-            : 1;
-    }, [timeLeft]);
 
     const timerColors = useMemo(() => {
-        if (percentageLeft > 0.1) {
+        const fiveMinutesInMs = 5 * 60 * 1000;
+
+        if (timeLeft !== undefined && timeLeft <= fiveMinutesInMs) {
             return {
-                bg: theme.palette.success.light,
-                border: theme.palette.success.main,
-                color: theme.palette.success.main,
+                bg: "rgba(255, 200, 200, 0.2)",
+                border: "rgb(255, 80, 80)",
+                color: "rgb(255, 50, 50)",
             };
         }
 
-        const redIntensity = Math.min(255, Math.floor((1 - percentageLeft / 0.1) * 255));
-
         return {
-            bg: `rgba(255, ${200 - redIntensity}, ${200 - redIntensity}, 0.2)`,
-            border: `rgb(255, ${80 - redIntensity / 3}, ${80 - redIntensity / 3})`,
-            color: `rgb(255, ${50 - redIntensity / 4}, ${50 - redIntensity / 4})`,
+            bg: theme.palette.success.light,
+            border: theme.palette.success.main,
+            color: theme.palette.success.main,
         };
-    }, [percentageLeft, theme.palette.success.light, theme.palette.success.main]);
+    }, [timeLeft, theme.palette.success.light, theme.palette.success.main]);
 
-    // Get current question's uploaded files from API
     const currentQuestionFiles = useMemo(() => {
         return subjectiveAnswer?.data || [];
     }, [subjectiveAnswer?.data]);
 
     return (
-        <div className="single__subject__test__root">
+        <div className="single__subject__test__root h-full overflow-auto">
             <div className="test__header flex items-center justify-between">
                 <div className="title">
                     <Button

@@ -1,5 +1,6 @@
 
 import type { Pagination } from ".";
+import type { MediaProps } from "./media";
 import type { GlobalResponse } from "./user";
 
 export interface SelectionType {
@@ -61,11 +62,14 @@ export interface CourseProps {
     subscriptions?: CourseSubscription[] | null;
     marked_price?: string,
     sale_price?: string,
+    purchased_date?: string;
     mega_categories?: string[];
     user: {
         has_taken_freetrial: false,
         is_free_trial_valid: false,
         has_purchased: false
+        free_trial_count: number;
+        free_trial_expires_at: string | null;
     },
     is_bookmarked?: boolean;
     no_of_notes: number;
@@ -73,6 +77,11 @@ export interface CourseProps {
     no_of_videos: number;
     no_of_tests: number;
     progress: number;
+    ends_at?: string;
+    started_from?: string;
+    can_take_free_trial: boolean;
+    course_completion_status: "completed" | "ongoing" | "not_started";
+
 }
 
 export interface CourseList extends GlobalResponse {
@@ -118,12 +127,13 @@ export const CourseTabs: { label: string; value: courseTabType }[] = [
 // Media type for curriculum items
 export type CurriculumMediaType = "temp_audios" | "temp_video" | "temp_notes"
 
-export interface CurriculumMediaProps {
+export interface CurriculumMediaProps extends MediaProps {
     id: number;
     file_name: string;
     url: string;
     size: number;
     type: CurriculumMediaType;
+
 }
 
 // Base props for all curriculum items
@@ -159,5 +169,18 @@ export interface CurriculumList extends GlobalResponse {
     data: {
         data: CurriculumProps[];
         pagination: Pagination;
+    }
+}
+
+export interface PlaylistProps {
+    chapter_id: number;
+    chapter_name: string;
+    count: number;
+}
+
+export interface PlaylistListing {
+    data: {
+        data: PlaylistProps[];
+        pagination: Pagination
     }
 }

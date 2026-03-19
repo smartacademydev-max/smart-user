@@ -18,6 +18,9 @@ import SingleLiveClassRoot from "../components/pages/CourseManagement/course/sin
 import LiveClassRoot from "../components/pages/CourseManagement/liveClasses";
 import AllLiveClass from "../components/pages/CourseManagement/liveClasses/allLiveClass";
 import MyCourseRoot from "../components/pages/CourseManagement/myCourse";
+import GorkhapatraRoot from "../components/pages/Gorkhapatra";
+import AllGorkhapatras from "../components/pages/Gorkhapatra/AllGorkhapatra";
+import SingleGorkhapatraRoot from "../components/pages/Gorkhapatra/SingleGorkhapatra";
 import AuthLayout from "../components/pages/layout/AuthLayout";
 import NotFound from "../components/pages/layout/NotFound";
 import SingleFormAuthLayout from "../components/pages/layout/SingleFormAuthLayout";
@@ -26,20 +29,34 @@ import AllAudios from "../components/pages/MediaManagement/audios/allAudios";
 import NotesRoot from "../components/pages/MediaManagement/notes";
 import AllNotes from "../components/pages/MediaManagement/notes/allNotes";
 import VideosRoot from "../components/pages/MediaManagement/videos";
-import AllVideos from "../components/pages/MediaManagement/videos/allVideos";
+import CoursePlaylist from "../components/pages/MediaManagement/videos/allPlaylist";
+import SinglePlaylist from "../components/pages/MediaManagement/videos/allPlaylist/singlePlaylist";
+import AllNotices from "../components/pages/NoticeBoard/allNotices";
+import NoticeRoot from "../components/pages/NoticeBoard/index.";
+import SingleNoticeRoot from "../components/pages/NoticeBoard/singleNotice";
 import PrivacyPolicyRoot from "../components/pages/PrivacyPolicy";
 import PurchaseRoot from "../components/pages/Purchase";
 import PurchaseFailure from "../components/pages/Purchase/failure";
 import PurchaseLayout from "../components/pages/Purchase/PurchaseLayout";
 import PaymentSuccessPage from "../components/pages/Purchase/success";
+import SettingRoot from "../components/pages/Settings";
+import LinkedDevices from "../components/pages/Settings/LinkedDevices";
+import ProfilePage from "../components/pages/Settings/ProfilePage";
 import SupportRoot from "../components/pages/Support";
 import TestManagementRoot from "../components/pages/TestManagement";
 import AllTestRoot from "../components/pages/TestManagement/allTest";
+import ExploreTestRoot from "../components/pages/TestManagement/exploreTest";
+import ExploreBundle from "../components/pages/TestManagement/exploreTest/bundles/ExploreBundle";
+import SingleBundle from "../components/pages/TestManagement/exploreTest/bundles/singleBundle";
+import ExploreAllTest from "../components/pages/TestManagement/exploreTest/ExploreAllTest";
+import ExploreIndividualTest from "../components/pages/TestManagement/exploreTest/ExploreIndividualTest";
+import ExploreOmr from "../components/pages/TestManagement/exploreTest/ExploreOmr";
+import MyBundles from "../components/pages/TestManagement/myTests/MyBundles";
+import MyIndividualTest from "../components/pages/TestManagement/myTests/MyIndividualTest";
 import ReviewTestRoot from "../components/pages/TestManagement/reviewTest";
 import ReviewSubjectTestRoot from "../components/pages/TestManagement/reviewTest/subjective";
 import SingleSubjectiveTest from "../components/pages/TestManagement/singleSubjectiveTest";
 import SingleTestRoot from "../components/pages/TestManagement/singleTest";
-import MyAccount from "../components/pages/UserManagement/MyAccount";
 import { PATH } from "./PATH";
 import Private from "./Private";
 import RootLayout from "./RootLayout";
@@ -120,39 +137,52 @@ const router = createBrowserRouter([
               { path: PATH.COURSE_MANAGEMENT.COURSES.SAVED_COURSES.ROOT, element: <SavedCourse /> },
             ],
           },
-          // COURSE OUTSIDE LAYOUT
 
           {
             element:
-              <TestManagementRoot />
-            ,
+              <TestManagementRoot />,
             children: [
-              { path: PATH.TEST.ROOT, element: <AllTestRoot /> },
-
+              { path: PATH.TEST.MY_TEST.ROOT, element: <AllTestRoot /> },
+              { path: PATH.TEST.MY_INDIVIDUAl_TEST.ROOT, element: <MyIndividualTest /> },
+              { path: PATH.TEST.MY_BUNDLES.ROOT, element: <MyBundles /> },
+              { path: PATH.TEST.VIEW_TEST.ROOT({}), element: <SingleTestRoot /> },
+              { path: PATH.TEST.VIEW_TEST.SUBJECTIVE_TEST.ROOT({}), element: <SingleSubjectiveTest /> },
+              { path: PATH.TEST.VIEW_TEST.REVIEW_TEST.ROOT({}), element: <ReviewTestRoot /> },
+              { path: PATH.TEST.VIEW_TEST.REVIEW_TEST.REVIEW_SUBJECTIVE_TEST.ROOT({}), element: <ReviewSubjectTestRoot /> },
             ]
           },
           {
+            element: <ExploreTestRoot />,
+            children: [
+              { path: PATH.TEST.EXPLORE_TEST.ROOT, element: <ExploreAllTest /> },
+              { path: PATH.TEST.EXPLORE_TEST.INDIVIDUAl_TEST.ROOT, element: <ExploreIndividualTest /> },
+              { path: PATH.TEST.EXPLORE_TEST.BUNDLE_TEST.ROOT, element: <ExploreBundle /> },
+              { path: PATH.TEST.EXPLORE_TEST.OMR.ROOT, element: <ExploreOmr /> },
+            ]
+          },
+          { path: PATH.TEST.EXPLORE_TEST.BUNDLE_TEST.VIEW_BUNDLE.ROOT(), element: <SingleBundle /> },
+          {
             element:
-              <PurchaseRoot />
-            ,
+              <PurchaseRoot />,
             children: [
               { path: PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.ROOT(), element: <PurchaseLayout /> },
-              { path: PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.SUCCESS.ROOT, element: <PaymentSuccessPage /> },
-              { path: PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.FAILURE.ROOT, element: <PurchaseFailure /> },
+              { path: PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.ROOT(), element: <PurchaseLayout /> },
+              { path: PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.SUCCESS.ROOT(), element: <PaymentSuccessPage /> },
+              { path: PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.FAILURE.ROOT(), element: <PurchaseFailure /> },
+              // { path: PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.SUCCESS.ROOT(), element: <PaymentSuccessPage /> },
+              // { path: PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.FAILURE.ROOT(), element: <PurchaseFailure /> },
               // { path: PATH.COURSE_MANAGEMENT.LIVE_CLASSES.PURCHASE.ROOT(), element: <PurchaseLayout /> },
             ],
           },
           {
             path: PATH.MY_COURSE.ROOT,
             element:
-              <MyCourseRoot />
-            ,
+              <MyCourseRoot />,
           },
           {
 
             element:
-              <LiveClassRoot />
-            ,
+              <LiveClassRoot />,
             children: [{
               path: PATH.LIVE_CLASSES.ROOT,
               element: <AllLiveClass />
@@ -161,8 +191,7 @@ const router = createBrowserRouter([
           {
 
             element:
-              <NotesRoot />
-            ,
+              <NotesRoot />,
             children: [
               { path: PATH.NOTES.ROOT, element: <AllNotes /> }
             ]
@@ -170,34 +199,48 @@ const router = createBrowserRouter([
           {
 
             element:
-              <TestManagementRoot />
-            ,
+              <TestManagementRoot />,
             children: [
               { path: PATH.TEST.ROOT, element: <AllTestRoot /> }
             ]
           },
           {
-
             element:
-              <VideosRoot />
-            ,
+              <VideosRoot />,
             children: [
-              { path: PATH.VIDEOS.ROOT, element: <AllVideos /> }
+              { path: PATH.VIDEOS.ROOT, element: <CoursePlaylist /> },
+              { path: PATH.VIDEOS.VIEW_PLAYLIST.ROOT(), element: <SinglePlaylist /> }
             ]
           },
           {
             element:
-              <AudiosRoot />
-            ,
+              <GorkhapatraRoot />,
+            children: [
+              { path: PATH.GORKHAPATRA.ROOT, element: <AllGorkhapatras /> },
+              { path: PATH.GORKHAPATRA.VIEW_GORKHAPATRA.ROOT(), element: <SingleGorkhapatraRoot /> },
+            ]
+          },
+          {
+            element:
+              <NoticeRoot />,
+            children: [
+              { path: PATH.NOTICE.ROOT, element: <AllNotices /> },
+              { path: PATH.NOTICE.VIEW_NOTICE.ROOT(), element: <SingleNoticeRoot /> },
+            ]
+          },
+          {
+            element:
+              <AudiosRoot />,
             children: [
               { path: PATH.AUDIOS.ROOT, element: <AllAudios /> }
             ]
           },
           {
-            path: PATH.USER.MY_ACCOUNT.ROOT,
-            element:
-              <MyAccount />
-
+            element: <SettingRoot />,
+            children: [
+              { path: PATH.SETTINGS.PROFILE.ROOT, element: <ProfilePage /> },
+              { path: PATH.SETTINGS.LINKED_DEVICES.ROOT, element: <LinkedDevices /> },
+            ]
           },
           {
             path: PATH.SUPPORT.ROOT,

@@ -4,6 +4,40 @@
     --breakpoint-3xl: 120rem;
 }
 
+@font-face {
+    font-family: "HelveticaNeueCyr";
+    src: url("/fonts/HelveticaNeueCyr-Light.woff2") format("woff2");
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "HelveticaNeueCyr";
+    src: url("/fonts/HelveticaNeueCyr-Roman.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "HelveticaNeueCyr";
+    src: url("/fonts/HelveticaNeueCyr-Medium.woff2") format("woff2");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "HelveticaNeueCyr";
+    src: url("/fonts/HelveticaNeueCyr-Bold.woff2") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+
+
 button.plyr__control.plyr__control--overlaid {
     width: 120px !important;
     height: 120px !important;
@@ -96,4 +130,18 @@ canvas {
 .plyr {
     height: 100% !important;
     width: 100% !important;
+}
+
+.slick-dots li {
+    border-radius: 50%;
+    width: 8px !important;
+    height: 8px !important;
+}
+
+.slick-track>div {
+    padding: 0 4px;
+}
+
+.slick-dots li button::before {
+    display: none !important;
 }

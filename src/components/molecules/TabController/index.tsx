@@ -12,6 +12,7 @@ import "slick-carousel/slick/slick.css";
 interface TabOption<T> {
     label: string;
     value: T;
+    count?: string | null;
 }
 
 interface TabControllerProps<T> {
@@ -52,6 +53,7 @@ export default function TabController<T extends string | number>({
                 breakpoint: 1200,
                 settings: {
                     slidesToShow: 6,
+                    focusOnSelect: false,
                 }
             },
             {
@@ -67,6 +69,7 @@ export default function TabController<T extends string | number>({
     const theme = useTheme();
 
 
+    console.log(options)
 
     return (
         <>
@@ -79,16 +82,29 @@ export default function TabController<T extends string | number>({
                     {options.map((tab) => (
                         <div key={tab.value}
                             onClick={() => setActiveTab(tab.value)}
-                            className={
-                                currentActive === tab.value ? "active__tab__controller" : ""
+                        >
+                            <div className={
+                                `px-6 py-2 rounded-md cursor-pointer flex  items-center gap-1.5 ${currentActive === tab.value ? "active__tab__controller" : ""}`
                             }>
-                            <Typography
-                                variant="subtitle2"
-                                color="text.middle"
-                                className="px-6 py-2 rounded-md cursor-pointer text-nowrap text-center"
-                            >
-                                {tab.label}
-                            </Typography>
+                                <Typography
+                                    variant="subtitle2"
+                                    color="text.middle"
+                                    className=" text-nowrap"
+                                >
+                                    {tab.label}
+                                </Typography>
+                                {tab.count ? <Typography
+                                    component="span"
+                                    variant="caption"
+                                    color="text.dark"
+                                    className="w-4.5 h-4.5 rounded-full flex justify-center items-center"
+                                    sx={{
+                                        background: (theme) => theme.palette.primary.contrastText
+                                    }}
+                                >
+                                    {tab.count}
+                                </Typography> : ""}
+                            </div>
                         </div>
                     ))}
                 </Slider>
@@ -106,17 +122,31 @@ export default function TabController<T extends string | number>({
                     <ListItem
                         key={tab.value}
                         onClick={() => setActiveTab(tab.value)}
-                        className={
-                            currentActive === tab.value ? "active__tab__controller" : ""
-                        }
+
                     >
-                        <Typography
-                            variant="subtitle2"
-                            color="text.middle"
-                            className="px-6 py-2 rounded-md cursor-pointer text-nowrap"
-                        >
-                            {tab.label}
-                        </Typography>
+                        <div className={
+                            `px-6 py-2 rounded-md cursor-pointer flex  items-center gap-1.5 ${currentActive === tab.value ? "active__tab__controller" : ""}`
+                        }>
+                            <Typography
+                                variant="subtitle2"
+                                color="text.middle"
+                                className=" text-nowrap"
+                            >
+                                {tab.label}
+                            </Typography>
+                            {tab.count ? <Typography
+                                component="span"
+                                variant="caption"
+                                color="text.dark"
+                                className="w-4.5 h-4.5 rounded-full flex justify-center items-center"
+                                sx={{
+                                    background: (theme) => theme.palette.primary.contrastText
+                                }}
+                            >
+                                {tab.count}
+                            </Typography> : ""}
+                        </div>
+
                     </ListItem>
                 ))}
             </List>

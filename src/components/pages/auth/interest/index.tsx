@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { PATH } from "../../../../routes/PATH";
 import { useGetAllInterestQuery, useUpdateUserInterestMutation } from "../../../../services/categoryApi";
 import { showToast } from "../../../../slice/toastSlice";
-import { useAppDispatch } from "../../../../store/hook";
+import { useAppDispatch, useAppSelector } from "../../../../store/hook";
 import { getItem, setItem } from "../../../../utils/localStorageUtil";
 
 const INTEREST_SELECTED_KEY = "interest__selected";
@@ -35,7 +35,7 @@ export default function InterestRoot() {
     const dispatch = useAppDispatch();
     const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
 
-
+    const user = useAppSelector((state) => state.auth.user);
     const { data, isLoading } = useGetAllInterestQuery();
     const [updatedUserInterest, { isLoading: addingUserInterest }] = useUpdateUserInterestMutation();
 
@@ -54,7 +54,7 @@ export default function InterestRoot() {
 
     useEffect(() => {
         const completed = getItem<boolean>(INTEREST_SELECTED_KEY);
-        if (completed) {
+        if (completed || user?.interested_categories?.length) {
             navigate(PATH.DASHBOARD.ROOT);
         }
     }, [navigate]);

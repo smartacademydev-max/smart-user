@@ -37,6 +37,8 @@ export default function SingleLiveClassRoot() {
     const { data: liveClassData, isLoading: isLoadingLiveClass } = useGetSingleLiveClassQuery({
         courseId: Number(courseId),
         liveId: Number(liveId),
+    }, {
+        skip: !courseId || !liveId,
     });
 
     const [generateSignature] = useGetMeetingSignatureMutation();
@@ -96,8 +98,13 @@ export default function SingleLiveClassRoot() {
 
                 if (meetingData.account_id === 1) {
                     sdkKey = import.meta.env.VITE_ZOOM_MEETING_SDK_SECRET1;
-                } else {
+                } else if (meetingData.account_id === 2) {
                     sdkKey = import.meta.env.VITE_ZOOM_MEETING_SDK_SECRET2;
+                } else if (meetingData.account_id === 3) {
+                    sdkKey = import.meta.env.VITE_ZOOM_MEETING_SDK_SECRET3;
+                }
+                else {
+                    sdkKey = import.meta.env.VITE_ZOOM_MEETING_SDK_SECRET4;
                 }
 
                 if (!meetingNumber) throw new Error("Invalid Meeting URL in server data.");

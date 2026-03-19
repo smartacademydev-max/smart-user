@@ -1,10 +1,16 @@
-import { useAppSelector } from "./store/hook";
+import DashboardAnalytics from "./components/pages/Dashboard/DashboardAnalytics";
+import DashboardGorkhapatraListing from "./components/pages/Dashboard/DashboardGorkhapatraListing";
+import DashboardPurchasedCourseListing from "./components/pages/Dashboard/DashboardPurchasedCourseListing";
+import LiveClassAndTestFilter from "./components/pages/Dashboard/LiveClassAndTestFilter";
 
 export default function App() {
 
-  const user = useAppSelector((state) => state.auth.user);
-
   return (
-    <h1>Welcome {user?.name}</h1>
+    <div className="h-full overflow-auto pr-2">
+      <DashboardAnalytics />
+      <DashboardPurchasedCourseListing />
+      <DashboardGorkhapatraListing />
+      <LiveClassAndTestFilter />
+    </div>
   )
 }

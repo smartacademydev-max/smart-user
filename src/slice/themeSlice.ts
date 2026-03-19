@@ -24,7 +24,7 @@ const initialState: DefaultThemeProps = storedTheme
     ? JSON.parse(storedTheme)
     : {
         fontFamily: "Inter",
-        lang: "en",
+        lang: null,
         mode: ThemeMode.LIGHT,
         miniDrawer: false,
     };

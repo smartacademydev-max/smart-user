@@ -49,7 +49,7 @@ export default function NotificationCard({ data }: Props) {
     const [readNotification] = useReadNotificationMutation();
 
     return (
-        <Box className="notification__item  flex gap-3 py-1.5 px-0 lg:px-4 lg:py-3.5 2xl:py-6 2xl:px-6 cursor-pointer last:border-b-0!"
+        <Box className="notification__item  flex flex-wrap gap-3 py-1.5 px-0 lg:px-4 lg:py-3.5 2xl:py-6 2xl:px-6 cursor-pointer last:border-b-0!"
             sx={{
                 backgroundColor: (theme) => data?.has_seen ? "transparent" : theme.palette.primary.light,
                 borderBottom: (theme) => `1px solid ${theme.palette.separator.darker}`,

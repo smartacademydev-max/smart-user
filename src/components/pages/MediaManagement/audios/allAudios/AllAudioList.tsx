@@ -78,13 +78,10 @@ export default function AllAudioListing() {
     const totalPages = audios?.data?.pagination?.total_pages || 0;
     const currentPage = qpMedia.pageIndex;
 
-    // ✅ Simplified effect - let RTK Query cache handle the data
     useEffect(() => {
         if (qpMedia.pageIndex === 1) {
-            // First page - replace all audios
             setAllAudios(audioListing);
         } else if (audioListing.length > 0) {
-            // Subsequent pages - append new audios
             setAllAudios(prev => {
                 const existingIds = new Set(prev.map(v => v.id));
                 const newAudios = audioListing.filter(v => !existingIds.has(v.id));
@@ -93,17 +90,16 @@ export default function AllAudioListing() {
         }
     }, [audioListing, qpMedia.pageIndex]);
 
-    // ✅ Reset pagination when course changes - don't clear allAudios
+
     useEffect(() => {
         setQpMedia(prev => ({ ...prev, pageIndex: 1 }));
-        // Let the audioListing effect handle updating allAudios
     }, [selectedCourseId]);
 
-    // ✅ Reset pagination when search changes - don't clear allAudios
+
     useEffect(() => {
         const timer = setTimeout(() => {
             setQpMedia(prev => ({ ...prev, search, pageIndex: 1 }));
-            // Let the audioListing effect handle updating allAudios
+
         }, 500);
 
         return () => clearTimeout(timer);
@@ -120,7 +116,7 @@ export default function AllAudioListing() {
 
     const hasMore = currentPage < totalPages;
 
-    // ✅ Show loading skeleton only when actually loading first page with no audios
+
     const isLoadingFirstPage = (loadingAudios || isFetching) && qpMedia.pageIndex === 1 && allAudios.length === 0;
 
     if (isLoading) {
@@ -152,7 +148,7 @@ export default function AllAudioListing() {
     }
 
     return (
-        <div className="all__note__listing">
+        <div className="all__note__listing  h-full flex flex-col overflow-hidden">
             <div className="mb-6">
                 <TableFilter
                     search={search || ""}
@@ -170,13 +166,10 @@ export default function AllAudioListing() {
                     </h2>
                 </div>
             )}
-            <div className="media__listing__wrapper">
+            <div className="media__listing__wrapper h-full overflow-hidden">
                 <Box
                     id="video__listing__wrapper"
-                    sx={{
-                        maxHeight: "calc(100vh - 460px)",
-                        overflow: "auto",
-                    }}
+                    className="h-full overflow-auto"
                 >
                     {isLoadingFirstPage ? (
                         <div className="flex flex-col gap-4 md:grid grid-cols-2 xl:grid-cols-3 lg:gap-6">

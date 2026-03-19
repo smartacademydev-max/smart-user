@@ -31,7 +31,7 @@ export default function TableFilter({
 
   return (
     <Box className={`flex gap-2 md:grid md:grid-cols-12 justify-between items-center`}>
-      <div className="col-span-6">
+      <div className={!onFilter ? "col-span-12" : "col-span-6"}>
         <OutlinedInput
           fullWidth
           placeholder="Search"

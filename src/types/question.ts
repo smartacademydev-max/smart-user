@@ -1,7 +1,8 @@
 import type { Pagination } from ".";
+import type { DiscountTypeProps, SelectionType } from "./course";
 import type { GlobalResponse } from "./user";
 
-export type QuestionTypeProps = "mcq" | "subjective"
+export type QuestionTypeProps = "mcq" | "subjective" | "omr" | ""
 export interface OptionProps {
     id: number | null,
     option: string,
@@ -36,7 +37,7 @@ export interface QuestionList extends GlobalResponse {
 
 export interface TestProps {
     id?: number;
-    course_id?:number;
+    course_id?: number;
     name: string;
     test_type?: string;
     duration: {
@@ -59,11 +60,16 @@ export interface TestProps {
     is_scheduled?: boolean;
     is_graded?: boolean;
     has_expired?: boolean;
+    marked_price?: string,
+    sale_price?: string;
+    selections: SelectionType;
+    mega_categories?: string[];
+    download_format_url?: string;
+    results: {
+        attempted: number;
+        score: number
+    }
 }
-
-
-
-
 export interface TestList {
     data: {
         data: TestProps[]
@@ -73,10 +79,11 @@ export interface TestList {
 
 export interface SingleMcqResponse extends GlobalResponse {
     data: QuestionProps[];
-    overview: {
+    overview: TestProps & {
         name: string;
         time: number;
-        test_type: QuestionTypeProps
+        test_type: QuestionTypeProps;
+        end_datetime: string;
     }
 }
 export interface Answers {
@@ -122,8 +129,49 @@ export interface McqReportData {
     start_date: string;
     start_time: string;
     end_time: string;
-
     correct_answers: McqReportAnswerItem[];
     incorrect_answers: McqReportAnswerItem[];
     skipped_answers: McqReportAnswerItem[];
+}
+
+export type TestTypeProps = "subjective" | "mcq"
+
+
+export interface SetProps {
+    id?: number;
+    name: string;
+    description: string;
+    price: string;
+    discount_type: DiscountTypeProps;
+    discount: string;
+    set_count: string;
+    test_ids: number[];
+    thumbnail: File | null;
+    thumbnail_url: string;
+    status: "published" | "draft";
+    marked_price?: string;
+    sale_price?: string;
+    sets: { label: string; value: string }[]
+    selections: SelectionType;
+    created_at: string
+    mega_categories?: string[];
+    enrolled: number;
+    avg_score: number;
+    progress: number;
+    completed: number;
+    has_purchased: boolean;
+    not_started_count: number;
+    in_progress_count: number;
+}
+
+
+export interface SetList extends GlobalResponse {
+    data: {
+        data: SetProps[];
+        pagination: Pagination
+    }
+}
+
+export interface SetOveriew extends SetProps {
+    total_questions: number;
 }

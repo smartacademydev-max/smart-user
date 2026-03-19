@@ -2,9 +2,10 @@ import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import * as React from "react";
 
-import { useMediaQuery, useTheme } from "@mui/material";
+import { useMediaQuery } from "@mui/material";
 import Toolbar from "@mui/material/Toolbar";
 import { Link, useLocation } from "react-router-dom";
+import { useAppSelector } from "../../../../store/hook";
 import CustomAppbar from "../appbar";
 import PrimaryMenu from "./PrimaryMenu";
 
@@ -20,7 +21,6 @@ export default function ResponsiveDrawer(props: Props) {
     const [isClosing, setIsClosing] = React.useState(false);
     const location = useLocation();
 
-    const theme = useTheme();
     const handleDrawerClose = () => {
         setIsClosing(true);
         setMobileOpen(false);
@@ -66,6 +66,8 @@ export default function ResponsiveDrawer(props: Props) {
 
     const isLargeScreen = useMediaQuery("(min-width:1440px)");
     const drawerWidth = isLargeScreen ? 356 : 320;
+    const { mode } = useAppSelector((state) => state.udaan_theme)
+
     return (
         <Box sx={{ display: "flex" }}>
             <CustomAppbar handleDrawerToggle={handleDrawerToggle} />
@@ -117,29 +119,28 @@ export default function ResponsiveDrawer(props: Props) {
                     },
                     padding: {
                         xs: "16px 0 0",
-                        lg: "32px 24px 0"
+                        lg: "32px 0 0"
                     },
                     overflow: "hidden"
                 }}>
                 <Toolbar sx={{
                     height: {
-                        xs: 64,
-                        lg: 80
+                        xs: 48,
+                        xl: 48
                     }
                 }} />
                 <Box
-                    className="content lg:rounded-2xl overflow-y-auto flex flex-col "
+                    className="content lg:rounded-2xl  flex flex-col overflow-hidden"
                     sx={{
-                        background: theme.palette.primary.contrastText,
+                        backgroundColor: (theme) => mode === "dark" ? theme.palette.background.paper : theme.palette.primary.contrastText,
                         height: {
-                            xs: "calc(100vh - 85px)",
-                            lg: "calc(100vh - 145px)"
+                            xs: "calc(100vh - 80px)",
+                            lg: "calc(100vh - 100px)"
                         },
                         padding: {
                             xs: "32px 16px 0",
-                            lg: "32px 32px 0"
+                            lg: "32px 24px 0"
                         },
-                        overflow: "auto"
                     }}>
                     {props.children}
                 </Box>
