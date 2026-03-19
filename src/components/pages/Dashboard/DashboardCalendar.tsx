@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 /**
@@ -312,185 +312,111 @@ export default function DashboardCalendar({ onDateSelect }: DashboardCalendarPro
     //     }
     // };
     // const selectedDateFormatted = selectedDate ? formatSelectedDate() : null;
+    const navBtnStyle: React.CSSProperties = {
+        width: '26px', height: '26px', borderRadius: '6px',
+        border: '1px solid #E5E7EB', background: 'transparent',
+        cursor: 'pointer', display: 'flex', alignItems: 'center',
+        justifyContent: 'center', color: '#6B7280', flexShrink: 0,
+    };
+
     return (
-        <div className="w-full mx-auto p-6 bg-white rounded-xl ">
-            <div className="mb-6 space-y-4">
-                <div className="flex items-center justify-between">
-                    {viewMode === 'month' ? (
-                        <>
-                            <button
-                                onClick={handlePrevMonth}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                                aria-label="Previous month"
-                            >
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                                </svg>
-                            </button>
-
-                            <div className="text-center">
-                                <button
-                                    onClick={() => setViewMode('year')}
-                                    className="hover:bg-gray-50 px-4 py-2 rounded-lg transition-colors flex gap-2 items-center"
-                                >
-                                    <h2 className="text-2xl font-bold text-gray-800">
-                                        {useNepaliScript ? NEPALI_MONTHS[currentMonth - 1] : ENGLISH_MONTHS[currentMonth - 1]}
-                                    </h2>
-                                    <p className="text-lg text-gray-600">
-                                        ( {useNepaliScript ? toNepaliNumber(currentYear) : currentYear})
-                                    </p>
-                                </button>
-                            </div>
-
-                            <button
-                                onClick={handleNextMonth}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                                aria-label="Next month"
-                            >
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                </svg>
-                            </button>
-                        </>
-                    ) : (
-                        <>
-                            <button
-                                onClick={handlePrevYear}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                                aria-label="Previous year"
-                            >
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                                </svg>
-                            </button>
-
-                            <div className="text-center">
-                                <h2 className="text-2xl font-bold text-gray-800">
-                                    {useNepaliScript ? toNepaliNumber(currentYear) : currentYear}
-                                </h2>
-                                <p className="text-sm text-gray-500">Select Month</p>
-                            </div>
-
-                            <button
-                                onClick={handleNextYear}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                                aria-label="Next year"
-                            >
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                </svg>
-                            </button>
-                        </>
-                    )}
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex flex-wrap gap-2 justify-center">
-                    <button
-                        onClick={handleToday}
-                        className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
-                    >
-                        {useNepaliScript ? 'आज' : 'Today'}
-                    </button>
-                    {viewMode === 'month' && (
-                        <button
-                            onClick={() => setViewMode('year')}
-                            className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors font-medium"
-                        >
-                            {useNepaliScript ? 'महिना छान्नुहोस्' : 'Select Month'}
-                        </button>
-                    )}
-                </div>
-
-                {/* {selectedDateFormatted && (
-                    <div className="text-center p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
-                        <p className="font-bold text-green-800 text-lg">{selectedDateFormatted.bs}</p>
-                        <p className="text-sm text-gray-600 mt-1">{selectedDateFormatted.ad}</p>
-                    </div>
-                )} */}
-            </div>
-
-            {/* Calendar Content */}
-            {viewMode === 'month' ? (
+        <div className="w-full">
+            {viewMode === 'year' ? (
                 <div>
-                    {/* Weekday Headers */}
-                    <div className="grid grid-cols-7 gap-1 mb-2">
-                        {(useNepaliScript ? SHORT_WEEKDAYS_NEPALI : SHORT_WEEKDAYS_ENGLISH).map((day, index) => (
-                            <div
-                                key={index}
-                                className={`text-center font-bold py-3 text-sm ${index === 6 ? 'text-red-600' : 'text-gray-700'
-                                    }`}
-                            >
-                                {day}
-                            </div>
-                        ))}
+                    <div className="flex items-center justify-between mb-3">
+                        <button onClick={handlePrevYear} style={navBtnStyle}>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+                        </button>
+                        <button onClick={() => setViewMode('month')} className="text-center hover:opacity-70 transition-opacity">
+                            <div style={{ fontSize: '14px', fontWeight: 700 }}>{useNepaliScript ? toNepaliNumber(currentYear) : currentYear}</div>
+                            <div style={{ fontSize: '11px', color: '#6B7280', marginTop: '1px' }}>Select Month</div>
+                        </button>
+                        <button onClick={handleNextYear} style={navBtnStyle}>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M9 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+                        </button>
                     </div>
-
-                    {/* Calendar Grid */}
-                    <div className="grid grid-cols-7 gap-1">
-                        {calendarDays.map((day, index) => (
-                            <div key={index} className="aspect-square">
-                                {day ? (
-                                    <button
-                                        onClick={() => handleDateClick(day)}
-                                        className={`relative w-full h-full flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${isToday(day)
-                                            ? 'bg-blue-600 text-white hover:bg-blue-700 ring-2 ring-blue-300'
-                                            : isSelected(day)
-                                                ? 'bg-green-500 text-white hover:bg-green-600'
-                                                : isSaturday(day)
-                                                    ? 'text-red-600 hover:bg-red-50'
-                                                    : 'text-gray-700 hover:bg-gray-100'
-                                            }`}
-                                    >
-                                        {useNepaliScript ? toNepaliNumber(day) : day}
-                                        <span className="absolute bottom-1 right-1 text-[10px] opacity-70 font-normal">
-                                            {(() => {
-                                                const ad = bsToAd(currentYear, currentMonth, day);
-                                                return ad.getDate();
-                                            })()}
-                                        </span>
-                                    </button>
-                                ) : (
-                                    <div className="w-full h-full bg-gray-50 rounded-lg" />
-                                )}
-                            </div>
-                        ))}
+                    <div className="grid grid-cols-3 gap-2">
+                        {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => {
+                            const isCurrentMonth = month === todayBS.month && currentYear === todayBS.year;
+                            const isSelectedMonth = month === currentMonth;
+                            return (
+                                <button key={month} onClick={() => handleMonthClick(month)} style={{
+                                    padding: '7px 4px', borderRadius: '6px', textAlign: 'center',
+                                    fontSize: '11px', fontWeight: 600, cursor: 'pointer', border: 'none',
+                                    background: isCurrentMonth ? '#AA2132' : isSelectedMonth ? 'rgba(170,33,50,0.1)' : '#F9FAFB',
+                                    color: isCurrentMonth ? '#fff' : isSelectedMonth ? '#AA2132' : '#374151',
+                                    transition: 'all .15s',
+                                }}>
+                                    {useNepaliScript ? NEPALI_MONTHS[month - 1] : ENGLISH_MONTHS[month - 1]}
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
             ) : (
-                /* Year View - Month Selector */
-                <div className="grid grid-cols-3 gap-3">
-                    {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => {
-                        const isCurrentMonth = month === todayBS.month && currentYear === todayBS.year;
-                        const isSelectedMonth = month === currentMonth;
-
-                        return (
-                            <button
-                                key={month}
-                                onClick={() => handleMonthClick(month)}
-                                className={`p-4 rounded-lg text-center font-semibold transition-all ${isCurrentMonth
-                                    ? 'bg-blue-600 text-white hover:bg-blue-700'
-                                    : isSelectedMonth
-                                        ? 'bg-green-100 text-green-800 border-2 border-green-500'
-                                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'
-                                    }`}
-                            >
-                                {useNepaliScript ? NEPALI_MONTHS[month - 1] : ENGLISH_MONTHS[month - 1]}
+                <div>
+                    {/* Header */}
+                    <div className="flex items-center justify-between mb-3">
+                        <button onClick={() => setViewMode('year')} className="text-left hover:opacity-70 transition-opacity">
+                            <div style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>
+                                {useNepaliScript ? NEPALI_MONTHS[currentMonth - 1] : ENGLISH_MONTHS[currentMonth - 1]} {useNepaliScript ? toNepaliNumber(currentYear) : currentYear}
+                            </div>
+                            <div style={{ fontSize: '11px', color: '#6B7280', marginTop: '1px' }}>Bikram Sambat</div>
+                        </button>
+                        <div className="flex gap-1">
+                            <button onClick={handlePrevMonth} style={navBtnStyle}>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
                             </button>
-                        );
-                    })}
+                            <button onClick={handleNextMonth} style={navBtnStyle}>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M9 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Day headers */}
+                    <div className="grid grid-cols-7 gap-0.5 text-center mb-1">
+                        {(useNepaliScript ? SHORT_WEEKDAYS_NEPALI : SHORT_WEEKDAYS_ENGLISH).map((day, index) => (
+                            <div key={index} style={{ fontSize: '10px', fontWeight: 600, color: '#6B7280', padding: '3px 0', textTransform: 'uppercase' }}>{day}</div>
+                        ))}
+                    </div>
+
+                    {/* Calendar days */}
+                    <div className="grid grid-cols-7 gap-0.5 text-center">
+                        {calendarDays.map((day, index) => (
+                            day ? (
+                                <button key={index} onClick={() => handleDateClick(day)} style={{
+                                    fontSize: '11.5px', padding: '5px 2px', borderRadius: '6px',
+                                    cursor: 'pointer', border: 'none', fontWeight: isToday(day) ? 700 : 500,
+                                    background: isToday(day) ? '#AA2132' : isSelected(day) ? 'rgba(170,33,50,0.1)' : 'transparent',
+                                    color: isToday(day) ? '#fff' : isSelected(day) ? '#AA2132' : isSaturday(day) ? '#E21D48' : '#374151',
+                                    transition: 'background .12s',
+                                }}>
+                                    {useNepaliScript ? toNepaliNumber(day) : day}
+                                </button>
+                            ) : (
+                                <div key={index} />
+                            )
+                        ))}
+                    </div>
+
+                    {/* Legend */}
+                    <div className="flex gap-3 mt-2.5">
+                        <div className="flex items-center gap-1.5" style={{ fontSize: '11px', color: '#6B7280' }}>
+                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#E21D48', flexShrink: 0 }} />
+                            Live Class
+                        </div>
+                        <div className="flex items-center gap-1.5" style={{ fontSize: '11px', color: '#6B7280' }}>
+                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#F59F0A', flexShrink: 0 }} />
+                            Test / Exam
+                        </div>
+                    </div>
+
+                    {/* Footer */}
+                    <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #E5E7EB', fontSize: '10.5px', color: '#9CA3AF', textAlign: 'center' }}>
+                        Bikram Sambat · 2000 BS – 2100 BS
+                    </div>
                 </div>
             )}
-
-            <div className="mt-6 pt-4 border-t border-gray-200 text-center text-xs text-gray-500">
-                <p>{useNepaliScript ? 'बिक्रम संवत पात्रो' : 'Bikram Sambat Calendar'}</p>
-                <p className="mt-1">
-                    {useNepaliScript
-                        ? `${toNepaliNumber(2000)} - ${toNepaliNumber(2100)} सम्म उपलब्ध`
-                        : 'Available from 2000 BS to 2100 BS'
-                    }
-                </p>
-            </div>
         </div>
     );
 }

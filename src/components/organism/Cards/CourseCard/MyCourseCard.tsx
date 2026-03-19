@@ -21,6 +21,7 @@ export default function MyCourseCard({ course }: { course: CourseProps }) {
 
     return (
         <Box className="my__course__card rounded-lg p-3 md:p-4 h-full flex flex-col justify-between" sx={{
+            background: (theme) => theme.palette.background.paper,
             border: (theme) => `1px solid ${theme.palette.separator.dark}`
         }}>
             <div className="my__course__top">

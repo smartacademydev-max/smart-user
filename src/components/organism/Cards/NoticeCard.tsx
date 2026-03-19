@@ -13,8 +13,9 @@ export default function NoticeCard({ data }: { data: NotificationProps }) {
     const navigate = useNavigate();
     return (
         <Box sx={{
-            boxShadow: "0 2px 10px 0 rgba(0, 0, 0, 0.08)",
-            backgorund: (theme) => theme.palette.primary.contrastText
+            background: (theme: any) => theme.palette.background.paper,
+            boxShadow: "0 2px 10px 0 rgba(0, 0, 0, 0.06)",
+            border: (theme: any) => `1px solid ${theme.palette.divider}`
         }} className="notice__card p-4! rounded-md h-full flex flex-col justify-between">
             <div className="top">
                 <Typography variant="h6" className="mb-2!">{data?.title}</Typography>

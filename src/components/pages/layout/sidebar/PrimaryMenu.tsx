@@ -74,7 +74,7 @@ export default function PrimaryMenu() {
           <ListItem disablePadding className="menu__item">
             <ListItemButton
               onClick={() => navigate(PATH.COURSE_MANAGEMENT.COURSES.ROOT)}
-              className={isActive(PATH.COURSE_MANAGEMENT.COURSES.ROOT) ? "active" : ""}
+              className={isActive(PATH.COURSE_MANAGEMENT.COURSES.ROOT) && !isActive(PATH.COURSE_MANAGEMENT.COURSES.SAVED_COURSES.ROOT) ? "active" : ""}
             >
               <ListItemIcon>
                 <SearchNormal size={20} />

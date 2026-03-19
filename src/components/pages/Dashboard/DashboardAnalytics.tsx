@@ -45,12 +45,12 @@ export default function DashboardAnalytics() {
                 <div className="user_message">
                     <Typography
                         className="w-full"
-                        variant="h3"
+                        variant="h5"
                         sx={{
                             display: "flex",
                             flexDirection: "column",
-                            lineHeight: 1.25,
-                            fontWeight: 600
+                            lineHeight: 1.3,
+                            fontWeight: 700
                         }}
                     >
                         <span>
@@ -61,11 +61,11 @@ export default function DashboardAnalytics() {
                             👋
                         </span>
                     </Typography>
-                    <Typography variant='subtitle2' className='mt-1.5!' fontWeight={400}>You're making great progress. Keep exploring!</Typography>
+                    <Typography variant='body2' className='mt-1!' fontWeight={400} sx={{ opacity: 0.85 }}>You're making great progress. Keep exploring!</Typography>
                 </div>
                 <div className="date__today lg:text-right">
-                    <Typography variant='h5' fontWeight={500}> {formatDateCustom(new Date(), { shortMonth: true })}</Typography>
-                    <Typography variant='subtitle1'> {days[new Date().getDay()]}</Typography>
+                    <Typography variant='subtitle1' fontWeight={600}> {formatDateCustom(new Date(), { shortMonth: true })}</Typography>
+                    <Typography variant='caption' sx={{ opacity: 0.75 }}> {days[new Date().getDay()]}</Typography>
                 </div>
             </div>
             <Divider className='my-4! lg:mt-4! lg:mb-8!' sx={{

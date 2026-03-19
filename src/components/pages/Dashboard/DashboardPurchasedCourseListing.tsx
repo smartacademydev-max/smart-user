@@ -1,4 +1,4 @@
-import { Box, Button, Skeleton, Typography } from "@mui/material";
+import { Box, Skeleton, Typography } from "@mui/material";
 import { t } from "i18next";
 import { Book, SearchNormal } from "iconsax-reactjs";
 import { useState } from "react";
@@ -39,9 +39,24 @@ export default function DashboardPurchasedCourseListing() {
     const courses = data?.data?.data || [];
     return (
         <div className="dashboard__purchased__course__lisitng">
-            <div className="flex justify-between items-center gap-4 mb-4! mt-8!">
-                <Typography variant="h4" fontWeight={600} >{t("messages.my_course")}</Typography>
-                <Button variant="contained" onClick={() => navigate(PATH.COURSE_MANAGEMENT.COURSES.ROOT)}>{t("actions.view_all")}</Button>
+            <div className="flex justify-between items-center gap-4 mb-3">
+                <Typography variant="subtitle1" fontWeight={700} sx={{ fontSize: '14.5px' }}>{t("messages.my_course")}</Typography>
+                <Box
+                    component="span"
+                    onClick={() => navigate(PATH.COURSE_MANAGEMENT.COURSES.ROOT)}
+                    sx={{
+                        fontSize: '12px',
+                        color: 'primary.main',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '3px',
+                        '&:hover': { opacity: 0.7 },
+                    }}
+                >
+                    {t("actions.view_all")} →
+                </Box>
             </div>
 
             <div className="flex flex-col gap-4 lg:gap-3 sm:grid sm:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 pb-4">
