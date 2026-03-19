@@ -20,7 +20,7 @@ export default function CustomAppbar({
     handleDrawerToggle: () => void;
 }) {
     const theme = useTheme();
-    const { mode } = useAppSelector((state) => state.udaan_theme)
+    const { mode } = useAppSelector((state) => state.smart_theme)
     const isLargeScreen = useMediaQuery("(min-width:1440px)");
     const drawerWidth = isLargeScreen ? 356 : 320;
     return (

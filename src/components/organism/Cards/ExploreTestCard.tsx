@@ -52,7 +52,7 @@ export default function ExploreTestCard({ test }: { test: TestProps; }) {
                     : ""}
 
                 <Box className="flex justify-between items-center gap-2">
-                    <Typography variant="caption" color="text.dark" className="flex items-center gap-1">
+                    <Typography variant="subtitle2" color="text.secondary" className="flex items-center gap-1">
                         <Box sx={{ color: (theme) => theme.palette.info.main }}><Notepad2 size={16} variant="Bold" /></Box>  <strong>{test?.total_questions}</strong> Total Questions
                     </Typography>
                     <Typography variant="subtitle2" color="text.secondary" className="flex items-center gap-1">

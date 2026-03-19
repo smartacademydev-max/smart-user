@@ -66,7 +66,7 @@ export default function ResponsiveDrawer(props: Props) {
 
     const isLargeScreen = useMediaQuery("(min-width:1440px)");
     const drawerWidth = isLargeScreen ? 356 : 320;
-    const { mode } = useAppSelector((state) => state.udaan_theme)
+    const { mode } = useAppSelector((state) => state.smart_theme)
 
     return (
         <Box sx={{ display: "flex" }}>
