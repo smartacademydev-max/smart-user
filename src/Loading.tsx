@@ -7,7 +7,7 @@ export default function Loading() {
             }}>
                 <img src="/udaan-welcome.png" alt="" className='h-auto max-w-[210px] mx-auto' />
                 <div className="mt-6">
-                    <Typography variant='h4' color='primary'>Welcome to Udaan</Typography>
+                    <Typography variant='h4' color='primary'>Welcome to Smart</Typography>
                     <Typography variant='h4' color='primary'>उडानमा हजुरलाई स्वागत छ|</Typography>
                 </div>
             </Box>

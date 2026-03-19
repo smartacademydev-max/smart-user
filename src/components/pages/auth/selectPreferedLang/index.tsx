@@ -42,8 +42,8 @@ export default function SelectPreferedLanguage() {
                     <div className="header text-center">
                         <img src="/udaan-welcome.png" alt="" className='h-auto max-w-[210px] mx-auto' />
                         <div className="mt-6">
-                            <Typography variant='h4' color='primary'>{t("messages.welcome_to_udaan")}</Typography>
-                            <Typography variant='h4' color='primary'>{t("messages.welcom_message_udaan")}</Typography>
+                            <Typography variant='h4' color='primary'>{t("messages.welcome_to_smart")}</Typography>
+                            <Typography variant='h4' color='primary'>{t("messages.welcom_message_smart")}</Typography>
                         </div>
                     </div>
                     <div className="label mt-4 md:mt-8 mb-4 md:mb-6">

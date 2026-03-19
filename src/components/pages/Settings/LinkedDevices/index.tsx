@@ -9,7 +9,7 @@ import { useAppDispatch } from "../../../../store/hook";
 import type { LinkedDeviceProps } from "../../../../types/setting";
 import { formatDateTime } from "../../../../utils/dateFormat";
 import TablePagination from "../../../molecules/Pagination";
-import UdaanTable from "../../../molecules/Table";
+import SmartTable from "../../../molecules/Table";
 
 
 export default function LinkedDevices() {
@@ -143,7 +143,7 @@ export default function LinkedDevices() {
 
             <div className="flex flex-col justify-between items-center">
                 <div className="w-full h-full overflow-auto">
-                    <UdaanTable
+                    <SmartTable
                         loading={isLoading}
                         data={data?.data?.data || []}
                         columns={columns}
