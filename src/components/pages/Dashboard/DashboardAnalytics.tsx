@@ -71,8 +71,8 @@ export default function DashboardAnalytics() {
             <Divider className='my-4! lg:mt-4! lg:mb-8!' sx={{
                 background: "rgba(255,255,255,0.3)"
             }} />
-            <div className="flex flex-col gap-4 lg:gap-6 lg:grid lg:grid-cols-2">
-                <div className="col-span-1">
+            <div className="flex flex-col gap-4 lg:gap-6 lg:grid lg:grid-cols-12">
+                <div className="col-span-7">
                     <div className="gap-4 grid grid-cols-2 2xl:gap-8">
                         {isLoading ? Array.from({ length: 4 }).map((_, index) => <DashboardAnalyticsLoading key={index + "Analytics"} />) : analytics?.data?.map((item) => (
                             <div className="col-span-1">
@@ -81,7 +81,7 @@ export default function DashboardAnalytics() {
                         ))}
                     </div>
                 </div>
-                <div className="col-span-1 h-full">
+                <div className="col-span-5 h-full">
                     <Slider {...settings}>
                         {loadingBanner ? Array.from({ length: 4 }).map((_, index) => <BannerCardLoading key={index + "Banners"} />) : banners?.data?.map((item) => (
                             <BannerCard data={item} key={item.description + item.title} />

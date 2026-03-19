@@ -186,7 +186,7 @@ export default function AllVideosListing() {
                 </div>
               }
             >
-              <div className="flex flex-col gap-4 md:grid grid-cols-2 xl:grid-cols-3 lg:gap-6">
+              <div className="flex flex-col gap-4 md:grid grid-cols-2 xl:grid-cols-3  3xl:grid-cols-4 lg:gap-6">
                 {allVideos.map((media) => (
                   <MediaCard
                     media={media}

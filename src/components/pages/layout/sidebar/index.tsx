@@ -131,14 +131,14 @@ export default function ResponsiveDrawer(props: Props) {
                 <Box
                     className="content flex flex-col overflow-hidden"
                     sx={{
-                        backgroundColor: (theme) => theme.palette.background.default,
+                        backgroundColor: (theme) => theme.palette.primary.contrastText,
                         height: {
                             xs: "calc(100vh - 58px)",
                             lg: "calc(100vh - 58px)"
                         },
                         padding: {
-                            xs: "20px 16px 0",
-                            lg: "20px 24px 0"
+                            xs: "20px 16px 20px",
+                            lg: "20px 24px 24px"
                         },
                         overflowY: "auto",
                     }}>
