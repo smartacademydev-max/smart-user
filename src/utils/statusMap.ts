@@ -11,7 +11,6 @@ export function statusMap<T extends string>(map: Record<T, StatusVariant>) {
     };
 }
 
-
 export const getPublishedStatus = statusMap<PublishedStatus>({
     published: "success",
     draft: "warning",
