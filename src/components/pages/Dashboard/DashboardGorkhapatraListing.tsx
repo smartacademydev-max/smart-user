@@ -1,4 +1,4 @@
-import { Button, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -20,25 +20,45 @@ export default function DashboardGorkhapatraListing() {
         status: "published",
     });
     const gorkhapatras = data?.data?.data || []
-    if (!gorkhapatras.length) {
+    if (!gorkhapatras.length && !isLoading) {
         return null;
     }
 
     return (
-
-        <div className="gorkhapatra__dashboard__listing mb-8">
-            <div className="flex justify-between items-center gap-4">
-                <Typography variant="h4" fontWeight={600} className="mb-4! mt-8!">{t("messages.gorkhapatra")}</Typography>
-                <Button variant="contained" onClick={() => navigate(PATH.GORKHAPATRA.ROOT)}>{t("actions.view_all")}</Button>
+        <Box className="gorkhapatra__dashboard__listing">
+            <div className="flex justify-between items-center mb-3">
+                <Typography variant="subtitle1" fontWeight={700} sx={{ fontSize: '14.5px' }}>
+                    {t("messages.gorkhapatra")}
+                </Typography>
+                <Box
+                    component="span"
+                    onClick={() => navigate(PATH.GORKHAPATRA.ROOT)}
+                    sx={{
+                        fontSize: '12px',
+                        color: 'primary.main',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '3px',
+                        '&:hover': { opacity: 0.7 },
+                    }}
+                >
+                    {t("actions.view_all")} →
+                </Box>
             </div>
-            <div className="flex flex-col gap-4 md:grid md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-                {isLoading ? Array.from({ length: 4 }).map((_, index) =>
-                    <GorkhapatraCardSkeleton key={index + "gorkhapatra"} />) : gorkhapatras.map((gorkhapatra) => (
+
+            <div className="flex flex-col gap-2 sm:grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+                {isLoading
+                    ? Array.from({ length: 4 }).map((_, index) =>
+                        <GorkhapatraCardSkeleton key={index + "gorkhapatra"} />)
+                    : gorkhapatras.map((gorkhapatra) => (
                         <GorkhapatraCard
                             data={gorkhapatra} key={gorkhapatra.title + gorkhapatra.id}
                         />
-                    ))}
+                    ))
+                }
             </div>
-        </div>
+        </Box>
     )
 }

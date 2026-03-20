@@ -72,26 +72,31 @@ export default function SingleCourse() {
                             label: t("messages.curriculum"),
                             value: "curriculum"
                         },
-                        {
+
+                        ...(videos?.data && videos?.data?.data?.length ? [{
                             label: t("menus.videos"),
                             value: "videos"
-                        },
-                        {
+                        }] : []),
+
+                        ...(notes?.data && notes?.data?.data?.length ? [{
                             label: t("menus.notes"),
                             value: "notes"
-                        },
-                        {
+                        }] : []),
+
+                        ...(audios?.data && audios?.data?.data?.length ? [{
                             label: t("menus.audios"),
                             value: "audios"
-                        },
+                        }] : []),
+
                         {
                             label: t("menus.test"),
                             value: "tests"
                         },
-                        {
+
+                        ...(liveClasses?.data && liveClasses?.data?.data?.length ? [{
                             label: t("menus.liveClasses"),
                             value: "live_classes"
-                        },
+                        }] : []),
                     ]}
                     setActiveTab={(newValue) => {
                         setActiveTab(newValue);

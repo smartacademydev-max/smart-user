@@ -1,4 +1,3 @@
-
 export default function PrivacyPolicyRoot() {
     return (
         <div className="privacy__policy__root py-16 lg:pb-32">
@@ -8,106 +7,99 @@ export default function PrivacyPolicyRoot() {
                     <h1>Privacy Policy</h1>
 
                     <p>
-                        Welcome to <strong>Udaan Academy</strong>, an online education marketplace.
-                        Udaan Academy's website and services, including (without limitation)
-                        <a href="https://udaanacademy.com.np/" target="_blank" rel="noopener noreferrer">
-                            https://udaanacademy.com.np/
+                        Welcome to <strong>Smart Academy</strong>, a modern digital learning platform.
+                        Smart Academy's website and services, including (without limitation)
+                        <a href="https://smartacademy.com.np/" target="_blank" rel="noopener noreferrer">
+                            https://smartacademy.com.np/
                         </a>
                         (the “Site”) and mobile applications (collectively, the “Services”),
-                        are owned and operated by Udaan Academy ("we," "us," or "our").
-                        By using our Services, you agree to the terms and conditions outlined in this Privacy Policy.
+                        are owned and operated by Smart Academy ("we," "us," or "our").
+                        By using our Services, you agree to the terms outlined in this Privacy Policy.
                     </p>
 
                     <h2>Information We Collect</h2>
 
-                    <p>We collect personal information you provide when you:</p>
+                    <p>We collect personal information when you:</p>
 
                     <ul>
                         <li>Create an account</li>
-                        <li>Subscribe to our services</li>
-                        <li>Engage with our educational content</li>
+                        <li>Enroll in courses or subscribe to services</li>
+                        <li>Interact with our learning content and features</li>
                     </ul>
 
                     <p>
-                        The information we collect may include your name, email address,
-                        and other contact details. This data is used solely to provide and
-                        enhance our Services.
+                        This information may include your name, email address,
+                        phone number, and other relevant details. We use this data
+                        strictly to provide and improve our Services.
                     </p>
 
                     <h2>How We Use Your Information</h2>
 
-                    <p>We use the data we collect to:</p>
+                    <p>We use your information to:</p>
 
                     <ul>
-                        <li>Provide and improve our services</li>
-                        <li>Communicate service updates, promotions, and events</li>
-                        <li>Ensure security and prevent unauthorized access</li>
-                        <li>Personalize user experience and provide relevant content</li>
+                        <li>Deliver and enhance our learning services</li>
+                        <li>Provide course recommendations and personalized content</li>
+                        <li>Send updates, notifications, and promotional content</li>
+                        <li>Maintain platform security and prevent misuse</li>
                     </ul>
 
                     <p>
-                        We do not sell your personal data or share your information with
-                        third parties for marketing purposes.
+                        We do not sell or rent your personal information to third parties.
                     </p>
 
                     <h2>Sharing Your Information</h2>
 
-                    <p>We may share your information only in the following cases:</p>
+                    <p>We may share your information only in the following situations:</p>
 
                     <ul>
                         <li>
-                            With trusted service providers (such as payment processors)
-                            that follow strict confidentiality and security standards
+                            With trusted partners (such as payment gateways or hosting providers)
+                            who adhere to strict data protection standards
                         </li>
                         <li>
-                            To comply with legal obligations or lawful requests from authorities
+                            To comply with legal obligations or official requests
                         </li>
                         <li>
-                            To enforce our policies and protect the rights of Udaan Academy
+                            To protect the rights, safety, and integrity of Smart Academy
                         </li>
                     </ul>
 
-                    <p>
-                        We do not share your personal data with government entities.
-                    </p>
-
-                    <h2>Third-Party Links & Services</h2>
+                    <h2>Third-Party Services</h2>
 
                     <p>
-                        Our platform may include links to third-party websites or services
-                        (such as educational platforms). We are not responsible for the
-                        privacy practices or content of those external sites.
+                        Our platform may contain links to third-party websites or tools.
+                        We are not responsible for the privacy practices or content of those services.
+                        Users are encouraged to review their policies separately.
                     </p>
 
                     <h2>Data Security</h2>
 
                     <p>
-                        We prioritize your privacy and use encryption and industry-standard
-                        security measures to protect your personal information.
+                        We implement industry-standard security measures, including encryption
+                        and secure servers, to protect your personal data from unauthorized access,
+                        misuse, or disclosure.
                     </p>
 
                     <h2>No Government Affiliation</h2>
 
                     <p>
-                        Udaan Academy does not represent, work with, or provide services on
-                        behalf of any government agency. Our platform is strictly for
-                        educational purposes.
+                        Smart Academy is an independent educational platform and is not affiliated
+                        with or operated by any government entity.
                     </p>
 
-                    <h2>Changes to Our Privacy Policy</h2>
+                    <h2>Updates to This Policy</h2>
 
                     <p>
-                        We may update this Privacy Policy from time to time. Any changes
-                        will be posted on this page, and we encourage you to review it
-                        periodically.
+                        We may update this Privacy Policy from time to time. Changes will be posted
+                        on this page, and we recommend reviewing it periodically.
                     </p>
 
                     <h2>Contact Us</h2>
 
                     <p>
-                        If you have any questions or concerns regarding this Privacy Policy,
-                        please contact us at:
-                        <a href="mailto:info.udaanedu2@gmail.com">info.udaanedu2@gmail.com</a>
+                        If you have any questions regarding this Privacy Policy, please contact us at:
+                        <a href="mailto:info@smartacademy.com.np">info@smartacademy.com.np</a>
                     </p>
                 </div>
             </div>

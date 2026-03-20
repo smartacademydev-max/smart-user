@@ -100,8 +100,8 @@ export default function NotificationModal() {
                     onClick={handleToggle}
                     sx={{
                         background: theme.palette.separator.dark,
-                        minWidth: { xs: 36, lg: 44 },
-                        height: { xs: 36, lg: 44 },
+                        minWidth: { xs: 34, lg: 36 },
+                        height: { xs: 34, lg: 36 },
                         aspectRatio: "1/1",
                         display: "flex",
                         alignItems: "center",
@@ -112,6 +112,7 @@ export default function NotificationModal() {
                     }}
                 >
                     <Notification
+                        size={18}
                         variant="Bold"
                         color={theme.palette.separator.darkest}
                     />

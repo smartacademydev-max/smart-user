@@ -8,7 +8,7 @@ export default function Login() {
     return (
         <>
             <AuthHeader
-                title="Welcome to Udaan 👋🏻 "
+                title="Welcome to Smart 👋🏻 "
                 description="You're one step closer to exponential growth"
             />
             <LoginForm />

@@ -8,7 +8,7 @@ export default function Private() {
     const user = useAppSelector((state) => state.auth.user);
     React.useEffect(() => {
         if (!user) {
-            navigate(PATH.AUTH.CHOOSE_PLATFORM.ROOT);
+            navigate(PATH.AUTH.LOGIN.ROOT);
         }
     }, [user, navigate]);
 

@@ -124,15 +124,15 @@ const commonThemeOptions: ThemeOptions = {
     fontFamily: '"HelveticaNeueCyr", "Noto Sans", sans-serif',
 
     h1: {
-      fontSize: "64px",
-      lineHeight: 1.41
+      fontSize: "48px",
+      lineHeight: 1.4
     },
     h2: {
-      fontSize: "48px", lineHeight: 1.4
+      fontSize: "36px", lineHeight: 1.38
     },
 
     h3: {
-      fontSize: "32px", lineHeight: 1.41
+      fontSize: "28px", lineHeight: 1.4
     },
     h4: {
       fontSize: "24px", lineHeight: 1.42
@@ -141,27 +141,27 @@ const commonThemeOptions: ThemeOptions = {
       fontSize: "20px", lineHeight: 1.5
     },
     h6: {
-      fontSize: "18px", lineHeight: 1.56
+      fontSize: "16px", lineHeight: 1.5
     },
     body1: {
-      fontSize: "20px", lineHeight: 1.4
+      fontSize: "16px", lineHeight: 1.5
     },
 
     body2: {
-      fontSize: "18px", lineHeight: 1.44
+      fontSize: "14px", lineHeight: 1.5
     },
     subtitle1: {
-      fontSize: "16px", lineHeight: 1.5
+      fontSize: "14px", lineHeight: 1.5
     },
     subtitle2: {
-      fontSize: "14px", lineHeight: 1.36
+      fontSize: "13px", lineHeight: 1.4
     },
     caption: {
-      fontSize: "12px", lineHeight: 1.33
+      fontSize: "12px", lineHeight: 1.4
     },
 
     overline: {
-      fontSize: "8px", lineHeight: 1.38
+      fontSize: "10px", lineHeight: 1.4
     },
   },
   shape: {
@@ -524,16 +524,24 @@ const commonThemeOptions: ThemeOptions = {
 
     MuiListItemButton: {
       styleOverrides: {
-        root: () => ({
-          padding: "16px",
-          marginBottom: "4px",
-          borderBottom: `1px solid #4B4B4B`,
-          gap: "16px",
-          "&.active *": {
-            color: "#fff !important",
-
-            "svg path": {
+        root: ({ theme }) => ({
+          padding: "8px 10px",
+          marginBottom: "1px",
+          borderRadius: "6px",
+          gap: "9px",
+          "&.active": {
+            backgroundColor: `rgba(170, 33, 50, 0.28)`,
+            "& *": {
+              color: "#fff !important",
+            },
+            "& svg path": {
               stroke: "#fff",
+            },
+          },
+          "&:hover": {
+            backgroundColor: "rgba(255,255,255,0.06)",
+            "& *": {
+              color: "#fff",
             },
           },
           "&.active-nested": {
@@ -543,6 +551,9 @@ const commonThemeOptions: ThemeOptions = {
             "& svg path": {
               stroke: "#fff !important",
             },
+          },
+          [theme.breakpoints.down("lg")]: {
+            padding: "8px 10px",
           },
         }),
       },

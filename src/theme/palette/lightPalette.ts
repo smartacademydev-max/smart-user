@@ -1,89 +1,111 @@
 export const lightPalette = {
-  button: {
-    main: "#303188",
-    gray: "#6B7280",
-    hover: "#1D1D52",
-    light: "#D7D7EC",
-    lightest: "#E9E9F7",
+  primary: {
+    main: "#AA2132",
+    light: "#F4D6DA",
+    dark: "#7E1825",
+    hover: "#8E1B29",
+    black: "#111827",
+    white: "#FFFFFF",
+
     contrastText: "#FFFFFF",
   },
+
+  secondary: {
+    main: "#1A2B57",
+    light: "#D6DBE9",
+    dark: "#121F3F",
+    hover: "#162449",
+    contrastText: "#FFFFFF",
+  },
+
+  button: {
+    main: "#AA2132",
+    gray: "#6B7280",
+    hover: "#8E1B29",
+    light: "#F4D6DA",
+    lightest: "#F4D6DA",
+    contrastText: "#FFFFFF",
+  },
+
   error: {
     main: "#E21D48",
     hover: "#A1123A",
     light: "#FFF0F1",
     contrastText: "#FFFFFF",
   },
-  primary: {
-    main: "#303188",
-    hover: "#1D1D52",
-    light: "#E9E9F7",
-    lightest: "#0EA5E9",
-    black: "#111827",
-    contrastText: "#FFFFFF",
-  },
 
   gray: {
-    main: "#E5E7EB",
+    main: "#3B9AFF",
     gray1: "#F3F4F6",
-    gray2: "#E5E7EB ",
-    gray3: "#D1D5DB",
+    gray2: "#FFF0F1",
+    gray3: "#9CA3B0",
   },
+
   icon: {
-    main: "#9CA3B0",
+    main: "#1A2B57",
     black: "#111827",
-    dark: "#303188",
+    dark: "#AA2132",
     light: "#9CA3B0",
-    lightest: "#D1D5DB"
   },
+
   info: {
-    main: "#F59F0A",
+    main: "#F59E0B",
     hover: "#DB7706",
     light: "#FEF3C8",
     contrastText: "#FFFFFF",
   },
+
   separator: {
-    main: "#D1D5DB",
+    main: "#3B9AFF",
     dark: "#E5E7EB",
-    darker: "#D1D5DB",
-    darkest: "#9CA3B0",
+    darker: "#9CA3B0",
+    darkest: "#6B7280",
   },
+
   success: {
     main: "#059467",
     hover: "#066046",
     light: "#EDFDF5",
     contrastText: "#FFFFFF",
   },
+
   warning: {
     main: "#F97415",
     hover: "#E9590C",
     light: "#FFF6EB",
     contrastText: "#FFFFFF",
   },
+
   tab: {
-    main: "#3B9AFF",
+    main: "#1A2B57",
     background: "#E5E7EB",
-    backgroundHover: "#E9E9F7",
+    backgroundHover: "#D6DBE9",
     border: "#D1D5DB",
     text: "#6B7280",
-    textHover: "#303188",
+    textHover: "#AA2132",
   },
+
   text: {
-    main: "#3B9AFF",
+    main: "#1A2B57",
     dark: "#111827",
     light: "#9CA3B0",
     lightest: "#F9FAFB",
     middle: "#6B7280",
   },
+
   textField: {
-    main: "#3B9AFF",
+    main: "#1A2B57",
     border: "#E5E7EB",
     error: "#E21D48",
     placeholder: "#9CA3B0",
     name: "#111827",
   },
+
   background: {
-    default: "#f5f5f5",
-    paper: "#F9FAFB",
+    default: "#F4F5FB",
+    paper: "#FFFFFF",
     sidebar: "#171F29",
   },
+
+  divider: "#E5E7EB",
 };

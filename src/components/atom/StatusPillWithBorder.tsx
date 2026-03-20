@@ -12,7 +12,9 @@ export default function StatusPillWithBorder({ status, variant, showIcon = false
             }}
         >
             {showIcon && (
-                variant === "error" ? (
+                variant === "error" ? variant === "error" && status === "ongoing" ? (
+                    <img src={"/live.gif"} alt="" className='w-10' />
+                ) : (
                     <Lock variant="Bold" />
                 ) : variant === "warning" ? (
                     <PlayCircle variant="Bold" />
@@ -20,7 +22,7 @@ export default function StatusPillWithBorder({ status, variant, showIcon = false
                     <TickCircle variant="Bold" />
                 ) : <Clock variant='Bold' />
             )}
-            <Typography variant='caption' className='text-center w-full text-nowrap capitalize'>{status}</Typography>
+            {showIcon && variant === "error" && status === "ongoing" ? "" : <Typography variant='caption' className='text-center w-full text-nowrap capitalize'>{status}</Typography>}
         </Box>
     )
 }

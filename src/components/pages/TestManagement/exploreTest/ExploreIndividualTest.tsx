@@ -23,7 +23,7 @@ export default function ExploreIndividualTest() {
             </div>
             <div className="individual__root h-full overflow-auto pt-4 pr-2 ">
                 {data && data?.data?.data?.length > 0 ? <>
-                    <div className="flex flex-col gap-4 md:grid grid-cols-2 xl:grid-cols-3 lg:gap-6 ">
+                    <div className="flex flex-col gap-4 md:grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-5 ">
                         {data?.data?.data?.map((test) => (
                             <ExploreTestCard
                                 test={test}
@@ -31,7 +31,6 @@ export default function ExploreIndividualTest() {
                             />
                         ))}
                     </div>
-
                 </>
                     : <EmptyList
                         title="No Test Found"

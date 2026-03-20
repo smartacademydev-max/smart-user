@@ -222,7 +222,7 @@ const ChildLesson = ({ childLesson, isOpen, onToggle, havePurchased, courseId }:
                         dangerouslySetInnerHTML={{ __html: childLesson.description }}
                     />
                     {childLesson?.media?.length ? (
-                        <div className="flex flex-col md:grid md:grid-cols-2  xl:grid-cols-3 gap-4">
+                        <div className="flex flex-col md:grid md:grid-cols-2  xl:grid-cols-3  3xl:grid-cols-4 gap-4">
                             {childLesson.media.map((item: CurriculumMediaProps) => (
                                 <div className="col-span-1" key={item.id}>
                                     <MediaCard havePurchased={havePurchased} type={item.type} media={item} courseId={courseId} />
@@ -273,7 +273,7 @@ const LessonItem = ({ lesson, isOpen, openChildLessonIds, onToggle, onChildLesso
                     />
 
                     {lesson?.media?.length ? (
-                        <div className="flex flex-col md:grid md:grid-cols-2  xl:grid-cols-3 gap-4 mb-4">
+                        <div className="flex flex-col md:grid md:grid-cols-2  xl:grid-cols-3  3xl:grid-cols-4 gap-4 mb-4">
                             {lesson.media.map((item: CurriculumMediaProps) => (
                                 <div className="col-span-1" key={item.id}>
                                     <MediaCard havePurchased={havePurchased} type={item.type} media={item} courseId={courseId} />
@@ -341,7 +341,7 @@ const UnitItem = ({ unit, isOpen, openLessonIds, openChildLessonIds, onUnitToggl
                     />
 
                     {unit?.media?.length ? (
-                        <div className="flex flex-col md:grid md:grid-cols-2  xl:grid-cols-3 gap-4 mb-4">
+                        <div className="flex flex-col md:grid md:grid-cols-2  xl:grid-cols-3  3xl:grid-cols-4 gap-4 mb-4">
                             {unit.media.map((item: CurriculumMediaProps) => (
                                 <div className="col-span-1" key={item.id}>
                                     <MediaCard havePurchased={havePurchased} type={item.type} media={item} courseId={courseId} />
@@ -405,7 +405,7 @@ const ChapterContent = ({
                 <ResourceCounter item={activeChapter} />
             </div>
             {activeChapter?.media?.length ? (
-                <div className="flex flex-col md:grid md:grid-cols-2  xl:grid-cols-3 gap-4 mb-4">
+                <div className="flex flex-col md:grid md:grid-cols-2  xl:grid-cols-3  3xl:grid-cols-4 gap-4 mb-4">
                     {activeChapter.media.map((item: CurriculumMediaProps) => (
                         <div className="col-span-1" key={item.id}>
                             <MediaCard havePurchased={havePurchased} type={item.type} media={item} courseId={courseId} />

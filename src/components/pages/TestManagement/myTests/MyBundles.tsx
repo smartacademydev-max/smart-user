@@ -44,7 +44,7 @@ export default function MyBundles() {
         return () => clearTimeout(timer);
     }, [search]);
 
-    const variant = "primary"
+    // const variant = "primary"
     return (
         <>
             <div className="top__header mt-4 pb-1">

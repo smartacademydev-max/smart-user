@@ -29,7 +29,7 @@ export default function SettingMenu() {
     const theme = useTheme();
     const dispatch = useAppDispatch();
     const { i18n } = useTranslation();
-    const { mode, lang } = useAppSelector((state) => state.udaan_theme);
+    const { mode, lang } = useAppSelector((state) => state.smart_theme);
 
     const [open, setOpen] = useState(false);
     const anchorRef = useRef<HTMLDivElement | null>(null);
@@ -65,8 +65,8 @@ export default function SettingMenu() {
                 onClick={handleToggle}
                 sx={{
                     background: theme.palette.separator.dark,
-                    minWidth: { xs: 36, lg: 44 },
-                    height: { xs: 36, lg: 44 },
+                    minWidth: { xs: 34, lg: 36 },
+                    height: { xs: 34, lg: 36 },
                     aspectRatio: "1/1",
                     display: "flex",
                     alignItems: "center",
@@ -76,7 +76,7 @@ export default function SettingMenu() {
                     "&:hover": { backgroundColor: theme.palette.action.hover },
                 }}
             >
-                <Setting2 variant="Bold" color={theme.palette.separator.darkest} />
+                <Setting2 size={18} variant="Bold" color={theme.palette.separator.darkest} />
             </Box>
 
             {/* Popper */}

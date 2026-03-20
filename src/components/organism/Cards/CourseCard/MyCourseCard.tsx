@@ -1,101 +1,238 @@
-import { Box, Button, Divider, Typography } from "@mui/material";
-import { Calendar } from "iconsax-reactjs";
+import { Box, Button, Typography, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { PATH } from "../../../../routes/PATH";
 import type { CourseProps } from "../../../../types/course";
 import Bookmark from "../../../atom/Bookmark";
-import MyProgress from "../../../atom/MyProgress";
 import CourseStatus from "./CourseStatus";
 
 export default function MyCourseCard({ course }: { course: CourseProps }) {
     const navigate = useNavigate();
     const { t } = useTranslation();
-    const endDate = course?.ends_at || "";
-    const startDate = course?.started_from || "";
-    const day = endDate.split(',')[0].split(' ')[0];
-    const monthAndYear = endDate.split(',')[0].split(' ').slice(1).join(' ');
-    const expiredDay = course?.user?.free_trial_expires_at?.split(',')[0].split(' ')[0];
-    const expiredMonthAndYear = course?.user?.free_trial_expires_at?.split(',')[0].split(' ').slice(1).join(' ');
+    const theme = useTheme();
 
+    const hasAccess =
+        course.course_type === "free" ||
+        course?.user?.has_purchased ||
+        course?.user?.is_free_trial_valid;
+
+    const isExpired =
+        !course?.user?.has_purchased &&
+        !course?.user?.is_free_trial_valid &&
+        course.course_type !== "free";
+
+    // ends_at arrives as e.g. "06 Dec 2025, Monday" — take the date part only
+    const expiryLabel = course?.ends_at?.split(",")?.[0] ?? "";
+
+    const handleContinue = () =>
+        navigate(PATH.COURSE_MANAGEMENT.COURSES.VIEW_COURSE.ROOT(Number(course.id)));
+    const handlePurchase = () =>
+        navigate(PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.ROOT(Number(course.id), "course"));
 
     return (
-        <Box className="my__course__card rounded-lg p-3 md:p-4 h-full flex flex-col justify-between" sx={{
-            border: (theme) => `1px solid ${theme.palette.separator.dark}`
-        }}>
-            <div className="my__course__top">
-                <div className="flex items-center justify-between mb-2">
-                    <CourseStatus status={course.course_type} />
-                    <Bookmark course={course} />
-                </div>
-                <Typography className="mb-1.5! font-medium" variant="h6">{course.name}</Typography>
-                <div className="flex justify-start items-center gap-4">
-                    {course?.mega_categories?.length ? <>
-                        <div className="flex items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="13" viewBox="0 0 15 13" fill="none">
-                                <path d="M7.16797 2.5L7.16797 11.8333" stroke="#9CA3B0" stroke-linecap="round" />
-                                <path d="M3.15371 0.69029C5.38117 1.1144 6.70874 2.00154 7.16667 2.51086C7.62459 2.00154 8.95216 1.1144 11.1796 0.69029C12.3081 0.475436 12.8723 0.368008 13.3528 0.779762C13.8333 1.19152 13.8333 1.86015 13.8333 3.19741V8.00331C13.8333 9.22604 13.8333 9.83741 13.5249 10.2191C13.2165 10.6008 12.5376 10.7301 11.1796 10.9886C9.96911 11.2191 9.02437 11.5864 8.34055 11.9554C7.66775 12.3185 7.33133 12.5 7.16667 12.5C7.002 12.5 6.66559 12.3185 5.99279 11.9554C5.30896 11.5864 4.36422 11.2191 3.15371 10.9886C1.79577 10.7301 1.1168 10.6008 0.808399 10.2191C0.5 9.83741 0.5 9.22604 0.5 8.00331V3.19741C0.5 1.86015 0.5 1.19152 0.980522 0.779762C1.46104 0.368008 2.02526 0.475436 3.15371 0.69029Z" stroke="#9CA3B0" stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                            {course.mega_categories && course.mega_categories.length ? (
-                                <Typography variant="subtitle2" color="text.middle">{course.mega_categories[0]}</Typography>
-                            ) : null}
-                        </div>
-                        <Divider orientation="vertical" className="h-4!" />
-                    </> : ""
-                    }
-                    <div className="flex items-center gap-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="13" viewBox="0 0 15 13" fill="none">
-                            <path d="M7.16797 2.5L7.16797 11.8333" stroke="#9CA3B0" stroke-linecap="round" />
-                            <path d="M3.15371 0.69029C5.38117 1.1144 6.70874 2.00154 7.16667 2.51086C7.62459 2.00154 8.95216 1.1144 11.1796 0.69029C12.3081 0.475436 12.8723 0.368008 13.3528 0.779762C13.8333 1.19152 13.8333 1.86015 13.8333 3.19741V8.00331C13.8333 9.22604 13.8333 9.83741 13.5249 10.2191C13.2165 10.6008 12.5376 10.7301 11.1796 10.9886C9.96911 11.2191 9.02437 11.5864 8.34055 11.9554C7.66775 12.3185 7.33133 12.5 7.16667 12.5C7.002 12.5 6.66559 12.3185 5.99279 11.9554C5.30896 11.5864 4.36422 11.2191 3.15371 10.9886C1.79577 10.7301 1.1168 10.6008 0.808399 10.2191C0.5 9.83741 0.5 9.22604 0.5 8.00331V3.19741C0.5 1.86015 0.5 1.19152 0.980522 0.779762C1.46104 0.368008 2.02526 0.475436 3.15371 0.69029Z" stroke="#9CA3B0" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                        {course.subjects ? (
-                            <Typography variant="subtitle2" color="text.middle">{course.subjects} {t("messages.subjects")}</Typography>
-                        ) : null}
-                    </div>
-                </div>
-            </div>
-            <div className="my__course__bottom">
-                <Divider className="my-3!" />
-                <div className="flex flex-col gap-2 md:grid md:grid-cols-2">
-                    {course?.course_type !== "free" ? <div className="middle">
-                        {!course?.user?.is_free_trial_valid && !course?.user?.has_purchased ? <Typography variant="caption" color="error">Expired on</Typography> : <Typography variant="caption">Expires</Typography>}
-                        <div className="flex items-center gap-1.5">
-                            <Typography variant="h4">{expiredDay || day}</Typography>
-                            <div className="date flex flex-col items-start justify-end">
-                                <Calendar size={12} />
-                                <Typography variant="caption">{!course?.user?.is_free_trial_valid ? monthAndYear : expiredMonthAndYear}</Typography>
-                            </div>
-                        </div>
-                    </div> : ""}
-                    <div className={`${course?.course_type === "free" ? "col-span-2" : ""} bottom`}>
-                        <div className="flex justify-between items-center">
-                            <Typography variant="caption">Progress</Typography>
-                            <Typography variant="subtitle1" fontWeight={500}>{course?.progress}%</Typography>
-                        </div>
+        <Box
+            className="my__course__card rounded-lg overflow-hidden flex flex-col h-full"
+            sx={{
+                bgcolor: "background.paper",
+                border: `1px solid ${theme.palette.divider}`,
+                transition: "transform 0.15s, box-shadow 0.15s",
+                "&:hover": {
+                    transform: "translateY(-2px)",
+                    boxShadow: "0 6px 22px rgba(0,0,0,0.09)",
+                },
+            }}
+        >
+            {/* ── Image area ── */}
+            <Box
+                sx={{
+                    height: 108,
+                    position: "relative",
+                    bgcolor: "primary.light",
+                    overflow: "hidden",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                }}
+            >
+                <Box
+                    component="img"
+                    src={course.thumbnail_url || "/fallback.png"}
+                    alt={course.name}
+                    onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                        e.currentTarget.src = "/fallback.png";
+                    }}
+                    sx={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
 
-                        <MyProgress progress={course?.progress || 0} />
-                        {course?.course_type !== "free" ? <div className="flex justify-between items-center">
-                            <Typography variant="caption">{startDate.split(",")[0]}</Typography>
-                            <Typography variant="subtitle1" >-</Typography>
-                        </div> : ""}
-                    </div>
-                </div>
-                <Divider className="mt-3! mb-5!" />
-                <div className="flex justify-content-between items-center gap-4">
-                    {!course?.user?.is_free_trial_valid && !course?.user?.has_purchased ?
-                        <Button fullWidth color="primary" variant="contained" onClick={() => navigate(PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.ROOT(Number(course.id), "course"))}>
-                            {t("messages.purchase_now")}
-                        </Button>
-                        : <>
-                            <Button variant="contained" color="primary" onClick={() => navigate(PATH.COURSE_MANAGEMENT.COURSES.VIEW_COURSE.ROOT(Number(course.id)))}>
+                {/* Status badge — top left */}
+                <Box sx={{ position: "absolute", top: 8, left: 8 }}>
+                    <CourseStatus status={course.course_type} />
+                </Box>
+
+                {/* Bookmark — top right */}
+                <Box sx={{ position: "absolute", top: 4, right: 4 }}>
+                    <Bookmark course={course} />
+                </Box>
+            </Box>
+
+            {/* ── Card body ── */}
+            <Box
+                sx={{
+                    p: "12px 13px 13px",
+                    display: "flex",
+                    flexDirection: "column",
+                    flex: 1,
+                }}
+            >
+                {/* Subjects / category meta */}
+                <Box sx={{ mb: "6px" }}>
+                    {course.subjects ? (
+                        <Typography sx={{ fontSize: "11px", fontWeight: 500, color: "text.secondary" }}>
+                            {course.subjects} {t("messages.subjects")}
+                        </Typography>
+                    ) : course.mega_categories?.length ? (
+                        <Typography sx={{ fontSize: "11px", fontWeight: 500, color: "text.secondary" }}>
+                            {course.mega_categories[0]}
+                        </Typography>
+                    ) : null}
+                </Box>
+
+                {/* Course name — 2-line clamp */}
+                <Typography
+                    sx={{
+                        fontSize: "12.5px",
+                        fontWeight: 700,
+                        color: "text.primary",
+                        lineHeight: 1.4,
+                        mb: "5px",
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                    }}
+                >
+                    {course.name}
+                </Typography>
+
+                {/* Expiry label — only when expired */}
+                {isExpired && expiryLabel && (
+                    <Typography
+                        sx={{ fontSize: "11px", color: "error.main", fontWeight: 500, mb: "8px" }}
+                    >
+                        Expired: {expiryLabel}
+                    </Typography>
+                )}
+
+                {/* Push progress + actions to bottom */}
+                <Box sx={{ flex: 1 }} />
+
+                {/* Progress row */}
+                <Box
+                    sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        mb: "5px",
+                    }}
+                >
+                    <Typography sx={{ fontSize: "11px", color: "text.secondary" }}>
+                        Progress
+                    </Typography>
+                    <Typography
+                        sx={{ fontSize: "11px", fontWeight: 700, color: "#16A34A" }}
+                    >
+                        {course?.progress ?? 0}%
+                    </Typography>
+                </Box>
+
+                {/* Progress bar — 4 px, green gradient fill */}
+                <Box
+                    sx={{
+                        height: 4,
+                        bgcolor: "#DCFCE7",
+                        borderRadius: "99px",
+                        overflow: "hidden",
+                        mb: "11px",
+                    }}
+                >
+                    <Box
+                        sx={{
+                            height: "100%",
+                            width: `${course?.progress ?? 0}%`,
+                            borderRadius: "99px",
+                            background: "linear-gradient(90deg, #16A34A, #4ADE80)",
+                        }}
+                    />
+                </Box>
+
+                {/* Action buttons */}
+                <Box sx={{ display: "flex", gap: "7px" }}>
+                    {isExpired ? (
+                        <>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                size="small"
+                                sx={{ flex: 1 }}
+                                onClick={handleContinue}
+                            >
                                 {t("messages.continue")}
                             </Button>
-                            <Button variant="outlined" color="primary" onClick={() => navigate(PATH.COURSE_MANAGEMENT.COURSES.VIEW_COURSE.ROOT(Number(course.id)))}>
-                                {t("messages.browse_this_course")}
+                            <Button
+                                variant="outlined"
+                                color="primary"
+                                size="small"
+                                sx={{ flex: 1 }}
+                                onClick={handlePurchase}
+                            >
+                                Renew
                             </Button>
-                        </>}
-                </div>
-            </div>
+                        </>
+                    ) : !hasAccess ? (
+                        <>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                size="small"
+                                sx={{ flex: 1 }}
+                                onClick={handlePurchase}
+                            >
+                                {t("messages.purchase_now")}
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                color="primary"
+                                size="small"
+                                sx={{ flex: 1 }}
+                                onClick={handleContinue}
+                            >
+                                Browse
+                            </Button>
+                        </>
+                    ) : (
+                        <>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                size="small"
+                                sx={{ flex: 1 }}
+                                onClick={handleContinue}
+                            >
+                                {t("messages.continue")}
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                color="primary"
+                                size="small"
+                                sx={{ flex: 1 }}
+                                onClick={handleContinue}
+                            >
+                                Browse
+                            </Button>
+                        </>
+                    )}
+                </Box>
+            </Box>
         </Box>
-    )
+    );
 }

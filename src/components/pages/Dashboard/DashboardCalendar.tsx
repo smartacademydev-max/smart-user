@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useTheme } from '@mui/material/styles';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 /**
@@ -48,8 +49,13 @@ const ENGLISH_MONTHS = [
     'Kartik', 'Mangsir', 'Poush', 'Magh', 'Falgun', 'Chaitra'
 ];
 
-// const NEPALI_WEEKDAYS = ['आइतबार', 'सोमबार', 'मंगलबार', 'बुधबार', 'बिहिबार', 'शुक्रबार', 'शनिबार'];
-// const ENGLISH_WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const AD_MONTHS_FULL = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+];
+
+const AD_MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
 const SHORT_WEEKDAYS_NEPALI = ['आइत', 'सोम', 'मंगल', 'बुध', 'बिहि', 'शुक्र', 'शनि'];
 const SHORT_WEEKDAYS_ENGLISH = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -59,9 +65,6 @@ interface BSDate {
     day: number;
 }
 
-/**
- * Convert English digits to Nepali digits
- */
 const toNepaliNumber = (num: number | string): string => {
     const nepaliDigits = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
     return num.toString().split('').map(digit => {
@@ -106,9 +109,6 @@ const countBSDays = (fromYear: number, fromMonth: number, fromDay: number,
     return -countBSDays(toYear, toMonth, toDay, fromYear, fromMonth, fromDay);
 };
 
-/**
- * Convert BS date to AD date
- */
 const bsToAd = (bsYear: number, bsMonth: number, bsDay: number): Date => {
     const { bsYear: refBsYear, bsMonth: refBsMonth, bsDay: refBsDay, adDate: refAdDate } = BS_AD_REFERENCE;
 
@@ -120,14 +120,9 @@ const bsToAd = (bsYear: number, bsMonth: number, bsDay: number): Date => {
     return resultDate;
 };
 
-/**
- * Convert AD date to BS date
- * FIXED: Corrected off-by-one error in forward calculation
- */
 const adToBs = (adDate: Date): BSDate => {
     const { bsYear: refBsYear, bsMonth: refBsMonth, bsDay: refBsDay, adDate: refAdDate } = BS_AD_REFERENCE;
 
-    // Calculate days difference
     const timeDiff = adDate.getTime() - refAdDate.getTime();
     const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
 
@@ -137,7 +132,6 @@ const adToBs = (adDate: Date): BSDate => {
     let remainingDays = daysDiff;
 
     if (daysDiff >= 0) {
-        // Forward calculation - FIXED
         while (remainingDays > 0) {
             const daysInCurrentMonth = BS_CALENDAR_DATA[currentYear][currentMonth - 1];
             const daysLeftInMonth = daysInCurrentMonth - currentDay + 1;
@@ -189,15 +183,33 @@ const getFirstDayOfBSMonth = (year: number, month: number): number => {
 
 interface DashboardCalendarProps {
     onDateSelect?: (adDate: Date) => void;
+    onMonthChange?: (startAD: string, endAD: string) => void;
+    liveClassDates?: string[];
+    testDates?: string[];
 }
-export default function DashboardCalendar({ onDateSelect }: DashboardCalendarProps) {
+
+const formatAD = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+export default function DashboardCalendar({ onDateSelect, onMonthChange, liveClassDates = [], testDates = [] }: DashboardCalendarProps) {
+    const theme = useTheme();
     const today = new Date();
     const todayBS = useMemo(() => adToBs(today), [today]);
 
+    // Calendar mode: 'bs' = Bikram Sambat, 'ad' = Anno Domini (Gregorian)
+    const [calMode, setCalMode] = useState<'bs' | 'ad'>('bs');
+
+    // BS state
     const [currentYear, setCurrentYear] = useState(todayBS.year);
     const [currentMonth, setCurrentMonth] = useState(todayBS.month);
     const [selectedDate, setSelectedDate] = useState<BSDate | null>(null);
     const [viewMode, setViewMode] = useState<'month' | 'year'>('month');
+
+    // AD state
+    const [adYear, setAdYear] = useState(today.getFullYear());
+    const [adMonth, setAdMonth] = useState(today.getMonth()); // 0-indexed
+    const [adViewMode, setAdViewMode] = useState<'month' | 'year'>('month');
+    const [selectedADDay, setSelectedADDay] = useState<number | null>(null);
 
     const daysInMonth = BS_CALENDAR_DATA[currentYear]?.[currentMonth - 1] || 30;
     const firstDayOfMonth = useMemo(() =>
@@ -205,9 +217,44 @@ export default function DashboardCalendar({ onDateSelect }: DashboardCalendarPro
         [currentYear, currentMonth]
     );
 
-    const { i18n } = useTranslation();
+    // AD helpers
+    const daysInADMonth = new Date(adYear, adMonth + 1, 0).getDate();
+    const firstDayOfADMonth = new Date(adYear, adMonth, 1).getDay();
 
-    const useNepaliScript = i18n.language === "np";
+    const { i18n } = useTranslation();
+    const useNepaliScript = i18n.language === 'np';
+
+    // Notify parent when BS month changes
+    useEffect(() => {
+        if (!onMonthChange || calMode !== 'bs') return;
+        const start = bsToAd(currentYear, currentMonth, 1);
+        const end = bsToAd(currentYear, currentMonth, daysInMonth);
+        onMonthChange(formatAD(start), formatAD(end));
+    }, [currentYear, currentMonth, calMode]);
+
+    // Notify parent when AD month changes
+    useEffect(() => {
+        if (!onMonthChange || calMode !== 'ad') return;
+        const start = `${adYear}-${String(adMonth + 1).padStart(2, '0')}-01`;
+        const end = `${adYear}-${String(adMonth + 1).padStart(2, '0')}-${String(daysInADMonth).padStart(2, '0')}`;
+        onMonthChange(start, end);
+    }, [adYear, adMonth, calMode]);
+
+    // Notify parent on mode switch
+    useEffect(() => {
+        if (!onMonthChange) return;
+        if (calMode === 'bs') {
+            const start = bsToAd(currentYear, currentMonth, 1);
+            const end = bsToAd(currentYear, currentMonth, daysInMonth);
+            onMonthChange(formatAD(start), formatAD(end));
+        } else {
+            const start = `${adYear}-${String(adMonth + 1).padStart(2, '0')}-01`;
+            const end = `${adYear}-${String(adMonth + 1).padStart(2, '0')}-${String(daysInADMonth).padStart(2, '0')}`;
+            onMonthChange(start, end);
+        }
+    }, [calMode]);
+
+    // BS navigation
     const handlePrevMonth = () => {
         if (currentMonth === 1) {
             if (BS_CALENDAR_DATA[currentYear - 1]) {
@@ -242,24 +289,39 @@ export default function DashboardCalendar({ onDateSelect }: DashboardCalendarPro
         }
     };
 
+    // AD navigation
+    const handleADPrevMonth = () => {
+        if (adMonth === 0) { setAdMonth(11); setAdYear(adYear - 1); }
+        else setAdMonth(adMonth - 1);
+    };
+
+    const handleADNextMonth = () => {
+        if (adMonth === 11) { setAdMonth(0); setAdYear(adYear + 1); }
+        else setAdMonth(adMonth + 1);
+    };
+
+    const handleADPrevYear = () => setAdYear(adYear - 1);
+    const handleADNextYear = () => setAdYear(adYear + 1);
+
     const handleDateClick = (day: number) => {
         setSelectedDate({ year: currentYear, month: currentMonth, day });
         const adDate = bsToAd(currentYear, currentMonth, day);
         onDateSelect?.(adDate);
     };
 
-
+    const handleADDateClick = (day: number) => {
+        setSelectedADDay(day);
+        onDateSelect?.(new Date(adYear, adMonth, day));
+    };
 
     const handleMonthClick = (month: number) => {
         setCurrentMonth(month);
         setViewMode('month');
     };
 
-    const handleToday = () => {
-        setCurrentYear(todayBS.year);
-        setCurrentMonth(todayBS.month);
-        setSelectedDate(todayBS);
-        setViewMode('month');
+    const handleADMonthClick = (month: number) => {
+        setAdMonth(month);
+        setAdViewMode('month');
     };
 
     const isToday = (day: number) => {
@@ -268,229 +330,353 @@ export default function DashboardCalendar({ onDateSelect }: DashboardCalendarPro
             todayBS.day === day;
     };
 
+    const isTodayAD = (day: number) =>
+        today.getFullYear() === adYear && today.getMonth() === adMonth && today.getDate() === day;
+
     const isSelected = (day: number) => {
         return selectedDate?.year === currentYear &&
             selectedDate?.month === currentMonth &&
             selectedDate?.day === day;
     };
 
+    const isSelectedAD = (day: number) => selectedADDay === day;
+
     const isSaturday = (day: number) => {
         const date = bsToAd(currentYear, currentMonth, day);
         return date.getDay() === 6;
     };
 
+    const isSaturdayAD = (day: number) => new Date(adYear, adMonth, day).getDay() === 6;
+
     const calendarDays = useMemo(() => {
         const days: (number | null)[] = [];
-
         for (let i = 0; i < firstDayOfMonth; i++) {
             days.push(null);
         }
-
         for (let day = 1; day <= daysInMonth; day++) {
             days.push(day);
         }
-
         return days;
     }, [firstDayOfMonth, daysInMonth]);
 
-    // const formatSelectedDate = () => {
-    //     if (!selectedDate) return null;
+    const adCalendarDays = useMemo(() => {
+        const days: (number | null)[] = [];
+        for (let i = 0; i < firstDayOfADMonth; i++) days.push(null);
+        for (let d = 1; d <= daysInADMonth; d++) days.push(d);
+        return days;
+    }, [firstDayOfADMonth, daysInADMonth]);
 
-    //     const adDate = bsToAd(selectedDate.year, selectedDate.month, selectedDate.day);
-    //     const weekDay = adDate.getDay();
+    const formatADDay = (day: number) =>
+        `${adYear}-${String(adMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
-    //     if (useNepaliScript) {
-    //         return {
-    //             bs: `${NEPALI_WEEKDAYS[weekDay]}, ${NEPALI_MONTHS[selectedDate.month - 1]} ${toNepaliNumber(selectedDate.day)}, ${toNepaliNumber(selectedDate.year)}`,
-    //             ad: `${adDate.toLocaleDateString('en-US', { weekday: 'long' })}, ${adDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`
-    //         };
-    //     } else {
-    //         return {
-    //             bs: `${ENGLISH_WEEKDAYS[weekDay]}, ${ENGLISH_MONTHS[selectedDate.month - 1]} ${selectedDate.day}, ${selectedDate.year}`,
-    //             ad: `${adDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}`
-    //         };
-    //     }
-    // };
-    // const selectedDateFormatted = selectedDate ? formatSelectedDate() : null;
+    // Theme-driven style tokens
+    const dividerColor = theme.palette.divider;
+    const textMuted = theme.palette.text.secondary;
+    const textPrimary = theme.palette.text.primary;
+    const primaryMain = theme.palette.primary.main;
+    const successMain = theme.palette.success.main;
+    const errorMain = theme.palette.error.main;
+    const infoMain = theme.palette.info.main;
+    const bgDefault = theme.palette.background.default;
+
+    const navBtnStyle: React.CSSProperties = {
+        width: '26px', height: '26px', borderRadius: '6px',
+        border: `1px solid ${dividerColor}`, background: 'transparent',
+        cursor: 'pointer', display: 'flex', alignItems: 'center',
+        justifyContent: 'center', color: textMuted, flexShrink: 0,
+    };
+
+    // AD | BS toggle pill styles
+    const toggleBase: React.CSSProperties = {
+        padding: '2px 7px', fontSize: '10px', fontWeight: 700,
+        cursor: 'pointer', border: 'none', borderRadius: '4px',
+        fontFamily: 'inherit', lineHeight: 1.6,
+        transition: 'all 0.15s',
+    };
+
+    const weekdayHeaders = useNepaliScript ? SHORT_WEEKDAYS_NEPALI : SHORT_WEEKDAYS_ENGLISH;
+
     return (
-        <div className="w-full mx-auto p-6 bg-white rounded-xl ">
-            <div className="mb-6 space-y-4">
-                <div className="flex items-center justify-between">
-                    {viewMode === 'month' ? (
-                        <>
-                            <button
-                                onClick={handlePrevMonth}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                                aria-label="Previous month"
-                            >
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                                </svg>
+        <div className="w-full">
+            {/* AD | BS toggle — always visible at top */}
+            <div style={{
+                display: 'flex', justifyContent: 'flex-end', marginBottom: '8px',
+            }}>
+                <div style={{
+                    display: 'flex', alignItems: 'center',
+                    border: `1px solid ${dividerColor}`,
+                    borderRadius: '6px', overflow: 'hidden',
+                    background: bgDefault,
+                }}>
+                    <button
+                        onClick={() => setCalMode('ad')}
+                        style={{
+                            ...toggleBase,
+                            background: calMode === 'ad' ? primaryMain : 'transparent',
+                            color: calMode === 'ad' ? '#fff' : textMuted,
+                        }}
+                    >
+                        AD
+                    </button>
+                    <button
+                        onClick={() => setCalMode('bs')}
+                        style={{
+                            ...toggleBase,
+                            background: calMode === 'bs' ? primaryMain : 'transparent',
+                            color: calMode === 'bs' ? '#fff' : textMuted,
+                        }}
+                    >
+                        BS
+                    </button>
+                </div>
+            </div>
+
+            {/* ── BS CALENDAR ── */}
+            {calMode === 'bs' && (
+                viewMode === 'year' ? (
+                    <div>
+                        <div className="flex items-center justify-between mb-3">
+                            <button onClick={handlePrevYear} style={navBtnStyle}>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+                            </button>
+                            <button onClick={() => setViewMode('month')} className="text-center hover:opacity-70 transition-opacity">
+                                <div style={{ fontSize: '14px', fontWeight: 700, color: textPrimary }}>{useNepaliScript ? toNepaliNumber(currentYear) : currentYear}</div>
+                                <div style={{ fontSize: '11px', color: textMuted, marginTop: '1px' }}>Select Month</div>
+                            </button>
+                            <button onClick={handleNextYear} style={navBtnStyle}>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M9 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+                            </button>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2">
+                            {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => {
+                                const isCurrentMonth = month === todayBS.month && currentYear === todayBS.year;
+                                const isSelectedMonth = month === currentMonth;
+                                return (
+                                    <button key={month} onClick={() => handleMonthClick(month)} style={{
+                                        padding: '7px 4px', borderRadius: '6px', textAlign: 'center',
+                                        fontSize: '11px', fontWeight: 600, cursor: 'pointer', border: 'none',
+                                        background: isCurrentMonth ? primaryMain : isSelectedMonth ? `${primaryMain}1A` : bgDefault,
+                                        color: isCurrentMonth ? '#fff' : isSelectedMonth ? primaryMain : textPrimary,
+                                        transition: 'all .15s',
+                                    }}>
+                                        {useNepaliScript ? NEPALI_MONTHS[month - 1] : ENGLISH_MONTHS[month - 1]}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                ) : (
+                    <div>
+                        {/* BS Header */}
+                        <div className="flex items-center justify-between mb-3">
+                            <button onClick={() => setViewMode('year')} className="text-left hover:opacity-70 transition-opacity">
+                                <div style={{ fontSize: '14px', fontWeight: 700, color: textPrimary }}>
+                                    {useNepaliScript ? NEPALI_MONTHS[currentMonth - 1] : ENGLISH_MONTHS[currentMonth - 1]}{' '}
+                                    {useNepaliScript ? toNepaliNumber(currentYear) : currentYear}
+                                </div>
+                                {/* <div style={{ fontSize: '11px', color: textMuted, marginTop: '1px' }}>Bikram Sambat</div> */}
                             </button>
 
-                            <div className="text-center">
-                                <button
-                                    onClick={() => setViewMode('year')}
-                                    className="hover:bg-gray-50 px-4 py-2 rounded-lg transition-colors flex gap-2 items-center"
-                                >
-                                    <h2 className="text-2xl font-bold text-gray-800">
-                                        {useNepaliScript ? NEPALI_MONTHS[currentMonth - 1] : ENGLISH_MONTHS[currentMonth - 1]}
-                                    </h2>
-                                    <p className="text-lg text-gray-600">
-                                        ( {useNepaliScript ? toNepaliNumber(currentYear) : currentYear})
-                                    </p>
+                            <div className="flex gap-1">
+                                <button onClick={handlePrevMonth} style={navBtnStyle}>
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+                                </button>
+                                <button onClick={handleNextMonth} style={navBtnStyle}>
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M9 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
                                 </button>
                             </div>
+                        </div>
 
-                            <button
-                                onClick={handleNextMonth}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                                aria-label="Next month"
-                            >
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                </svg>
-                            </button>
-                        </>
-                    ) : (
-                        <>
-                            <button
-                                onClick={handlePrevYear}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                                aria-label="Previous year"
-                            >
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                                </svg>
-                            </button>
+                        {/* Day headers */}
+                        <div className="grid grid-cols-7 gap-0.5 text-center mb-1">
+                            {weekdayHeaders.map((day, index) => (
+                                <div key={index} style={{ fontSize: '10px', fontWeight: 600, color: textMuted, padding: '3px 0', textTransform: 'uppercase' }}>{day}</div>
+                            ))}
+                        </div>
 
-                            <div className="text-center">
-                                <h2 className="text-2xl font-bold text-gray-800">
-                                    {useNepaliScript ? toNepaliNumber(currentYear) : currentYear}
-                                </h2>
-                                <p className="text-sm text-gray-500">Select Month</p>
-                            </div>
-
-                            <button
-                                onClick={handleNextYear}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                                aria-label="Next year"
-                            >
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                </svg>
-                            </button>
-                        </>
-                    )}
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex flex-wrap gap-2 justify-center">
-                    <button
-                        onClick={handleToday}
-                        className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
-                    >
-                        {useNepaliScript ? 'आज' : 'Today'}
-                    </button>
-                    {viewMode === 'month' && (
-                        <button
-                            onClick={() => setViewMode('year')}
-                            className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors font-medium"
-                        >
-                            {useNepaliScript ? 'महिना छान्नुहोस्' : 'Select Month'}
-                        </button>
-                    )}
-                </div>
-
-                {/* {selectedDateFormatted && (
-                    <div className="text-center p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
-                        <p className="font-bold text-green-800 text-lg">{selectedDateFormatted.bs}</p>
-                        <p className="text-sm text-gray-600 mt-1">{selectedDateFormatted.ad}</p>
-                    </div>
-                )} */}
-            </div>
-
-            {/* Calendar Content */}
-            {viewMode === 'month' ? (
-                <div>
-                    {/* Weekday Headers */}
-                    <div className="grid grid-cols-7 gap-1 mb-2">
-                        {(useNepaliScript ? SHORT_WEEKDAYS_NEPALI : SHORT_WEEKDAYS_ENGLISH).map((day, index) => (
-                            <div
-                                key={index}
-                                className={`text-center font-bold py-3 text-sm ${index === 6 ? 'text-red-600' : 'text-gray-700'
-                                    }`}
-                            >
-                                {day}
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Calendar Grid */}
-                    <div className="grid grid-cols-7 gap-1">
-                        {calendarDays.map((day, index) => (
-                            <div key={index} className="aspect-square">
-                                {day ? (
-                                    <button
-                                        onClick={() => handleDateClick(day)}
-                                        className={`relative w-full h-full flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${isToday(day)
-                                            ? 'bg-blue-600 text-white hover:bg-blue-700 ring-2 ring-blue-300'
-                                            : isSelected(day)
-                                                ? 'bg-green-500 text-white hover:bg-green-600'
-                                                : isSaturday(day)
-                                                    ? 'text-red-600 hover:bg-red-50'
-                                                    : 'text-gray-700 hover:bg-gray-100'
-                                            }`}
-                                    >
+                        {/* BS Calendar days */}
+                        <div className="grid grid-cols-7 gap-0.5 text-center">
+                            {calendarDays.map((day, index) => {
+                                if (!day) return <div key={index} />;
+                                const adStr = formatAD(bsToAd(currentYear, currentMonth, day));
+                                const hasLive = liveClassDates.some(d => d === adStr);
+                                const hasTest = testDates.some(d => d === adStr);
+                                const hasDots = hasLive || hasTest;
+                                const todayCell = isToday(day);
+                                return (
+                                    <button key={index} onClick={() => handleDateClick(day)} style={{
+                                        fontSize: '11.5px',
+                                        padding: hasDots ? '5px 2px 3px' : '5px 2px',
+                                        borderRadius: '6px',
+                                        cursor: 'pointer', border: 'none',
+                                        fontWeight: todayCell ? 700 : 500,
+                                        background: todayCell ? successMain : isSelected(day) ? `${primaryMain}1A` : 'transparent',
+                                        color: todayCell ? '#fff' : isSelected(day) ? primaryMain : isSaturday(day) ? errorMain : textPrimary,
+                                        transition: 'background .12s',
+                                        display: 'flex', flexDirection: 'column', alignItems: 'center',
+                                    }}>
                                         {useNepaliScript ? toNepaliNumber(day) : day}
-                                        <span className="absolute bottom-1 right-1 text-[10px] opacity-70 font-normal">
-                                            {(() => {
-                                                const ad = bsToAd(currentYear, currentMonth, day);
-                                                return ad.getDate();
-                                            })()}
-                                        </span>
+                                        {hasDots && (
+                                            <div style={{ display: 'flex', gap: '2px', marginTop: '2px' }}>
+                                                {hasLive && (
+                                                    <div style={{ width: 4, height: 4, borderRadius: '50%', background: errorMain, flexShrink: 0 }} />
+                                                )}
+                                                {hasTest && (
+                                                    <div style={{ width: 4, height: 4, borderRadius: '50%', background: infoMain, flexShrink: 0 }} />
+                                                )}
+                                            </div>
+                                        )}
                                     </button>
-                                ) : (
-                                    <div className="w-full h-full bg-gray-50 rounded-lg" />
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            ) : (
-                /* Year View - Month Selector */
-                <div className="grid grid-cols-3 gap-3">
-                    {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => {
-                        const isCurrentMonth = month === todayBS.month && currentYear === todayBS.year;
-                        const isSelectedMonth = month === currentMonth;
+                                );
+                            })}
+                        </div>
 
-                        return (
-                            <button
-                                key={month}
-                                onClick={() => handleMonthClick(month)}
-                                className={`p-4 rounded-lg text-center font-semibold transition-all ${isCurrentMonth
-                                    ? 'bg-blue-600 text-white hover:bg-blue-700'
-                                    : isSelectedMonth
-                                        ? 'bg-green-100 text-green-800 border-2 border-green-500'
-                                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'
-                                    }`}
-                            >
-                                {useNepaliScript ? NEPALI_MONTHS[month - 1] : ENGLISH_MONTHS[month - 1]}
-                            </button>
-                        );
-                    })}
-                </div>
+                        {/* Legend */}
+                        <div className="flex gap-3 mt-2.5">
+                            <div className="flex items-center gap-1.5" style={{ fontSize: '11px', color: textMuted }}>
+                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: errorMain, flexShrink: 0 }} />
+                                Live Class
+                            </div>
+                            <div className="flex items-center gap-1.5" style={{ fontSize: '11px', color: textMuted }}>
+                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: infoMain, flexShrink: 0 }} />
+                                Test / Exam
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div style={{
+                            marginTop: '10px', paddingTop: '10px',
+                            borderTop: `1px solid ${dividerColor}`,
+                            fontSize: '10.5px', color: textMuted, textAlign: 'center',
+                        }}>
+                            Bikram Sambat · 2000 BS – 2100 BS
+                        </div>
+                    </div>
+                )
             )}
 
-            <div className="mt-6 pt-4 border-t border-gray-200 text-center text-xs text-gray-500">
-                <p>{useNepaliScript ? 'बिक्रम संवत पात्रो' : 'Bikram Sambat Calendar'}</p>
-                <p className="mt-1">
-                    {useNepaliScript
-                        ? `${toNepaliNumber(2000)} - ${toNepaliNumber(2100)} सम्म उपलब्ध`
-                        : 'Available from 2000 BS to 2100 BS'
-                    }
-                </p>
-            </div>
+            {/* ── AD CALENDAR ── */}
+            {calMode === 'ad' && (
+                adViewMode === 'year' ? (
+                    <div>
+                        <div className="flex items-center justify-between mb-3">
+                            <button onClick={handleADPrevYear} style={navBtnStyle}>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+                            </button>
+                            <button onClick={() => setAdViewMode('month')} className="text-center hover:opacity-70 transition-opacity">
+                                <div style={{ fontSize: '14px', fontWeight: 700, color: textPrimary }}>{adYear}</div>
+                                <div style={{ fontSize: '11px', color: textMuted, marginTop: '1px' }}>Select Month</div>
+                            </button>
+                            <button onClick={handleADNextYear} style={navBtnStyle}>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M9 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+                            </button>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2">
+                            {AD_MONTHS_SHORT.map((name, i) => {
+                                const isCurrentMonth = i === today.getMonth() && adYear === today.getFullYear();
+                                const isSelectedMonth = i === adMonth;
+                                return (
+                                    <button key={i} onClick={() => handleADMonthClick(i)} style={{
+                                        padding: '7px 4px', borderRadius: '6px', textAlign: 'center',
+                                        fontSize: '11px', fontWeight: 600, cursor: 'pointer', border: 'none',
+                                        background: isCurrentMonth ? primaryMain : isSelectedMonth ? `${primaryMain}1A` : bgDefault,
+                                        color: isCurrentMonth ? '#fff' : isSelectedMonth ? primaryMain : textPrimary,
+                                        transition: 'all .15s',
+                                    }}>
+                                        {name}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                ) : (
+                    <div>
+                        {/* AD Header */}
+                        <div className="flex items-center justify-between mb-3">
+                            <button onClick={() => setAdViewMode('year')} className="text-left hover:opacity-70 transition-opacity">
+                                <div style={{ fontSize: '14px', fontWeight: 700, color: textPrimary }}>
+                                    {AD_MONTHS_FULL[adMonth]} {adYear}
+                                </div>
+                                <div style={{ fontSize: '11px', color: textMuted, marginTop: '1px' }}>Anno Domini</div>
+                            </button>
+
+                            <div className="flex gap-1">
+                                <button onClick={handleADPrevMonth} style={navBtnStyle}>
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+                                </button>
+                                <button onClick={handleADNextMonth} style={navBtnStyle}>
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M9 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Day headers */}
+                        <div className="grid grid-cols-7 gap-0.5 text-center mb-1">
+                            {SHORT_WEEKDAYS_ENGLISH.map((day, index) => (
+                                <div key={index} style={{ fontSize: '10px', fontWeight: 600, color: textMuted, padding: '3px 0', textTransform: 'uppercase' }}>{day}</div>
+                            ))}
+                        </div>
+
+                        {/* AD Calendar days */}
+                        <div className="grid grid-cols-7 gap-0.5 text-center">
+                            {adCalendarDays.map((day, index) => {
+                                if (!day) return <div key={index} />;
+                                const adStr = formatADDay(day);
+                                const hasLive = liveClassDates.some(d => d === adStr);
+                                const hasTest = testDates.some(d => d === adStr);
+                                const hasDots = hasLive || hasTest;
+                                const todayCell = isTodayAD(day);
+                                return (
+                                    <button key={index} onClick={() => handleADDateClick(day)} style={{
+                                        fontSize: '11.5px',
+                                        padding: hasDots ? '5px 2px 3px' : '5px 2px',
+                                        borderRadius: '6px',
+                                        cursor: 'pointer', border: 'none',
+                                        fontWeight: todayCell ? 700 : 500,
+                                        background: todayCell ? successMain : isSelectedAD(day) ? `${primaryMain}1A` : 'transparent',
+                                        color: todayCell ? '#fff' : isSelectedAD(day) ? primaryMain : isSaturdayAD(day) ? errorMain : textPrimary,
+                                        transition: 'background .12s',
+                                        display: 'flex', flexDirection: 'column', alignItems: 'center',
+                                    }}>
+                                        {day}
+                                        {hasDots && (
+                                            <div style={{ display: 'flex', gap: '2px', marginTop: '2px' }}>
+                                                {hasLive && (
+                                                    <div style={{ width: 4, height: 4, borderRadius: '50%', background: errorMain, flexShrink: 0 }} />
+                                                )}
+                                                {hasTest && (
+                                                    <div style={{ width: 4, height: 4, borderRadius: '50%', background: infoMain, flexShrink: 0 }} />
+                                                )}
+                                            </div>
+                                        )}
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        {/* Legend */}
+                        <div className="flex gap-3 mt-2.5">
+                            <div className="flex items-center gap-1.5" style={{ fontSize: '11px', color: textMuted }}>
+                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: errorMain, flexShrink: 0 }} />
+                                Live Class
+                            </div>
+                            <div className="flex items-center gap-1.5" style={{ fontSize: '11px', color: textMuted }}>
+                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: infoMain, flexShrink: 0 }} />
+                                Test / Exam
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div style={{
+                            marginTop: '10px', paddingTop: '10px',
+                            borderTop: `1px solid ${dividerColor}`,
+                            fontSize: '10.5px', color: textMuted, textAlign: 'center',
+                        }}>
+                            Anno Domini · Gregorian Calendar
+                        </div>
+                    </div>
+                )
+            )}
         </div>
     );
 }

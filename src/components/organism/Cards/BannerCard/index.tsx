@@ -16,7 +16,7 @@ export default function BannerCard({ data }: { data: BannerProps }) {
     }
     return (
         <Box className="banner__card rounded-2xl 2xl:rounded-4xl flex items-center justify-start overflow-hidden h-full" onClick={() => handleBannerClick(data?.notifiable_type)}>
-            <img src={data?.image_url} alt="" className="object-cover w-full h-full" />
+            <img src={data?.image_url} alt="" className="object-cover w-full h-full aspect-video" />
         </Box>
     )
 }

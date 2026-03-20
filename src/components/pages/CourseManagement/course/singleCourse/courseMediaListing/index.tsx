@@ -118,7 +118,7 @@ export default function CourseMediaListing({
                 search={searchInput}
                 setSearch={handleSearchChange}
             />
-            <div className="flex flex-col gap-4 md:grid grid-cols-2 xl:grid-cols-3 lg:gap-6 mt-6">
+            <div className="flex flex-col gap-4 md:grid grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 lg:gap-6 mt-6">
                 {isLoading ? (
                     [...Array(6)].map((_, idx) => (
                         <div key={idx} className="col-span-1">

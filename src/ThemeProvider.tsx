@@ -6,10 +6,10 @@ import { useAppSelector } from './store/hook';
 import type { RootState } from './store/store';
 import { createAppTheme } from './theme';
 
-export default function UdaanThemeProvider({ children }: { children: React.ReactNode }) {
+export default function SmartThemeProvider({ children }: { children: React.ReactNode }) {
     const { i18n } = useTranslation();
     const { lang, mode } = useAppSelector(
-        (state: RootState) => state.udaan_theme
+        (state: RootState) => state.smart_theme
     );
 
     const theme = React.useMemo(() => {

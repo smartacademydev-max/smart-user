@@ -34,7 +34,7 @@ export default function EmptyRoute({ icon, title, message, cta, handleClick, var
                     </svg>}
                 </Box>
                 <div className="content">
-                    <Typography variant="h4" className="mb-2! capitalize">{title || t("messages.empty_states.roles.title")}</Typography>
+                    <Typography variant="h4" fontWeight={500} className="mb-2! capitalize">{title || t("messages.empty_states.roles.title")}</Typography>
                     <Typography variant="subtitle1" color="text.middle">{message || ""}</Typography>
                 </div>
                 {cta ? <Button variant="contained" color="primary" startIcon={<Add />} onClick={() => {

@@ -38,7 +38,7 @@ export default function PlaylistCard({ data, courseId }: { data: PlaylistProps; 
                     <Typography variant="subtitle2">{data?.count} Videos</Typography>
                 </Stack>
             </Box>
-            <Typography variant="h6" fontWeight={600}>{data?.chapter_name}</Typography>
+            <Typography variant="h6" className="line-clamp-3" fontWeight={600}>{data?.chapter_name}</Typography>
         </Box>
     )
 }

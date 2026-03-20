@@ -55,7 +55,7 @@ export default function CourseListing() {
                     <TableFilter categoryLayout={true} search={search} setSearch={(newVal) => setSearch(newVal)} />
                 </Box>
                 {isLoading ? (
-                    <div className="flex flex-col gap-4 lg:gap-3 sm:grid sm:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
+                    <div className="flex flex-col gap-4 lg:gap-3 sm:grid sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
                         {Array.from({ length: 8 }).map((_, index) => (
                             <Box
                                 key={index}
@@ -91,7 +91,7 @@ export default function CourseListing() {
                         ))}
                     </div>
                 ) : courses.length ? (
-                    <div className="flex flex-col gap-4 lg:gap-3 sm:grid sm:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 pb-4">
+                    <div className="flex flex-col gap-4 lg:gap-3 sm:grid sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5 pb-4">
                         {courses.map((course) => (
                             <div key={course.id} className="col-span-1">
                                 <CourseCard course={course} />

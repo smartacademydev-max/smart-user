@@ -23,7 +23,7 @@ export default function SelectPreferedLanguage() {
         },
     ]
 
-    const { lang: selectedLanguage } = useAppSelector((state) => state.udaan_theme);
+    const { lang: selectedLanguage, mode } = useAppSelector((state) => state.smart_theme);
 
     const handleLanguageSelect = (lang: "en" | "np") => {
         dispatch(setLanguage(lang));
@@ -40,10 +40,10 @@ export default function SelectPreferedLanguage() {
             <div className="container mx-auto px-4">
                 <div className="content w-full lg:max-w-[592px] mx-auto">
                     <div className="header text-center">
-                        <img src="/udaan-welcome.png" alt="" className='h-auto max-w-[210px] mx-auto' />
+                        <img src={mode === "light" ? "/logo-dark.svg" : "/logo.svg"} alt="" className='h-auto max-w-[210px] mx-auto' />
                         <div className="mt-6">
-                            <Typography variant='h4' color='primary'>{t("messages.welcome_to_udaan")}</Typography>
-                            <Typography variant='h4' color='primary'>{t("messages.welcom_message_udaan")}</Typography>
+                            <Typography variant='h4' color='primary'>{t("messages.welcome_to_smart")}</Typography>
+                            <Typography variant='h4' color='primary'>{t("messages.welcom_message_smart")}</Typography>
                         </div>
                     </div>
                     <div className="label mt-4 md:mt-8 mb-4 md:mb-6">

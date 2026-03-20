@@ -1,40 +1,105 @@
-import { Box, Divider, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { Book, Money, Note, Profile2User } from "iconsax-reactjs";
 import type { Analytics } from "../../../../types/dashboard";
 
-export default function DashboardAnalyticsCard({ data }: { data: Analytics }) {
-    const getIconsBasedOnType = (type: "success" | "error" | "info" | "warning") => {
-        switch (type) {
-            case "info":
-                return <Book variant="Bold" />
-            case "error":
-                return <Profile2User variant="Bold" />
-            case "warning":
-                return <Note variant="Bold" />
-            case "success":
-                return <Money variant="Bold" />
-            default:
-                return <Money variant="Bold" />
-        }
-    }
+// Map API `type` → icon + icon-bg + icon-color
+// HTML intent: info=courses(blue), error=classes(teal), warning=tests(amber), success=saved(red)
+const CONFIG = {
+    info: {
+        icon: <Book variant="Bold" size={18} />,
+        bg: "secondary.light",
+        color: "secondary.main",
+    },
+    error: {
+        icon: <Profile2User variant="Bold" size={18} />,
+        bg: "success.light",
+        color: "success.main",
+    },
+    warning: {
+        icon: <Note variant="Bold" size={18} />,
+        bg: "info.light",
+        color: "info.main",
+    },
+    success: {
+        icon: <Money variant="Bold" size={18} />,
+        bg: "error.light",
+        color: "error.main",
+    },
+} as const;
+
+export default function DashboardAnalyticsCard({
+    data,
+    index,
+}: {
+    data: Analytics;
+    index: number;
+}) {
+    const { icon, bg, color } = CONFIG[data.type] ?? CONFIG.info;
+
     return (
-        <Box className="dashboard__analytics__card rounded-lg lg:py-4 lg:px-6 backdrop-blur-2xl px-3 py-2" sx={{
-            background: "rgba(255,255,255,0.1)",
-            // border: (theme) => `1px solid ${theme.palette.primary.contrastText}`
-        }}>
-            <div className="flex flex-col lg:flex-row lg:items-center gap-2">
-                <Box className="w-11 h-11 flex items-center justify-center rounded-md" sx={{
-                    background: (theme) => theme.palette.primary.contrastText,
-                    color: (theme) => theme.palette[data.type].main,
-                }}>
-                    {getIconsBasedOnType(data?.type)}
-                </Box>
-                <Typography variant="h4">{data?.title}</Typography>
-            </div>
-            <Divider className='my-4!' sx={{
-                background: "rgba(255,255,255,0.3)"
-            }} />
-            <Typography variant="h2" fontWeight={600}>{data?.value}</Typography>
+        <Box
+            sx={{
+                bgcolor: "background.paper",
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 2,
+                p: "14px 16px",
+                cursor: "default",
+                opacity: 0,
+                animation: "stat-fade-up 0.3s ease forwards",
+                animationDelay: `${index * 0.05}s`,
+                transition: "transform 0.15s, box-shadow 0.15s",
+                "&:hover": {
+                    transform: "translateY(-2px)",
+                    boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
+                },
+                "@keyframes stat-fade-up": {
+                    from: { opacity: 0, transform: "translateY(10px)" },
+                    to: { opacity: 1, transform: "translateY(0)" },
+                },
+            }}
+        >
+            {/* Icon square */}
+            <Box
+                sx={{
+                    width: 34,
+                    height: 34,
+                    borderRadius: 1.5,
+                    bgcolor: bg,
+                    color: color,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    mb: "10px",
+                    flexShrink: 0,
+                }}
+            >
+                {icon}
+            </Box>
+
+            {/* Value */}
+            <Typography
+                sx={{
+                    fontSize: "24px",
+                    fontWeight: 800,
+                    lineHeight: 1,
+                    mb: "3px",
+                    color: "text.primary",
+                }}
+            >
+                {data.value}
+            </Typography>
+
+            {/* Label */}
+            <Typography
+                sx={{
+                    fontSize: "11.5px",
+                    fontWeight: 500,
+                    color: "text.secondary",
+                }}
+            >
+                {data.title}
+            </Typography>
         </Box>
-    )
+    );
 }
