@@ -17,7 +17,7 @@ export default function DashboardTopBanners() {
 
     const { data, isLoading } = useGetAllLiveClassesQuery({
         pageIndex: 1,
-        pageSize: 1,
+        pageSize: 2,
         type: "ongoing",
     });
 

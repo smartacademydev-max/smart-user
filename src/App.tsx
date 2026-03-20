@@ -19,7 +19,7 @@ export default function App() {
         }}
       >
         {/* Left column */}
-        <Box sx={{ display: "flex", flexDirection: "column", gap: "18px" }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: "18px", overflow: "hidden" }}>
           <DashboardTopBanners />
           <DashboardAnalytics />
           <DashboardProgressCharts />

@@ -5,7 +5,8 @@
       "Bash(npx tsc:*)",
       "Bash(find D:/Makura -maxdepth 4 -name *.html)",
       "Read(//d//**)",
-      "Bash(node -e \"const ic = require\\(''d:/Makura/SMART/smart-user/node_modules/iconsax-reactjs''\\); console.log\\(Object.keys\\(ic\\).filter\\(k => k.toLowerCase\\(\\).includes\\(''volume''\\) || k.toLowerCase\\(\\).includes\\(''speaker''\\) || k.toLowerCase\\(\\).includes\\(''megaphone''\\) || k.toLowerCase\\(\\).includes\\(''announcement''\\)\\).join\\('', ''\\)\\)\")"
+      "Bash(node -e \"const ic = require\\(''d:/Makura/SMART/smart-user/node_modules/iconsax-reactjs''\\); console.log\\(Object.keys\\(ic\\).filter\\(k => k.toLowerCase\\(\\).includes\\(''volume''\\) || k.toLowerCase\\(\\).includes\\(''speaker''\\) || k.toLowerCase\\(\\).includes\\(''megaphone''\\) || k.toLowerCase\\(\\).includes\\(''announcement''\\)\\).join\\('', ''\\)\\)\")",
+      "Bash(grep -r \"nepali\\\\|bikram\\\\|NepaliDate\\\\|nepalidate\" package.json package-lock.json --include=*.json -l)"
     ]
   }
 }

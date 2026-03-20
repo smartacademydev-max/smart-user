@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Typography, useTheme } from "@mui/material";
+import { Box, CircularProgress, type Theme, Typography, useTheme } from "@mui/material";
 import { t } from "i18next";
 import type { JSX } from "react";
 import { useState } from "react";
@@ -25,7 +25,7 @@ const currentMonthRange = () => {
     };
 };
 
-// ── Compact calendar event list (matches HTML .cal-ev-panel style) ────────────
+// ── Compact calendar event list ───────────────────────────────────────────────
 function CalendarEventPanel({
     selectedDate, selectedDateLabel, liveList, testList, loading, onClear,
 }: {
@@ -55,7 +55,6 @@ function CalendarEventPanel({
 
     const allEmpty = liveList.length === 0 && testList.length === 0;
 
-    // Combine into a single list for rendering
     type EventItem =
         | { kind: "live"; data: LiveClassProps }
         | { kind: "test"; data: TestProps };
@@ -71,7 +70,6 @@ function CalendarEventPanel({
             pt: "12px",
             borderTop: `1px solid ${theme.palette.divider}`,
         }}>
-            {/* Header */}
             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: "10px" }}>
                 <Typography sx={{ fontSize: "13px", fontWeight: 700, color: "text.primary" }}>
                     {selectedDateLabel}
@@ -102,7 +100,7 @@ function CalendarEventPanel({
                 <Box>
                     {combined.map((ev, i) => {
                         const isLive = ev.kind === "live";
-                        const dotColor = isLive ? theme.palette.error.main : "#F59F0A";
+                        const dotColor = isLive ? theme.palette.error.main : theme.palette.info.main;
                         const name = isLive ? (ev.data as LiveClassProps).name : (ev.data as TestProps).name;
                         const time = isLive
                             ? getTime((ev.data as LiveClassProps).start_time)
@@ -120,13 +118,11 @@ function CalendarEventPanel({
                                     borderBottom: isLast ? "none" : `1px solid ${theme.palette.divider}`,
                                 }}
                             >
-                                {/* Colored dot */}
                                 <Box sx={{
                                     width: 8, height: 8, borderRadius: "50%",
                                     bgcolor: dotColor, flexShrink: 0,
                                 }} />
 
-                                {/* Name + time */}
                                 <Box sx={{ flex: 1, minWidth: 0 }}>
                                     <Typography sx={{
                                         fontSize: "12px", fontWeight: 600, color: "text.primary",
@@ -139,7 +135,6 @@ function CalendarEventPanel({
                                     </Typography>
                                 </Box>
 
-                                {/* Action button */}
                                 <Box
                                     component="button"
                                     onClick={() => isLive ? handleJoin(ev.data as LiveClassProps) : handleViewTest(ev.data as TestProps)}
@@ -169,30 +164,46 @@ function CalendarEventPanel({
     );
 }
 
-// ── Notice item icon/badge config by notification_type ────────────────────────
-const NOTICE_TYPE_CONFIG: Record<string, {
+// ── Notice type config (theme-aware) ─────────────────────────────────────────
+function getNoticeTypeConfig(theme: Theme): Record<string, {
     bgColor: string; iconColor: string; badgeBg: string; badgeColor: string; label: string;
     icon: JSX.Element;
-}> = {
-    live_class: {
-        bgColor: "#FFF0F1", iconColor: "#E21D48", badgeBg: "#FFF0F1", badgeColor: "#E21D48", label: "Class Notice",
-        icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 10l4.553-2.07A1 1 0 0121 8.87v6.26a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" stroke="#E21D48" strokeWidth="1.5" strokeLinecap="round" /></svg>,
-    },
-    test: {
-        bgColor: "#ECFDF5", iconColor: "#059467", badgeBg: "#ECFDF5", badgeColor: "#065F46", label: "New Content",
-        icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4M22 12c0 5.52-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2s10 4.48 10 10Z" stroke="#059467" strokeWidth="1.5" strokeLinecap="round" /></svg>,
-    },
-    general: {
-        bgColor: "#FFFBEB", iconColor: "#F59F0A", badgeBg: "#FFFBEB", badgeColor: "#92400E", label: "Important",
-        icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0Z" stroke="#F59F0A" strokeWidth="1.5" strokeLinecap="round" /></svg>,
-    },
-    offline: {
-        bgColor: "#EFF6FF", iconColor: "#3B82F6", badgeBg: "#EFF6FF", badgeColor: "#1D4ED8", label: "Offline",
-        icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M8 2v3M16 2v3M3.5 9h17M21 8.5V17c0 3-1.5 5-5 5H8c-3.5 0-5-2-5-5V8.5c0-3 1.5-5 5-5h8c3.5 0 5 2 5 5Z" stroke="#3B82F6" strokeWidth="1.5" strokeLinecap="round" /></svg>,
-    },
-};
-
-const DEFAULT_NOTICE_CONFIG = NOTICE_TYPE_CONFIG.general;
+}> {
+    return {
+        live_class: {
+            bgColor: theme.palette.error.light,
+            iconColor: theme.palette.error.main,
+            badgeBg: theme.palette.error.light,
+            badgeColor: theme.palette.error.main,
+            label: "Class Notice",
+            icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 10l4.553-2.07A1 1 0 0121 8.87v6.26a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" stroke={theme.palette.error.main} strokeWidth="1.5" strokeLinecap="round" /></svg>,
+        },
+        test: {
+            bgColor: theme.palette.success.light,
+            iconColor: theme.palette.success.main,
+            badgeBg: theme.palette.success.light,
+            badgeColor: theme.palette.success.main,
+            label: "New Content",
+            icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4M22 12c0 5.52-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2s10 4.48 10 10Z" stroke={theme.palette.success.main} strokeWidth="1.5" strokeLinecap="round" /></svg>,
+        },
+        general: {
+            bgColor: theme.palette.info.light,
+            iconColor: theme.palette.info.main,
+            badgeBg: theme.palette.info.light,
+            badgeColor: theme.palette.info.hover || "",
+            label: "Important",
+            icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0Z" stroke={theme.palette.info.main} strokeWidth="1.5" strokeLinecap="round" /></svg>,
+        },
+        offline: {
+            bgColor: theme.palette.secondary.light,
+            iconColor: theme.palette.secondary.main,
+            badgeBg: theme.palette.secondary.light,
+            badgeColor: theme.palette.secondary.main,
+            label: "Offline",
+            icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M8 2v3M16 2v3M3.5 9h17M21 8.5V17c0 3-1.5 5-5 5H8c-3.5 0-5-2-5-5V8.5c0-3 1.5-5 5-5h8c3.5 0 5 2 5 5Z" stroke={theme.palette.secondary.main} strokeWidth="1.5" strokeLinecap="round" /></svg>,
+        },
+    };
+}
 
 // ── Notice item ───────────────────────────────────────────────────────────────
 function NoticeItem({
@@ -203,8 +214,10 @@ function NoticeItem({
     onDismiss: () => void;
 }) {
     const theme = useTheme();
-    const cfg = NOTICE_TYPE_CONFIG[notice.notification_type] ?? DEFAULT_NOTICE_CONFIG;
+    const NOTICE_TYPE_CONFIG = getNoticeTypeConfig(theme);
+    const cfg = NOTICE_TYPE_CONFIG[notice.notification_type] ?? NOTICE_TYPE_CONFIG.general;
     const navigate = useNavigate();
+
     return (
         <Box sx={{
             display: "flex", alignItems: "flex-start", gap: "11px",
@@ -217,7 +230,6 @@ function NoticeItem({
             transition: "transform 0.15s",
             "&:hover": { transform: "translateX(3px)" },
         }}>
-            {/* Icon box */}
             <Box sx={{
                 width: 34, height: 34, borderRadius: "6px",
                 background: cfg.bgColor,
@@ -227,7 +239,6 @@ function NoticeItem({
                 {cfg.icon}
             </Box>
 
-            {/* Content */}
             <Box sx={{ flex: 1, minWidth: 0, pr: showDismiss ? "18px" : 0 }}>
                 <Box sx={{
                     display: "inline-block",
@@ -235,7 +246,6 @@ function NoticeItem({
                     fontSize: "10px", fontWeight: 700,
                     padding: "2px 8px", borderRadius: "99px",
                     mb: "4px",
-
                 }}>
                     {cfg.label}
                 </Box>
@@ -256,7 +266,6 @@ function NoticeItem({
                 </Typography>
             </Box>
 
-            {/* Dismiss button */}
             {showDismiss && (
                 <Box
                     component="button"
@@ -282,20 +291,19 @@ function NoticeItem({
 
 // ── Main component ────────────────────────────────────────────────────────────
 export default function LiveClassAndTestFilter() {
+    const theme = useTheme();
     const today = new Date();
     const todayStr = fmtDate(today);
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
     const [calendarRange, setCalendarRange] = useState(currentMonthRange);
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
-    // Always today's live classes
     const { data: todayLive, isLoading: liveLoading } = useGetAllLiveClassesQuery({
         pageIndex: 1, pageSize: 12,
         startDate: todayStr, endDate: todayStr,
     });
 
-    // Fetch up to 10 to support dismiss-and-replace
     const { data: noticesData, isLoading: noticesLoading } = useGetAllNotificationsQuery({
         pageIndex: 1, pageSize: 10,
         type: "notice_board",
@@ -303,7 +311,6 @@ export default function LiveClassAndTestFilter() {
 
     const [dismissedNoticeIds, setDismissedNoticeIds] = useState<Set<number>>(new Set());
 
-    // Dot queries (full visible month)
     const { data: monthLive } = useGetAllLiveClassesQuery({
         pageIndex: 1, pageSize: 100,
         ...calendarRange,
@@ -313,7 +320,6 @@ export default function LiveClassAndTestFilter() {
         ...calendarRange,
     });
 
-    // Date-filtered queries (calendar click)
     const { data: dateLive, isFetching: dateLiveFetching } = useGetAllLiveClassesQuery(
         { pageIndex: 1, pageSize: 12, startDate: selectedDate!, endDate: selectedDate! },
         { skip: !selectedDate }
@@ -345,8 +351,8 @@ export default function LiveClassAndTestFilter() {
         : null;
 
     const cardSx = {
-        background: (theme: any) => theme.palette.background.paper,
-        border: (theme: any) => `1px solid ${theme.palette.divider}`,
+        background: theme.palette.background.paper,
+        border: `1px solid ${theme.palette.divider}`,
         borderRadius: "14px",
         padding: "15px",
     };
@@ -368,7 +374,6 @@ export default function LiveClassAndTestFilter() {
                     onDateSelect={(adDate) => setSelectedDate(fmtDate(adDate))}
                 />
 
-                {/* Compact event list — same container, below calendar grid */}
                 <CalendarEventPanel
                     selectedDate={selectedDate}
                     selectedDateLabel={selectedDateLabel}
@@ -379,7 +384,7 @@ export default function LiveClassAndTestFilter() {
                 />
             </Box>
 
-            {/* ── Today's Live Classes (always today, never calendar-filtered) ─ */}
+            {/* ── Today's Live Classes ──────────────────────────────────────── */}
             {(liveLoading || todayClasses.length > 0) && (
                 <Box sx={cardSx}>
                     <div className="flex items-center justify-between mb-2.5">
@@ -389,7 +394,8 @@ export default function LiveClassAndTestFilter() {
                         <Box component="span" sx={{
                             fontSize: "10px", fontWeight: 700,
                             padding: "2px 8px", borderRadius: "99px",
-                            background: "#ECFDF5", color: "#065F46",
+                            background: theme.palette.success.light,
+                            color: theme.palette.success.main,
                         }}>
                             Today
                         </Box>
@@ -408,7 +414,7 @@ export default function LiveClassAndTestFilter() {
                 </Box>
             )}
 
-            {/* ── Notice Board (first 3, hidden if empty) ───────────────────── */}
+            {/* ── Notice Board ──────────────────────────────────────────────── */}
             {(noticesLoading || notices.length > 0) && (
                 <Box sx={cardSx}>
                     <div className="flex justify-between items-center">
