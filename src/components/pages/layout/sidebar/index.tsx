@@ -60,7 +60,7 @@ export default function ResponsiveDrawer(props: Props) {
                     minHeight: "72px !important",
                 }}>
                 <Link to={"/"}>
-                    <img src="/logo.svg" alt="" style={{ height: 40, width: "auto" }} />
+                    <img src="/logo.svg" alt="" style={{ height: 40, width: "auto", margin: "0 auto" }} />
                 </Link>
             </Toolbar>
             <PrimaryMenu isCollapsed={false} />
@@ -79,7 +79,7 @@ export default function ResponsiveDrawer(props: Props) {
                 }}>
                 <Link to={"/"}>
                     <img
-                        src={desktopCollapsed ? "/favicon.ico" : "/logo.svg"}
+                        src={desktopCollapsed ? "/favicon.svg" : "/logo.svg"}
                         alt=""
                         style={{
                             height: 40,
@@ -190,7 +190,7 @@ export default function ResponsiveDrawer(props: Props) {
                             lg: "20px 24px 24px"
                         },
                         overflowY: "auto",
-                    overflowX: "hidden",
+                        overflowX: "hidden",
                     }}>
                     {props.children}
                 </Box>

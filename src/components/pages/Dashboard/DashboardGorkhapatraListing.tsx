@@ -12,7 +12,7 @@ export default function DashboardGorkhapatraListing() {
     const { t } = useTranslation();
     const [qp, _setQp] = useState({
         pageIndex: 1,
-        pageSize: 4,
+        pageSize: 3,
     })
 
     const { data, isLoading } = useGetAllGorkhapatraQuery({
@@ -48,7 +48,7 @@ export default function DashboardGorkhapatraListing() {
                 </Box>
             </div>
 
-            <div className="flex flex-col gap-2 sm:grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+            <div className="flex flex-col gap-2 sm:grid sm:grid-cols-2 lg:grid-cols-3 ">
                 {isLoading
                     ? Array.from({ length: 4 }).map((_, index) =>
                         <GorkhapatraCardSkeleton key={index + "gorkhapatra"} />)

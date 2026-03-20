@@ -544,13 +544,13 @@ export default function DashboardCalendar({ onDateSelect, onMonthChange, liveCla
                         </div>
 
                         {/* Footer */}
-                        <div style={{
+                        {/* <div style={{
                             marginTop: '10px', paddingTop: '10px',
                             borderTop: `1px solid ${dividerColor}`,
                             fontSize: '10.5px', color: textMuted, textAlign: 'center',
                         }}>
                             Bikram Sambat · 2000 BS – 2100 BS
-                        </div>
+                        </div> */}
                     </div>
                 )
             )}

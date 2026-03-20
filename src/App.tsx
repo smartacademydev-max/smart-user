@@ -1,6 +1,7 @@
 import { Box } from "@mui/material";
 import DashboardAnalytics from "./components/pages/Dashboard/DashboardAnalytics";
 import DashboardDailyQuiz from "./components/pages/Dashboard/DashboardDailyQuiz";
+import DashboardGorkhapatraListing from "./components/pages/Dashboard/DashboardGorkhapatraListing";
 import DashboardProgressCharts from "./components/pages/Dashboard/DashboardProgressCharts";
 import DashboardPurchasedCourseListing from "./components/pages/Dashboard/DashboardPurchasedCourseListing";
 import DashboardTopBanners from "./components/pages/Dashboard/DashboardTopBanners";
@@ -10,25 +11,25 @@ export default function App() {
   return (
     <div className="h-full overflow-auto pr-2">
       <Box
+        className="flex flex-col xl:grid xl:grid-cols-12"
         sx={{
-          display: "grid",
-          gridTemplateColumns: { xs: "1fr", xl: "1fr 298px" },
           gap: "18px",
           alignItems: "start",
           pb: 4,
         }}
       >
         {/* Left column */}
-        <Box sx={{ display: "flex", flexDirection: "column", gap: "18px", overflow: "hidden" }}>
+        <Box className="col-span-8" sx={{ display: "flex", flexDirection: "column", gap: "18px", overflow: "hidden" }}>
           <DashboardTopBanners />
           <DashboardAnalytics />
           <DashboardProgressCharts />
           <DashboardPurchasedCourseListing />
+          <DashboardGorkhapatraListing />
           <DashboardDailyQuiz />
         </Box>
 
         {/* Right column — Calendar at top, notices + live below */}
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        <Box className="col-span-4" sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <LiveClassAndTestFilter />
         </Box>
       </Box>

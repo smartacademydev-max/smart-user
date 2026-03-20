@@ -14,7 +14,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { AudioSquare, Book, Bookmark, Document, Element4, I24Support, Notepad2, Notification, PenAdd, SearchNormal, VideoOctagon, VideoPlay } from "iconsax-reactjs";
+import { AudioSquare, Book, Bookmark, Document, Element4, I24Support, Notepad2, Notification, Paperclip, PenAdd, SearchNormal, VideoOctagon, VideoPlay } from "iconsax-reactjs";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -305,6 +305,20 @@ export default function PrimaryMenu({ isCollapsed = false }: PrimaryMenuProps) {
                   <Notification size={20} />
                 </ListItemIcon>
                 {!isCollapsed && <ListItemText primary={t("messages.notice")} className="text-nowrap!" />}
+              </ListItemButton>
+            </ListItem>
+          )}
+          {wrap(t("messages.gorkhapatra"),
+            <ListItem disablePadding className="menu__item">
+              <ListItemButton
+                onClick={() => navigate(PATH.GORKHAPATRA.ROOT)}
+                className={isActive(PATH.GORKHAPATRA.ROOT) ? "active" : ""}
+                sx={{ justifyContent: isCollapsed ? "center" : undefined }}
+              >
+                <ListItemIcon sx={{ minWidth: isCollapsed ? "unset" : undefined, justifyContent: "center" }}>
+                  <Paperclip size={20} />
+                </ListItemIcon>
+                {!isCollapsed && <ListItemText primary={t("messages.gorkhapatra")} className="text-nowrap!" />}
               </ListItemButton>
             </ListItem>
           )}
