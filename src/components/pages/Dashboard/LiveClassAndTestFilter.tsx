@@ -204,7 +204,7 @@ function NoticeItem({
 }) {
     const theme = useTheme();
     const cfg = NOTICE_TYPE_CONFIG[notice.notification_type] ?? DEFAULT_NOTICE_CONFIG;
-
+    const navigate = useNavigate();
     return (
         <Box sx={{
             display: "flex", alignItems: "flex-start", gap: "11px",
@@ -235,15 +235,18 @@ function NoticeItem({
                     fontSize: "10px", fontWeight: 700,
                     padding: "2px 8px", borderRadius: "99px",
                     mb: "4px",
+
                 }}>
                     {cfg.label}
                 </Box>
-                <Typography sx={{
-                    fontSize: "12.5px", fontWeight: 600, color: "text.primary",
-                    lineHeight: 1.4, mb: "2px",
-                    display: "-webkit-box", WebkitLineClamp: 2,
-                    WebkitBoxOrient: "vertical", overflow: "hidden",
-                }}>
+                <Typography
+                    onClick={() => navigate(PATH.NOTICE.VIEW_NOTICE.ROOT(Number(notice?.id)))}
+                    sx={{
+                        fontSize: "12.5px", fontWeight: 600, color: "text.primary",
+                        lineHeight: 1.4, mb: "2px",
+                        display: "-webkit-box", WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical", overflow: "hidden",
+                    }}>
                     {notice.title}
                 </Typography>
                 <Typography sx={{ fontSize: "11px", color: "text.secondary" }}>

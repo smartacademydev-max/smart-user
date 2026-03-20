@@ -218,7 +218,7 @@ export default function DashboardCalendar({ onDateSelect, onMonthChange, liveCla
     useEffect(() => {
         if (!onMonthChange) return;
         const start = bsToAd(currentYear, currentMonth, 1);
-        const end   = bsToAd(currentYear, currentMonth, daysInMonth);
+        const end = bsToAd(currentYear, currentMonth, daysInMonth);
         onMonthChange(formatAD(start), formatAD(end));
     }, [currentYear, currentMonth]);
 
@@ -308,25 +308,6 @@ export default function DashboardCalendar({ onDateSelect, onMonthChange, liveCla
         return days;
     }, [firstDayOfMonth, daysInMonth]);
 
-    // const formatSelectedDate = () => {
-    //     if (!selectedDate) return null;
-
-    //     const adDate = bsToAd(selectedDate.year, selectedDate.month, selectedDate.day);
-    //     const weekDay = adDate.getDay();
-
-    //     if (useNepaliScript) {
-    //         return {
-    //             bs: `${NEPALI_WEEKDAYS[weekDay]}, ${NEPALI_MONTHS[selectedDate.month - 1]} ${toNepaliNumber(selectedDate.day)}, ${toNepaliNumber(selectedDate.year)}`,
-    //             ad: `${adDate.toLocaleDateString('en-US', { weekday: 'long' })}, ${adDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`
-    //         };
-    //     } else {
-    //         return {
-    //             bs: `${ENGLISH_WEEKDAYS[weekDay]}, ${ENGLISH_MONTHS[selectedDate.month - 1]} ${selectedDate.day}, ${selectedDate.year}`,
-    //             ad: `${adDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}`
-    //         };
-    //     }
-    // };
-    // const selectedDateFormatted = selectedDate ? formatSelectedDate() : null;
     const navBtnStyle: React.CSSProperties = {
         width: '26px', height: '26px', borderRadius: '6px',
         border: '1px solid #E5E7EB', background: 'transparent',
@@ -411,7 +392,7 @@ export default function DashboardCalendar({ onDateSelect, onMonthChange, liveCla
                                     borderRadius: '6px',
                                     cursor: 'pointer', border: 'none',
                                     fontWeight: todayCell ? 700 : 500,
-                                    background: todayCell ? '#AA2132' : isSelected(day) ? 'rgba(170,33,50,0.1)' : 'transparent',
+                                    background: todayCell ? '#059467' : isSelected(day) ? 'rgba(170,33,50,0.1)' : 'transparent',
                                     color: todayCell ? '#fff' : isSelected(day) ? '#AA2132' : isSaturday(day) ? '#E21D48' : '#374151',
                                     transition: 'background .12s',
                                     display: 'flex', flexDirection: 'column', alignItems: 'center',
@@ -420,10 +401,10 @@ export default function DashboardCalendar({ onDateSelect, onMonthChange, liveCla
                                     {hasDots && (
                                         <div style={{ display: 'flex', gap: '2px', marginTop: '2px' }}>
                                             {hasLive && (
-                                                <div style={{ width: 4, height: 4, borderRadius: '50%', background: todayCell ? 'rgba(255,255,255,0.85)' : '#E21D48', flexShrink: 0 }} />
+                                                <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#E21D48', flexShrink: 0 }} />
                                             )}
                                             {hasTest && (
-                                                <div style={{ width: 4, height: 4, borderRadius: '50%', background: todayCell ? 'rgba(255,255,255,0.85)' : '#F59F0A', flexShrink: 0 }} />
+                                                <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#F59F0A', flexShrink: 0 }} />
                                             )}
                                         </div>
                                     )}

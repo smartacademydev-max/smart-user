@@ -22,7 +22,7 @@ export default function StatusPillWithBorder({ status, variant, showIcon = false
                     <TickCircle variant="Bold" />
                 ) : <Clock variant='Bold' />
             )}
-            {variant === "error" && status === "ongoing" ? <Typography variant='caption' className='text-center w-full text-nowrap capitalize'>{status}</Typography> : ""}
+            {showIcon && variant === "error" && status === "ongoing" ? "" : <Typography variant='caption' className='text-center w-full text-nowrap capitalize'>{status}</Typography>}
         </Box>
     )
 }

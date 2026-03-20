@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { Box, MenuItem, Select, Typography, useTheme } from "@mui/material";
+import { useState } from "react";
 import ReactApexChart from "react-apexcharts";
 
 const studyData: Record<number, number[]> = {
@@ -147,6 +147,7 @@ export default function DashboardProgressCharts() {
                     sx={{
                         fontSize: "12px",
                         borderRadius: "99px",
+                        padding: "0 16px 0 0",
                         ".MuiOutlinedInput-notchedOutline": { borderColor: "divider" },
                         ".MuiSelect-select": { py: "4px", px: "14px !important" },
                     }}
