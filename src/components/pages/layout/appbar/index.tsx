@@ -26,15 +26,15 @@ export default function CustomAppbar({
     const { user } = useAppSelector((state) => state.auth);
     const drawerWidth = 252;
     const { t } = useTranslation();
-    const days = [
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-    ];
+    // const days = [
+    //     "Sunday",
+    //     "Monday",
+    //     "Tuesday",
+    //     "Wednesday",
+    //     "Thursday",
+    //     "Friday",
+    //     "Saturday",
+    // ];
     return (
         <AppBar
             position="fixed"

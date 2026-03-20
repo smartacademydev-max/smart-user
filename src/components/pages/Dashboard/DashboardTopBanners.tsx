@@ -1,8 +1,8 @@
-import { Box, Button, Skeleton, Typography } from "@mui/material";
+import { Box, Skeleton, Typography } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useGetAllLiveClassesQuery } from "../../../services/liveApi";
 import { PATH } from "../../../routes/PATH";
+import { useGetAllLiveClassesQuery } from "../../../services/liveApi";
 
 const STATIC_NOTICE = {
     title: "Your courses may expire soon — Renew now to continue learning!",
