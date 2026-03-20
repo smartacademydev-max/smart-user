@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -ri \"mcq\\\\|quiz\\\\|streak\\\\|daily\" d:MakuraSMARTsmart-usersrc --include=*.ts --include=*.tsx)",
+      "Bash(npx tsc:*)",
+      "Bash(find D:/Makura -maxdepth 4 -name *.html)",
+      "Read(//d//**)",
+      "Bash(node -e \"const ic = require\\(''d:/Makura/SMART/smart-user/node_modules/iconsax-reactjs''\\); console.log\\(Object.keys\\(ic\\).filter\\(k => k.toLowerCase\\(\\).includes\\(''volume''\\) || k.toLowerCase\\(\\).includes\\(''speaker''\\) || k.toLowerCase\\(\\).includes\\(''megaphone''\\) || k.toLowerCase\\(\\).includes\\(''announcement''\\)\\).join\\('', ''\\)\\)\")"
+    ]
+  }
+}

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 /**
@@ -189,8 +189,15 @@ const getFirstDayOfBSMonth = (year: number, month: number): number => {
 
 interface DashboardCalendarProps {
     onDateSelect?: (adDate: Date) => void;
+    onMonthChange?: (startAD: string, endAD: string) => void;
+    liveClassDates?: string[];
+    testDates?: string[];
 }
-export default function DashboardCalendar({ onDateSelect }: DashboardCalendarProps) {
+
+const formatAD = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+export default function DashboardCalendar({ onDateSelect, onMonthChange, liveClassDates = [], testDates = [] }: DashboardCalendarProps) {
     const today = new Date();
     const todayBS = useMemo(() => adToBs(today), [today]);
 
@@ -206,6 +213,14 @@ export default function DashboardCalendar({ onDateSelect }: DashboardCalendarPro
     );
 
     const { i18n } = useTranslation();
+
+    // Notify parent when displayed month changes so it can fetch events for that range
+    useEffect(() => {
+        if (!onMonthChange) return;
+        const start = bsToAd(currentYear, currentMonth, 1);
+        const end   = bsToAd(currentYear, currentMonth, daysInMonth);
+        onMonthChange(formatAD(start), formatAD(end));
+    }, [currentYear, currentMonth]);
 
     const useNepaliScript = i18n.language === "np";
     const handlePrevMonth = () => {
@@ -382,21 +397,39 @@ export default function DashboardCalendar({ onDateSelect }: DashboardCalendarPro
 
                     {/* Calendar days */}
                     <div className="grid grid-cols-7 gap-0.5 text-center">
-                        {calendarDays.map((day, index) => (
-                            day ? (
+                        {calendarDays.map((day, index) => {
+                            if (!day) return <div key={index} />;
+                            const adStr = formatAD(bsToAd(currentYear, currentMonth, day));
+                            const hasLive = liveClassDates.some(d => d === adStr);
+                            const hasTest = testDates.some(d => d === adStr);
+                            const hasDots = hasLive || hasTest;
+                            const todayCell = isToday(day);
+                            return (
                                 <button key={index} onClick={() => handleDateClick(day)} style={{
-                                    fontSize: '11.5px', padding: '5px 2px', borderRadius: '6px',
-                                    cursor: 'pointer', border: 'none', fontWeight: isToday(day) ? 700 : 500,
-                                    background: isToday(day) ? '#AA2132' : isSelected(day) ? 'rgba(170,33,50,0.1)' : 'transparent',
-                                    color: isToday(day) ? '#fff' : isSelected(day) ? '#AA2132' : isSaturday(day) ? '#E21D48' : '#374151',
+                                    fontSize: '11.5px',
+                                    padding: hasDots ? '5px 2px 3px' : '5px 2px',
+                                    borderRadius: '6px',
+                                    cursor: 'pointer', border: 'none',
+                                    fontWeight: todayCell ? 700 : 500,
+                                    background: todayCell ? '#AA2132' : isSelected(day) ? 'rgba(170,33,50,0.1)' : 'transparent',
+                                    color: todayCell ? '#fff' : isSelected(day) ? '#AA2132' : isSaturday(day) ? '#E21D48' : '#374151',
                                     transition: 'background .12s',
+                                    display: 'flex', flexDirection: 'column', alignItems: 'center',
                                 }}>
                                     {useNepaliScript ? toNepaliNumber(day) : day}
+                                    {hasDots && (
+                                        <div style={{ display: 'flex', gap: '2px', marginTop: '2px' }}>
+                                            {hasLive && (
+                                                <div style={{ width: 4, height: 4, borderRadius: '50%', background: todayCell ? 'rgba(255,255,255,0.85)' : '#E21D48', flexShrink: 0 }} />
+                                            )}
+                                            {hasTest && (
+                                                <div style={{ width: 4, height: 4, borderRadius: '50%', background: todayCell ? 'rgba(255,255,255,0.85)' : '#F59F0A', flexShrink: 0 }} />
+                                            )}
+                                        </div>
+                                    )}
                                 </button>
-                            ) : (
-                                <div key={index} />
-                            )
-                        ))}
+                            );
+                        })}
                     </div>
 
                     {/* Legend */}

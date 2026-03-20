@@ -10,7 +10,7 @@ import {
   ListItemText,
   Typography
 } from "@mui/material";
-import { AudioSquare, Book, Bookmark, Document, DocumentText, Element4, I24Support, Notepad2, Notification, PenAdd, SearchNormal, VideoOctagon, VideoPlay } from "iconsax-reactjs";
+import { AudioSquare, Book, Bookmark, Document, Element4, I24Support, Notepad2, Notification, PenAdd, SearchNormal, VideoOctagon, VideoPlay } from "iconsax-reactjs";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -218,7 +218,7 @@ export default function PrimaryMenu() {
           <Divider sx={{ borderColor: "rgba(255,255,255,0.07)" }} className="w-full" />
         </div>
         <List>
-          <ListItem disablePadding className="menu__item">
+          {/* <ListItem disablePadding className="menu__item">
             <ListItemButton
               onClick={() => navigate(PATH.GORKHAPATRA.ROOT)}
               className={isActive(PATH.GORKHAPATRA.ROOT) ? "active" : ""}
@@ -228,7 +228,7 @@ export default function PrimaryMenu() {
               </ListItemIcon>
               <ListItemText primary={t("messages.gorkhapatra")} className="text-nowrap!" />
             </ListItemButton>
-          </ListItem>
+          </ListItem> */}
           <ListItem disablePadding className="menu__item">
             <ListItemButton
               onClick={() => navigate(PATH.NOTICE.ROOT)}
