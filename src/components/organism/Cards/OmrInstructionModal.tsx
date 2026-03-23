@@ -131,7 +131,7 @@ export default function OmrInstructionModal({
                         <CircularProgress size={36} />
                     </Box>
                 ) : format ? (
-                    <Stack gap={2.5} flexDirection={"column"}>
+                    <Stack gap={2.5} flexDirection={"column"} className="general__content__box styled__list">
                         {/* Test instructions */}
                         <Box>
                             <Box className="flex gap-4">
