@@ -236,7 +236,6 @@ export default function OmrInstructionModal({
                                     background: (theme) => theme.palette.error.light,
                                 }}
                             >
-
                                 {renderHtml(format.omr_note)}
                             </Box>
                         )}
