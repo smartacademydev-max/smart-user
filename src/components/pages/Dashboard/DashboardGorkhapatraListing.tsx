@@ -48,7 +48,7 @@ export default function DashboardGorkhapatraListing() {
                 </Box>
             </div>
 
-            <div className="flex flex-col gap-2 sm:grid sm:grid-cols-2 lg:grid-cols-3 ">
+            <div className="flex flex-col gap-4 lg:gap-3 sm:grid sm:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
                 {isLoading
                     ? Array.from({ length: 4 }).map((_, index) =>
                         <GorkhapatraCardSkeleton key={index + "gorkhapatra"} />)

@@ -155,15 +155,15 @@ export default function OmrInstructionModal({
                                             alt="QR Code"
                                             sx={{ width: 100, height: 100, objectFit: "contain" }}
                                         />
-                                        {/* <Typography variant="caption" color="text.secondary" textAlign="center">
+                                        <Typography variant="caption" color="text.secondary" textAlign="center">
                                             Scan the QR code to<br />access the question
-                                        </Typography> */}
+                                        </Typography>
                                     </Box>
                                 )}
                             </Box>
                         </Box>
 
-                        <Divider />
+                        <Divider className="my-2!" />
 
                         {/* OMR sheet instructions */}
                         <Box>
@@ -210,7 +210,7 @@ export default function OmrInstructionModal({
                             )}
                         </Box>
 
-                        <Divider />
+                        <Divider className="my-2!" />
 
                         {/* Post-test instructions */}
                         <Box>
@@ -230,7 +230,7 @@ export default function OmrInstructionModal({
                         {format.omr_note && (
                             <Box
                                 sx={{
-                                    p: 2,
+                                    p: "8px 20px",
                                     borderRadius: 1.5,
                                     borderLeft: (theme) => `3px solid ${theme.palette.error.main}`,
                                     background: (theme) => theme.palette.error.light,
