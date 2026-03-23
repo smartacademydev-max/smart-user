@@ -1,5 +1,6 @@
 import { Box, Button, Divider, Stack, Typography } from "@mui/material";
 import { Calendar, Clock, Medal, Notepad2 } from "iconsax-reactjs";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import type { TestProps } from "../../../types/question";
 import { formatDateTime } from "../../../utils/dateFormat";
@@ -8,11 +9,13 @@ import { getTestProgressStatus } from "../../../utils/statusMap";
 import Donut from "../../atom/Donut";
 import StatusPillWithBorder from "../../atom/StatusPillWithBorder";
 import type { TestStatus } from "../../pages/TestManagement/allTest/AllTestList";
+import OmrInstructionModal from "./OmrInstructionModal";
 import TestActionButton from "./TestActionButton";
 
 export default function TestCard({ test, havePurchased, status: testStatus }: { test: TestProps; havePurchased: boolean; status?: TestStatus }) {
   const status = getStatus(test?.start_datetime, test?.end_datetime);
   const { id } = useParams();
+  const [omrOpen, setOmrOpen] = useState(false);
   const variant = getTestProgressStatus(!test?.has_taken_test ? "not_started" : !test?.is_graded ? "awaiting_review" : "completed");
   return (
     <Box
@@ -92,7 +95,8 @@ export default function TestCard({ test, havePurchased, status: testStatus }: { 
           >
             Download Format
           </Button>
-          <Button variant="contained" color="primary">Start Now</Button>
+          <Button variant="contained" color="primary" onClick={() => setOmrOpen(true)}>Start Now</Button>
+          <OmrInstructionModal open={omrOpen} onClose={() => setOmrOpen(false)} test={test} />
         </div> :
           <div className="flex items-center justify-between">
             <TestActionButton

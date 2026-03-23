@@ -3,6 +3,7 @@ import { authApi } from '../services/authApi';
 import { categoryApi } from '../services/categoryApi';
 import { contentApi } from '../services/contentApi';
 import { countryApi } from '../services/countryApi';
+import { omrInstructionApi } from '../services/omrInstructionApi';
 import { courseApi } from '../services/courseApi';
 import { dashboardApi } from '../services/dashboardApi';
 import { gorkhapatraApi } from '../services/gorkhapatraApi';
@@ -37,6 +38,7 @@ export const store = configureStore({
         [gorkhapatraApi.reducerPath]: gorkhapatraApi.reducer,
         [dashboardApi.reducerPath]: dashboardApi.reducer,
         [countryApi.reducerPath]: countryApi.reducer,
+        [omrInstructionApi.reducerPath]: omrInstructionApi.reducer,
 
     },
     middleware: (getDefaultMiddleware) =>
@@ -52,6 +54,7 @@ export const store = configureStore({
             .concat(gorkhapatraApi.middleware)
             .concat(dashboardApi.middleware)
             .concat(countryApi.middleware)
+            .concat(omrInstructionApi.middleware)
 })
 
 export type RootState = ReturnType<typeof store.getState>
