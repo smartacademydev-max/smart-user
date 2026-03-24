@@ -20,8 +20,6 @@ interface OmrInstructionModalProps {
     test: TestProps;
 }
 
-
-
 export default function OmrInstructionModal({
     open,
     onClose,
