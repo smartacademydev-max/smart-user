@@ -145,3 +145,7 @@ canvas {
 .slick-dots li button::before {
     display: none !important;
 }
+
+iframe {
+    width: 100% !important;
+}

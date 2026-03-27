@@ -1,11 +1,28 @@
 import type { Pagination } from ".";
 
+export interface PhoneItem {
+    label: string;
+    value: string;
+    icon_url?: string;
+}
+
+export interface EmailItem {
+    label: string;
+    value: string;
+    icon_url?: string;
+}
+
+export interface SocialItem {
+    label: string;
+    value: string;
+    link: string;
+    icon_url?: string;
+}
+
 export interface AppSettingProps {
-    contact_no: string;
-    support_contact_no: string;
-    email: string;
-    support_email: string;
-    address: string;
+    phones: PhoneItem[];
+    emails: EmailItem[];
+    socials: SocialItem[];
     map: string;
 }
 

@@ -327,9 +327,9 @@ export default function DashboardDailyQuiz() {
                     fontWeight={600}
                     sx={{ color: "#fff", lineHeight: 1.55, mb: 2 }}
                 >
-                    {quiz.question}
+                    {renderHtml(quiz.question)}
                 </Typography>
-
+                quiz.question
                 {/* Options */}
                 <Box
                     sx={{
