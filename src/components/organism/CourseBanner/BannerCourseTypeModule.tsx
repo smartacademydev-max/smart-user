@@ -1,4 +1,5 @@
-import { Button, Typography } from "@mui/material";
+import { Button, Checkbox, Divider, FormControlLabel, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { PATH } from "../../../routes/PATH";
@@ -29,6 +30,7 @@ export default function BannerCourseTypeModule({ courseType, courseExpiry, cours
     const { id } = useParams();
     const [purchaseCourse, isLoading] = usePurchaseCourseMutation();
     const user = useAppSelector((state) => state.auth.user);
+    const [selectedPlan, setSelectedPlan] = useState<number | undefined>(undefined);
 
     const getFreeTrialLabel = () => {
         if (!purchaseStatus?.has_taken_freetrial) {
@@ -41,6 +43,13 @@ export default function BannerCourseTypeModule({ courseType, courseExpiry, cours
 
         return t("messages.free_trial_already_taken");
     };
+
+
+    useEffect(() => {
+        if (courseSubscription?.length && selectedPlan === undefined) {
+            setSelectedPlan(courseSubscription[0].subscription_id);
+        }
+    }, [courseSubscription]);
 
     const renderButtons = () => {
         if (courseType === "free") {
@@ -78,9 +87,20 @@ export default function BannerCourseTypeModule({ courseType, courseExpiry, cours
         }
         return (
             <div className="actions flex flex-col gap-2">
-                {courseType === "subscription" && <Button variant="contained" className="black__btn" fullWidth onClick={() => {
-                    navigate(PATH.COURSE_MANAGEMENT.COURSES.PLANS.ROOT)
-                }}>View Subscription</Button>}
+                {courseType === "subscription" && (() => {
+                    const plan = courseSubscription?.find(p => p.subscription_id === selectedPlan);
+                    return (
+                        <Button
+                            variant="contained"
+                            className="black__btn"
+                            fullWidth
+                            disabled={selectedPlan === undefined}
+                            onClick={() => navigate(PATH.SUBSCRIPTION.PURCHASE.ROOT(selectedPlan))}
+                        >
+                            {plan ? `Purchase ${plan.name}` : "Select a Plan"}
+                        </Button>
+                    );
+                })()}
                 {courseType === "expiry" && <Button variant="contained" className="black__btn" fullWidth onClick={() => dispatch(
                     setPurchase({
                         courseId: Number(id),
@@ -163,9 +183,24 @@ export default function BannerCourseTypeModule({ courseType, courseExpiry, cours
                     <div className="subscription__course flex flex-col gap-4">
                         <Typography color="white" variant="body2" fontWeight={500}>Subscription Plans</Typography>
                         {courseSubscription?.map((plan, index) => (
-                            <div key={index} className="grid grid-cols-2 gap-2">
-                                <Typography color="white">{plan.name}</Typography>
-                                <Typography color="white">NRs. {plan.price} / {plan.number} {plan.billing_cycle}</Typography>
+                            <div key={index}>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <div className="flex items-center gap-0.5">
+                                        <FormControlLabel
+                                            control={
+                                                <Checkbox
+                                                    checked={selectedPlan !== undefined && plan.subscription_id === selectedPlan}
+                                                    onChange={() => setSelectedPlan(plan.subscription_id)}
+                                                />
+                                            }
+                                            label={<Typography color="white" variant="subtitle2" fontWeight={400}>{plan.name}</Typography>}
+                                        />
+                                    </div>
+                                    <Typography color="white" variant="subtitle2">NRs. {plan.price} / {plan.number} {plan.billing_cycle}</Typography>
+                                </div>
+                                <Divider sx={{
+                                    borderColor: (theme) => theme.palette.gray.gray2
+                                }} />
                             </div>
                         ))}
                         {renderButtons()}
@@ -178,7 +213,7 @@ export default function BannerCourseTypeModule({ courseType, courseExpiry, cours
     };
 
     return (
-        <div className="rounded-md p-4 bg-[rgba(255,255,255,0.12)] flex flex-col gap-4">
+        <div className="rounded-md p-4 bg-[rgba(255,255,255,0.12)] flex flex-col gap-4 relative">
             {renderContent()}
         </div>
     );

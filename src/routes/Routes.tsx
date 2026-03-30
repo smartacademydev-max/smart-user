@@ -169,9 +169,9 @@ const router = createBrowserRouter([
               { path: PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.ROOT(), element: <PurchaseLayout /> },
               { path: PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.SUCCESS.ROOT(), element: <PaymentSuccessPage /> },
               { path: PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.FAILURE.ROOT(), element: <PurchaseFailure /> },
-              // { path: PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.SUCCESS.ROOT(), element: <PaymentSuccessPage /> },
-              // { path: PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.FAILURE.ROOT(), element: <PurchaseFailure /> },
-              // { path: PATH.COURSE_MANAGEMENT.LIVE_CLASSES.PURCHASE.ROOT(), element: <PurchaseLayout /> },
+              { path: PATH.SUBSCRIPTION.PURCHASE.ROOT(), element: <PurchaseLayout /> },
+              { path: PATH.SUBSCRIPTION.PURCHASE.SUCCESS.ROOT(), element: <PaymentSuccessPage /> },
+              { path: PATH.SUBSCRIPTION.PURCHASE.FAILURE.ROOT(), element: <PurchaseFailure /> },
             ],
           },
           {

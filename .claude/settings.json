@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /d/Makura/UDAAN_LMS/src -name *router* -o -name *route* -o -name *Route*)",
+      "Bash(xargs grep:*)"
+    ]
+  }
+}

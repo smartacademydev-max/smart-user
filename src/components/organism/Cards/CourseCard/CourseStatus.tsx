@@ -29,7 +29,7 @@ export default function CourseStatus({ status }: { status: CourseTypeProps }) {
             className="text-center py-1! px-2! rounded-md! text-xs! max-w-fit font-medium! capitalize!"
             sx={getStyles()}
         >
-            {status.charAt(0).toUpperCase() + status.slice(1)}
+            {status==="expiry"?"Till Exam Date":status.charAt(0).toUpperCase() + status.slice(1)}
         </Typography>
     );
 }

@@ -52,7 +52,7 @@ export const PATH = {
                 FAILURE: {
                     ROOT: (id?: number, moduleType?: PurchaseModuleTypes) =>
                         (id ? `/${moduleType}/${id}/purchase/failure` : "/:type/:id/purchase/failure"),
-                },
+                }, 
             },
             PLANS: {
                 ROOT: `/courses/:id/plans`
@@ -183,5 +183,16 @@ export const PATH = {
     },
     PRIVACY_POLICY: {
         ROOT: "/privacy-policy"
-    }
+    },
+    SUBSCRIPTION: {
+        PURCHASE: {
+            ROOT: (subscriptionId?: number) => (subscriptionId ? `/subscription/${subscriptionId}/purchase` : "/subscription/:subscriptionId/purchase"),
+            SUCCESS: {
+                ROOT: (subscriptionId?: number) => (subscriptionId ? `/subscription/${subscriptionId}/purchase/success` : "/subscription/:subscriptionId/purchase/success"),
+            },
+            FAILURE: {
+                ROOT: (subscriptionId?: number) => (subscriptionId ? `/subscription/${subscriptionId}/purchase/failure` : "/subscription/:subscriptionId/purchase/failure"),
+            },
+        },
+    },
 };
