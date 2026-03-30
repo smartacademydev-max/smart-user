@@ -13,8 +13,8 @@ export default function Quote({ icon, message }: { icon: React.ReactElement, mes
             {icon && icon}
             <Typography variant="subtitle2" color="text.dark" fontWeight={400}>
                 {message}
-                <Link to={`tel:${data?.data?.support_contact_no}`} className="underline inline-block">
-                    <Typography color="primary" variant="subtitle2" fontWeight={400}> {data?.data?.support_contact_no}</Typography>
+                <Link to={`tel:${data?.data?.phones?.[0]?.value}`} className="underline inline-block">
+                    <Typography color="primary" variant="subtitle2" fontWeight={400}> {data?.data?.phones?.[0]?.value}</Typography>
                 </Link>
             </Typography>
         </Box>
