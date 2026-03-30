@@ -329,7 +329,7 @@ export default function DashboardDailyQuiz() {
                 >
                     {renderHtml(quiz.question)}
                 </Typography>
-                quiz.question
+                {/* quiz.question */}
                 {/* Options */}
                 <Box
                     sx={{
