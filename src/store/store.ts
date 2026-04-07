@@ -1,17 +1,20 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { authApi } from '../services/authApi';
 import { categoryApi } from '../services/categoryApi';
+import { commentApi } from '../services/commentApi';
 import { contentApi } from '../services/contentApi';
 import { countryApi } from '../services/countryApi';
-import { omrInstructionApi } from '../services/omrInstructionApi';
 import { courseApi } from '../services/courseApi';
 import { dashboardApi } from '../services/dashboardApi';
+import { discussionApi } from '../services/discussionApi';
 import { gorkhapatraApi } from '../services/gorkhapatraApi';
 import { liveClassApi } from '../services/liveApi';
 import { mediaApi } from '../services/mediaApi';
 import { notificationApi } from '../services/notificationApi';
+import { omrInstructionApi } from '../services/omrInstructionApi';
 import { settingApi } from '../services/settingApi';
 import { testApi } from '../services/testApi';
+import { ticketApi } from '../services/ticketApi';
 import authReducer from "../slice/authSlice";
 import purchaseSlice from '../slice/purchaseSlice';
 import readingScreenReducer from '../slice/ReadingScreenSlice';
@@ -39,6 +42,9 @@ export const store = configureStore({
         [dashboardApi.reducerPath]: dashboardApi.reducer,
         [countryApi.reducerPath]: countryApi.reducer,
         [omrInstructionApi.reducerPath]: omrInstructionApi.reducer,
+        [ticketApi.reducerPath]: ticketApi.reducer,
+        [discussionApi.reducerPath]: discussionApi.reducer,
+        [commentApi.reducerPath]: commentApi.reducer,
 
     },
     middleware: (getDefaultMiddleware) =>
@@ -55,6 +61,9 @@ export const store = configureStore({
             .concat(dashboardApi.middleware)
             .concat(countryApi.middleware)
             .concat(omrInstructionApi.middleware)
+            .concat(ticketApi.middleware)
+            .concat(discussionApi.middleware)
+            .concat(commentApi.middleware)
 })
 
 export type RootState = ReturnType<typeof store.getState>

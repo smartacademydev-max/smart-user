@@ -1,5 +1,6 @@
 import type { GorkhapatraTypes } from "../types/gorkhapatra";
 import type { QuestionTypeProps } from "../types/question";
+import type { TicketPriority, TicketStatus } from "../types/ticket";
 
 export type StatusVariant = "success" | "info" | "warning" | "error" | "primary";
 export type ProgressStatusProps = "in_progress" | "not_started" | "completed" | "awaiting_review"
@@ -44,4 +45,23 @@ export const getTestProgressStatus = statusMap<ProgressStatusProps>({
     in_progress: "warning",
     not_started: "error",
     awaiting_review: "info",
+});
+
+export const getDiscussionStatus = statusMap<"visible" | "hidden">({
+    visible: "success",
+    hidden: "warning",
+});
+
+export const getTicketStatus = statusMap<TicketStatus>({
+    open: "info",
+    assigned: "primary",
+    waiting_for_reply: "warning",
+    resolved: "success",
+});
+
+export const getTicketPriority = statusMap<TicketPriority>({
+    low: "info",
+    medium: "warning",
+    high: "error",
+    urgent: "error",
 });

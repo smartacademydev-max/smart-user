@@ -60,6 +60,13 @@ import SingleTestRoot from "../components/pages/TestManagement/singleTest";
 import { PATH } from "./PATH";
 import Private from "./Private";
 import RootLayout from "./RootLayout";
+import DiscussionManagementRoot from "../components/pages/DiscussionManagement";
+import AllDiscussions from "../components/pages/DiscussionManagement/allDiscussions";
+import DiscussionForm from "../components/pages/DiscussionManagement/DiscussionForm";
+import DiscussionDetail from "../components/pages/DiscussionManagement/DiscussionDetail";
+import TicketManagementRoot from "../components/pages/TicketManagement";
+import AllTickets from "../components/pages/TicketManagement/allTickets";
+import TicketChats from "../components/pages/TicketManagement/chats";
 
 const router = createBrowserRouter([
   {
@@ -246,6 +253,25 @@ const router = createBrowserRouter([
             path: PATH.SUPPORT.ROOT,
             element:
               <SupportRoot />
+          },
+          {
+            element:
+              <DiscussionManagementRoot />,
+            children: [
+              { path: PATH.DISCUSSION.ROOT, element: <AllDiscussions /> },
+              { path: PATH.DISCUSSION.CREATE.ROOT, element: <DiscussionForm /> },
+              { path: PATH.DISCUSSION.DETAIL.ROOT(), element: <DiscussionDetail /> },
+              { path: PATH.DISCUSSION.EDIT.ROOT(), element: <DiscussionForm /> },
+            ],
+          },
+          {
+            element: (
+              <TicketManagementRoot />
+            ),
+            children: [
+              { path: PATH.TICKET.ALL_TICKETS.ROOT, element: <AllTickets /> },
+              { path: PATH.TICKET.CHATS.ROOT, element: <TicketChats /> },
+            ],
           },
         ]
       },

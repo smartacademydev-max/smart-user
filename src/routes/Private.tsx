@@ -1,11 +1,14 @@
 import React from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
+import ChatDialogLauncher from '../components/organism/ChatDialogLauncher';
+import TicketChatPanel from '../components/pages/TicketManagement/allTickets/TicketChatPanel';
 import { useAppSelector } from '../store/hook';
 import { PATH } from './PATH';
 
 export default function Private() {
     const navigate = useNavigate();
     const user = useAppSelector((state) => state.auth.user);
+
     React.useEffect(() => {
         if (!user) {
             navigate(PATH.AUTH.LOGIN.ROOT);
@@ -13,7 +16,13 @@ export default function Private() {
     }, [user, navigate]);
 
     if (!user) return null;
+
     return (
-        <Outlet />
+        <>
+            <Outlet />
+            <ChatDialogLauncher>
+                <TicketChatPanel />
+            </ChatDialogLauncher>
+        </>
     );
 }

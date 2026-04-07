@@ -73,6 +73,75 @@
         "offer": "Offer",
         "load_more": "Load More",
         "my_bundles": "My Bundles",
+        "discussion": {
+            "singular": "Discussion",
+            "saved": "Discussion saved successfully.",
+            "save_error": "Unable to save discussion.",
+            "deleted": "Discussion deleted successfully.",
+            "delete_error": "Unable to delete discussion.",
+            "status_updated": "Discussion visibility updated.",
+            "status_error": "Unable to update discussion visibility.",
+            "delete_title": "Delete Discussion",
+            "delete_description": "Are you sure you want to delete this discussion? This action cannot be undone."
+        },
+        "comment": {
+            "title": "Comments",
+            "placeholder": "Write a comment... Use @ to mention someone",
+            "reply_placeholder": "Write a reply... Use @ to mention someone",
+            "reply": "Reply",
+            "posted": "Comment posted successfully.",
+            "post_error": "Unable to post comment.",
+            "updated": "Comment updated successfully.",
+            "update_error": "Unable to update comment.",
+            "deleted": "Comment deleted successfully.",
+            "delete_error": "Unable to delete comment.",
+            "status_updated": "Comment status updated.",
+            "status_error": "Unable to update comment status.",
+            "reply_posted": "Reply posted successfully.",
+            "reply_error": "Unable to post reply.",
+            "reply_updated": "Reply updated successfully.",
+            "reply_deleted": "Reply deleted successfully.",
+            "delete_title": "Delete Comment",
+            "delete_description": "Are you sure you want to delete this comment? This action cannot be undone.",
+            "delete_reply_title": "Delete Reply",
+            "delete_reply_description": "Are you sure you want to delete this reply? This action cannot be undone.",
+            "empty": "No comments yet. Be the first to comment.",
+            "anonymous": "Unknown User",
+            "no_users_found": "No users found"
+        },
+        "ticket": {
+            "singular": "Ticket",
+            "saved": "Ticket created successfully.",
+            "save_error": "Unable to create ticket.",
+            "updated": "Ticket updated successfully.",
+            "update_error": "Unable to update ticket.",
+            "deleted": "Ticket deleted successfully.",
+            "delete_error": "Unable to delete ticket.",
+            "replied": "Reply sent successfully.",
+            "reply_error": "Unable to send reply.",
+            "delete_title": "Delete Ticket",
+            "delete_description": "Are you sure you want to delete this ticket? This action cannot be undone.",
+            "type_saved": "Ticket type saved successfully.",
+            "type_deleted": "Ticket type deleted successfully.",
+            "closed_no_reply": "This ticket is closed. No further replies are allowed.",
+            "no_ticket_selected": "Select a ticket to view the conversation.",
+            "search_placeholder": "Search tickets...",
+            "new_ticket": "New Ticket",
+            "reply_placeholder": "Type your reply...",
+            "status": {
+                "open": "Open",
+                "assigned": "Assigned",
+                "waiting_for_reply": "Waiting for Reply",
+                "resolved": "Resolved",
+                "closed": "Closed"
+            },
+            "priority": {
+                "low": "Low",
+                "medium": "Medium",
+                "high": "High",
+                "urgent": "Urgent"
+            }
+        },
         "empty_states": {
             "gorkhapatra": {
                 "title": "No Gorkhapatra Found",
@@ -81,6 +150,19 @@
             "notification": {
                 "title": "No Notice Found",
                 "description": "No Notice available yet. Click the button below to create a new Notice."
+            },
+            "discussion": {
+                "title": "No Discussions Found",
+                "description": "No discussions available yet. Click the button below to create your first discussion."
+            },
+            "tickets": {
+                "title": "No Tickets Found",
+                "description": "No support tickets yet. Tickets raised by students will appear here.",
+                "action": "Create Ticket"
+            },
+            "ticket_replies": {
+                "title": "No Replies Yet",
+                "description": "No replies for this ticket yet. Be the first to respond."
             }
         }
     },
@@ -99,11 +181,50 @@
         "rooms": "Rooms",
         "alumni": "Alumni",
         "feedback": "Feedback",
-        "support": "Support"
+        "support": "Support",
+        "discussion": {
+            "root": "Discussions"
+        },
+        "ticket": {
+            "root": "Support Tickets",
+            "all_tickets": "All Tickets",
+            "chats": "Chats",
+            "ticket_types": "Ticket Types"
+        }
     },
     "actions": {
+        "create": "Create",
+        "edit": "Edit",
+        "view": "View",
+        "delete": "Delete",
         "cancel": "Cancel",
+        "suspend": "Suspend",
+        "unsuspend": "Un Suspend",
+        "view_file": "View Attachment",
+        "clone": "Clone",
+        "generate_otp": "Generate OTP",
+        "publish": "Publish",
+        "unpublish": "Unpublish",
+        "draft": "Save as Draft",
         "view_all": "View All",
-        "view": "View"
+        "back": "Back",
+        "hide": "Hide",
+        "show": "Show"
+    },
+    "labels": {
+        "title": "Title",
+        "description": "Description",
+        "status": "Status",
+        "mega_category": "Mega Category",
+        "all": "All",
+        "visible": "Visible",
+        "hidden": "Hidden",
+        "by": "By",
+        "suspended": "Suspended"
+    },
+    "placeholders": {
+        "search": "Search...",
+        "title": "Enter title",
+        "select_mega_category": "Select Mega Category"
     }
 }

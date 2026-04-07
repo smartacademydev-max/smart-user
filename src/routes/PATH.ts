@@ -52,7 +52,7 @@ export const PATH = {
                 FAILURE: {
                     ROOT: (id?: number, moduleType?: PurchaseModuleTypes) =>
                         (id ? `/${moduleType}/${id}/purchase/failure` : "/:type/:id/purchase/failure"),
-                }, 
+                },
             },
             PLANS: {
                 ROOT: `/courses/:id/plans`
@@ -193,6 +193,30 @@ export const PATH = {
             FAILURE: {
                 ROOT: (subscriptionId?: number) => (subscriptionId ? `/subscription/${subscriptionId}/purchase/failure` : "/subscription/:subscriptionId/purchase/failure"),
             },
+        },
+    },
+    DISCUSSION: {
+        ROOT: "/discussions",
+        CREATE: {
+            ROOT: "/discussions/create",
+        },
+        DETAIL: {
+            ROOT: (id?: number) => id ? `/discussions/${id}` : "/discussions/:id",
+        },
+        EDIT: {
+            ROOT: (id?: number) => id ? `/discussions/${id}/edit` : "/discussions/:id/edit",
+        },
+    },
+    TICKET: {
+        ROOT: "/tickets",
+        ALL_TICKETS: {
+            ROOT: "/tickets/all-tickets",
+        },
+        CHATS: {
+            ROOT: "/tickets/chats",
+        },
+        TICKET_TYPES: {
+            ROOT: "/tickets/ticket-types",
         },
     },
 };
