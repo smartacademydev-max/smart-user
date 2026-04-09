@@ -18,7 +18,7 @@ import {
 	useTheme,
 } from "@mui/material";
 import { format } from "date-fns";
-import { ArrowDown2, Clock, InfoCircle, TickCircle } from "iconsax-reactjs";
+import { ArrowDown2, Clock, InfoCircle, People, TickCircle } from "iconsax-reactjs";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useTicketSocket } from "../../../../hooks/useTicketSocket";
@@ -40,6 +40,7 @@ interface Props {
 	ticket?: TicketProps;
 	onTicketUpdated?: () => void;
 	readOnly?: boolean;
+	setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const statusColor: Record<TicketStatus, string> = {
@@ -139,30 +140,28 @@ function ReplyBubble({ reply, currentUserId }: { reply: TicketReplyProps; curren
 	);
 }
 
-export default function TicketChatPanel({ ticket: propTicket, onTicketUpdated: propOnTicketUpdated, readOnly = false }: Props) {
+export default function TicketChatPanel({ ticket: propTicket, onTicketUpdated: propOnTicketUpdated, readOnly = false, setOpen }: Props) {
 	const { t } = useTranslation();
 	const dispatch = useAppDispatch();
 	const theme = useTheme();
 	const currentUser = useAppSelector((state) => state.auth.user);
 	const bottomRef = useRef<HTMLDivElement>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	const pendingResetRef = useRef(false);
+	const initialPageSet = useRef(false);
+	const hasScrolledInitially = useRef(false);
 	const [replyText, setReplyText] = useState("");
 	const [attachment, setAttachment] = useState<File | null>(null);
 	const [page, setPage] = useState(1);
 	const [allReplies, setAllReplies] = useState<TicketReplyProps[]>([]);
 	const [selectedTicket, setSelectedTicket] = useState<TicketProps | null>(propTicket ?? null);
 
-	// Fetch all tickets if no ticket is provided
 	const { data: ticketsData, refetch: refetchTickets } = useGetAllTicketsQuery(
-		{ pageIndex: 1, pageSize: 100 },
+		{ pageIndex: 1, pageSize: 20 },
 		{ skip: !!propTicket }
 	);
 
-	// Use provided ticket or selected ticket
 	const ticket = propTicket ?? selectedTicket;
 
-	// Auto-select first ticket if none selected
 	useEffect(() => {
 		if (!propTicket && !selectedTicket && ticketsData?.data?.data?.length) {
 			setSelectedTicket(ticketsData.data.data[0]);
@@ -211,14 +210,18 @@ export default function TicketChatPanel({ ticket: propTicket, onTicketUpdated: p
 		}
 	}, [ticket?.id, ticket?.unread_count, markAsRead]);
 
+	// Scroll to bottom once the initial (newest) messages are rendered
 	useEffect(() => {
-		if (page === 1) {
-			bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+		if (allReplies.length > 0 && !hasScrolledInitially.current) {
+			hasScrolledInitially.current = true;
+			setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "instant" }), 50);
 		}
-	}, [allReplies, page]);
+	}, [allReplies]);
 
 	useEffect(() => {
-		pendingResetRef.current = true;
+		initialPageSet.current = false;
+		hasScrolledInitially.current = false;
+		setAllReplies([]);
 		setPage(1);
 		setReplyText("");
 		setAttachment(null);
@@ -226,14 +229,23 @@ export default function TicketChatPanel({ ticket: propTicket, onTicketUpdated: p
 
 	useEffect(() => {
 		const incoming = repliesData?.data?.data;
+		const pagination = repliesData?.data?.pagination;
 		if (!incoming) return;
 
-		if (pendingResetRef.current || page === 1) {
-			pendingResetRef.current = false;
+		if (!initialPageSet.current) {
+			const totalPages = Math.ceil((pagination?.total ?? 0) / 20);
+			initialPageSet.current = true;
+			if (totalPages > 1) {
+				setPage(totalPages);
+				return;
+			}
+			// Only one page, render directly
 			setAllReplies(dedupeReplies(incoming));
-		} else {
-			setAllReplies((prev) => dedupeReplies([...incoming, ...prev]));
+			return;
 		}
+
+		// Loading older pages (jumped to last page, or user clicked "Load earlier messages")
+		setAllReplies((prev) => dedupeReplies([...incoming, ...prev]));
 	}, [repliesData]);
 
 	useTicketSocket({
@@ -256,10 +268,7 @@ export default function TicketChatPanel({ ticket: propTicket, onTicketUpdated: p
 		},
 	});
 
-	const pagination = repliesData?.data?.pagination;
-	const hasMore = pagination
-		? page < Math.ceil((pagination.total ?? 0) / 20)
-		: false;
+	const hasMore = page > 1;
 
 	const handleSend = async () => {
 		if (!replyText.trim() || !ticket?.id || isClosed) return;
@@ -484,7 +493,7 @@ export default function TicketChatPanel({ ticket: propTicket, onTicketUpdated: p
 							variant="caption"
 							color="primary"
 							sx={{ cursor: "pointer", "&:hover": { textDecoration: "underline" } }}
-							onClick={() => setPage((p) => p + 1)}
+							onClick={() => setPage((p) => p - 1)}
 						>
 							{isFetching ? <CircularProgress size={14} /> : "Load earlier messages"}
 						</Typography>
@@ -543,99 +552,111 @@ export default function TicketChatPanel({ ticket: propTicket, onTicketUpdated: p
 
 				<div ref={bottomRef} />
 			</Box>
+			<div className="flex items-center gap-1">
+				<Box
+					sx={{
+						// px: 2.5,
+						width: "100%",
+						py: 1.5,
+						borderTop: `1px solid ${theme.palette.divider}`,
 
-			<Box
-				sx={{
-					px: 2.5,
-					py: 1.5,
-					borderTop: `1px solid ${theme.palette.divider}`,
-
-				}}
-			>
-				{isClosed ? (
-					<Stack direction="row" spacing={1} alignItems="center" justifyContent="center" py={1}>
-						<LockIcon sx={{ fontSize: 16, color: "text.secondary" }} />
-						<Typography variant="body2" color="text.secondary">
-							{t("messages.ticket.closed_no_reply")}
-						</Typography>
-					</Stack>
-				) : (
-					<>
-						{attachment && (
-							<Stack direction="row" alignItems="center" spacing={1} mb={1}>
-								<Chip
-									label={attachment.name}
-									size="small"
-									onDelete={() => setAttachment(null)}
-								/>
-							</Stack>
-						)}
-						<OutlinedInput
-							fullWidth
-							multiline
-							minRows={1}
-							maxRows={4}
-							placeholder={t("messages.ticket.reply_placeholder")}
-							value={replyText}
-							onChange={(e) => setReplyText(e.target.value)}
-							onKeyDown={handleKeyDown}
-							disabled={sending}
-							sx={{ borderRadius: 3, pr: 1 }}
-							endAdornment={
-								<InputAdornment position="end">
-									<Stack direction="row" spacing={0.5}>
-										{ticket.allow_attachment && (
-											<>
-												<input
-													ref={fileInputRef}
-													type="file"
-													hidden
-													accept="image/*,.pdf,.doc,.docx"
-													onChange={(e) => {
-														const f = e.target.files?.[0];
-														if (f && f.size <= 2 * 1024 * 1024) {
-															setAttachment(f);
-														}
-														e.target.value = "";
-													}}
-												/>
-												<Tooltip title="Attach file (max 2MB)">
-													<IconButton
-														size="small"
-														onClick={() => fileInputRef.current?.click()}
-													>
-														<AttachFileIcon fontSize="small" />
-													</IconButton>
-												</Tooltip>
-											</>
-										)}
-										<IconButton
-											size="small"
-											disabled={!replyText.trim() || sending}
-											onClick={handleSend}
-											sx={{
-												width: 32,
-												height: 32,
-												backgroundColor: (theme) => theme.palette.primary.main,
-												color: (theme) => theme.palette.primary.contrastText
-											}}
-										>
-											{sending ? (
-												<CircularProgress size={18} />
-											) : (
-												<SendIcon fontSize="small" />
+					}}
+				>
+					{isClosed ? (
+						<Stack direction="row" spacing={1} alignItems="center" justifyContent="center" py={1}>
+							<LockIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+							<Typography variant="body2" color="text.secondary">
+								{t("messages.ticket.closed_no_reply")}
+							</Typography>
+						</Stack>
+					) : (
+						<>
+							{attachment && (
+								<Stack direction="row" alignItems="center" spacing={1} mb={1}>
+									<Chip
+										label={attachment.name}
+										size="small"
+										onDelete={() => setAttachment(null)}
+									/>
+								</Stack>
+							)}
+							<OutlinedInput
+								fullWidth
+								multiline
+								minRows={1}
+								maxRows={4}
+								placeholder={t("messages.ticket.reply_placeholder")}
+								value={replyText}
+								onChange={(e) => setReplyText(e.target.value)}
+								onKeyDown={handleKeyDown}
+								disabled={sending}
+								sx={{ borderRadius: 3, pr: 1 }}
+								endAdornment={
+									<InputAdornment position="end">
+										<Stack direction="row" spacing={0.5}>
+											{ticket.allow_attachment && (
+												<>
+													<input
+														ref={fileInputRef}
+														type="file"
+														hidden
+														accept="image/*,.pdf,.doc,.docx"
+														onChange={(e) => {
+															const f = e.target.files?.[0];
+															if (f && f.size <= 2 * 1024 * 1024) {
+																setAttachment(f);
+															}
+															e.target.value = "";
+														}}
+													/>
+													<Tooltip title="Attach file (max 2MB)">
+														<IconButton
+															size="small"
+															onClick={() => fileInputRef.current?.click()}
+														>
+															<AttachFileIcon fontSize="small" />
+														</IconButton>
+													</Tooltip>
+												</>
 											)}
-										</IconButton>
-									</Stack>
-								</InputAdornment>
-							}
-						/>
-						<Typography variant="caption" color="text.secondary" mt={0.5} display="block">
-							Press Enter to send · Shift+Enter for new line
-						</Typography>
-					</>
-				)}
-			</Box>
+											<IconButton
+												size="small"
+												disabled={!replyText.trim() || sending}
+												onClick={handleSend}
+												sx={{
+													width: 32,
+													height: 32,
+													backgroundColor: (theme) => theme.palette.primary.main,
+													color: (theme) => theme.palette.primary.contrastText
+												}}
+											>
+												{sending ? (
+													<CircularProgress size={18} />
+												) : (
+													<SendIcon fontSize="small" />
+												)}
+											</IconButton>
+										</Stack>
+									</InputAdornment>
+								}
+							/>
+						</>
+					)}
+				</Box>
+				<div className="lg:hidden">
+					<IconButton sx={{
+						bgcolor: (theme) => theme.palette.primary.main,
+						color: (theme) => theme.palette.primary.contrastText
+					}}
+						onClick={() => setOpen?.((prev) => !prev)}
+					>
+						<People />
+					</IconButton>
+				</div>
+			</div>
+			{isClosed ? <Typography variant="caption" color="text.secondary" mt={0.5} display="block">
+				Press Enter to send · Shift+Enter for new line
+			</Typography> : ""}
 		</Box>
 	);
 }

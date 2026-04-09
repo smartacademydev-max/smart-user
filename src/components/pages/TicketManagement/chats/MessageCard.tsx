@@ -1,7 +1,7 @@
 import { Avatar, Box, Chip, Stack, Typography } from "@mui/material";
 import { format } from "date-fns";
 import type { TicketProps } from "../../../../types/ticket";
-import { getTicketStatus } from "../../../../utils/statusMap";
+import { getTicketPriority, getTicketStatus } from "../../../../utils/statusMap";
 
 interface MessageCardProps {
     ticket: TicketProps;
@@ -114,7 +114,7 @@ export default function MessageCard({ ticket, onClick, active = false }: Message
                         />
                     )}
                     {priorityLabel && (
-                        <Chip label={priorityLabel} size="small" variant="outlined" sx={{ height: 20, fontSize: 11 }} />
+                        <Chip label={priorityLabel} size="small" color={getTicketPriority(ticket.priority || "low")} variant="outlined" sx={{ height: 20, fontSize: 11 }} />
                     )}
                     {departmentLabel && (
                         <Chip label={departmentLabel} size="small" variant="outlined" sx={{ height: 20, fontSize: 11 }} />

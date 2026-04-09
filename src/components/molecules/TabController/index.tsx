@@ -19,12 +19,15 @@ interface TabControllerProps<T> {
     options?: TabOption<T>[];
     setActiveTab: (value: T) => void;
     currentActive: T;
+    size?: "sm" | "md";
+
 }
 
 export default function TabController<T extends string | number>({
     setActiveTab,
     currentActive,
-    options = []
+    options = [],
+    size = "md"
 }: TabControllerProps<T>) {
     const settings = {
         dots: false,
@@ -84,7 +87,7 @@ export default function TabController<T extends string | number>({
                             onClick={() => setActiveTab(tab.value)}
                         >
                             <div className={
-                                `px-6 py-2 rounded-md cursor-pointer flex  items-center gap-1.5 ${currentActive === tab.value ? "active__tab__controller" : ""}`
+                                `${size === "sm" ? "px-2.5 py-1" : "px-6 py-2 "} rounded-md cursor-pointer flex  items-center gap-1.5 ${currentActive === tab.value ? "active__tab__controller" : ""}`
                             }>
                                 <Typography
                                     variant="subtitle2"
@@ -125,7 +128,7 @@ export default function TabController<T extends string | number>({
 
                     >
                         <div className={
-                            `px-6 py-2 rounded-md cursor-pointer flex  items-center gap-1.5 ${currentActive === tab.value ? "active__tab__controller" : ""}`
+                            `${size === "sm" ? "px-2.5 py-1" : "px-6 py-2 "} rounded-md cursor-pointer flex  items-center gap-1.5 ${currentActive === tab.value ? "active__tab__controller" : ""}`
                         }>
                             <Typography
                                 variant="subtitle2"

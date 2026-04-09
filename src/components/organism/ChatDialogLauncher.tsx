@@ -26,8 +26,8 @@ export default function ChatDialogLauncher({
                 onClick={() => setOpen((prev) => !prev)}
                 sx={{
                     position: 'fixed',
-                    bottom: 24,
-                    right: 24,
+                    bottom: 0,
+                    right: 0,
                     zIndex: 9999,
                     width: 48,
                     height: 48,
