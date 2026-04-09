@@ -530,7 +530,7 @@ const commonThemeOptions: ThemeOptions = {
           borderRadius: "6px",
           gap: "9px",
           "&.active": {
-            backgroundColor: `rgba(170, 33, 50, 0.28)`,
+            backgroundColor: theme.palette.primary.main,
             "& *": {
               color: "#fff !important",
             },

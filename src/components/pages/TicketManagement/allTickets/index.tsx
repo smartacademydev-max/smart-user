@@ -6,6 +6,8 @@ import {
 } from "@mui/material";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import { PATH } from "../../../../routes/PATH";
 import {
 	useDeleteTicketMutation,
 	useGetAllTicketsQuery,
@@ -21,13 +23,11 @@ import TableFilter from "../../../organism/TableFilter";
 import TicketForm from "../TicketForm";
 import TicketAnalyticsBar from "./TicketAnalyticsBar";
 import TicketCard from "./TicketCard";
-import { useNavigate } from "react-router-dom";
-import { PATH } from "../../../../routes/PATH";
 
 
 export default function AllTickets() {
 	const { t } = useTranslation();
-const navigate = useNavigate();
+	const navigate = useNavigate();
 	const [selectedTicket, setSelectedTicket] = useState<TicketProps | null>(null);
 	const [statusTab, _setStatusTab] = useState<TicketStatus | "">("");
 	const [search, setSearch] = useState("");
@@ -183,7 +183,7 @@ const navigate = useNavigate();
 				<Box
 					ref={listRef}
 					onScroll={handleListScroll}
-					sx={{ px: 2, py: 1.5 }}
+					sx={{ py: 1.5 }}
 				>
 					{allTickets.length === 0 && !isFetching && (
 						<EmptyRoute
@@ -199,7 +199,7 @@ const navigate = useNavigate();
 							checked={selectedRows.has(ticket.id!)}
 							onSelect={handleSelectRow}
 							// onClick={() => setSelectedTicket(ticket)}
-							 onClick={() => navigate(PATH.TICKET.CHATS.ROOT)}
+							onClick={() => navigate(PATH.TICKET.CHATS.ROOT)}
 						/>
 					))}
 

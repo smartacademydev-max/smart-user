@@ -1,5 +1,5 @@
-import { Search } from "@mui/icons-material";
 import { Box, OutlinedInput } from "@mui/material";
+import { SearchNormal } from "iconsax-reactjs";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -77,7 +77,7 @@ export default function TicketChats() {
 								placeholder="Search"
 								name="search"
 								id="search"
-								startAdornment={<Search />}
+								startAdornment={<SearchNormal />}
 								value={search}
 								onChange={(e) => setSearch?.(e.target.value)}
 								sx={{
