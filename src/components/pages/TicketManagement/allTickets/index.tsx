@@ -169,16 +169,16 @@ export default function AllTickets() {
 						search={search}
 						setSearch={setSearch}
 					/>
+					<TabController
+						currentActive={typeTab}
+						setActiveTab={(val) => {
+							setTypeTab(val);
+							setSelectedTicket(null);
+						}}
+						options={typeTabs}
+					/>
 				</Box>
 
-				<TabController
-					currentActive={typeTab}
-					setActiveTab={(val) => {
-						setTypeTab(val);
-						setSelectedTicket(null);
-					}}
-					options={typeTabs}
-				/>
 
 				<Box
 					ref={listRef}
@@ -198,8 +198,7 @@ export default function AllTickets() {
 							ticket={ticket}
 							checked={selectedRows.has(ticket.id!)}
 							onSelect={handleSelectRow}
-							// onClick={() => setSelectedTicket(ticket)}
-							onClick={() => navigate(PATH.TICKET.CHATS.ROOT)}
+							onClick={() => navigate(PATH.TICKET.CHATS.DETAIL.ROOT(ticket.id))}
 						/>
 					))}
 

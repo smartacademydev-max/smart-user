@@ -4,6 +4,7 @@ import SendIcon from "@mui/icons-material/Send";
 import {
 	Avatar,
 	Box,
+	Button,
 	Chip,
 	CircularProgress,
 	Divider,
@@ -21,8 +22,10 @@ import { format } from "date-fns";
 import { ArrowDown2, Clock, InfoCircle, People, TickCircle } from "iconsax-reactjs";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { useTicketSocket } from "../../../../hooks/useTicketSocket";
 import CAN from "../../../../routes/CAN";
+import { PATH } from "../../../../routes/PATH";
 import {
 	useCreateTicketReplyMutation,
 	useGetAllTicketsQuery,
@@ -35,12 +38,14 @@ import { useAppDispatch, useAppSelector } from "../../../../store/hook";
 import type { TicketPriority, TicketProps, TicketReplyProps, TicketStatus } from "../../../../types/ticket";
 import { TICKET_PRIORITY_OPTIONS, TICKET_STATUS_OPTIONS } from "../../../../types/ticket";
 import AssignedUsers from "../../../organism/ListWithPlusMore";
+import TicketForm from "../TicketForm";
 
 interface Props {
 	ticket?: TicketProps;
 	onTicketUpdated?: () => void;
 	readOnly?: boolean;
 	setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+	isModal?: boolean
 }
 
 const statusColor: Record<TicketStatus, string> = {
@@ -140,15 +145,17 @@ function ReplyBubble({ reply, currentUserId }: { reply: TicketReplyProps; curren
 	);
 }
 
-export default function TicketChatPanel({ ticket: propTicket, onTicketUpdated: propOnTicketUpdated, readOnly = false, setOpen }: Props) {
+export default function TicketChatPanel({ ticket: propTicket, onTicketUpdated: propOnTicketUpdated, readOnly = false, setOpen, isModal = false }: Props) {
 	const { t } = useTranslation();
 	const dispatch = useAppDispatch();
 	const theme = useTheme();
+	const navigate = useNavigate();
 	const currentUser = useAppSelector((state) => state.auth.user);
 	const bottomRef = useRef<HTMLDivElement>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	const initialPageSet = useRef(false);
+	const pendingResetRef = useRef(false);
 	const hasScrolledInitially = useRef(false);
+	const [openForm, setOpenForm] = useState(false);
 	const [replyText, setReplyText] = useState("");
 	const [attachment, setAttachment] = useState<File | null>(null);
 	const [page, setPage] = useState(1);
@@ -183,7 +190,7 @@ export default function TicketChatPanel({ ticket: propTicket, onTicketUpdated: p
 	const isClosed = ticket?.status === "resolved";
 
 	const { data: repliesData, isFetching } = useGetTicketRepliesQuery(
-		{ ticket_id: ticket?.id!, pageIndex: page, pageSize: 20 },
+		{ ticket_id: ticket?.id!, pageIndex: page, pageSize: 5 },
 		{ skip: !ticket?.id }
 	);
 
@@ -191,18 +198,7 @@ export default function TicketChatPanel({ ticket: propTicket, onTicketUpdated: p
 	const [updateTicket] = useUpdateTicketMutation();
 	const [markAsRead] = useMarkRepliesAsReadMutation();
 
-	const dedupeReplies = (replies: TicketReplyProps[]) => {
-		const seen = new Set<number>();
-		return replies.filter((reply) => {
-			const replyId = reply.id;
-			if (replyId == null) {
-				return true;
-			}
-			if (seen.has(replyId)) return false;
-			seen.add(replyId);
-			return true;
-		});
-	};
+
 
 	useEffect(() => {
 		if (ticket?.id && (ticket?.unread_count ?? 0) > 0) {
@@ -218,10 +214,17 @@ export default function TicketChatPanel({ ticket: propTicket, onTicketUpdated: p
 		}
 	}, [allReplies]);
 
+	// useEffect(() => {
+	// 	initialPageSet.current = false;
+	// 	hasScrolledInitially.current = false;
+	// 	setAllReplies([]);
+	// 	setPage(1);
+	// 	setReplyText("");
+	// 	setAttachment(null);
+	// }, [ticket?.id]);
+
 	useEffect(() => {
-		initialPageSet.current = false;
-		hasScrolledInitially.current = false;
-		setAllReplies([]);
+		pendingResetRef.current = true;
 		setPage(1);
 		setReplyText("");
 		setAttachment(null);
@@ -229,23 +232,14 @@ export default function TicketChatPanel({ ticket: propTicket, onTicketUpdated: p
 
 	useEffect(() => {
 		const incoming = repliesData?.data?.data;
-		const pagination = repliesData?.data?.pagination;
 		if (!incoming) return;
 
-		if (!initialPageSet.current) {
-			const totalPages = Math.ceil((pagination?.total ?? 0) / 20);
-			initialPageSet.current = true;
-			if (totalPages > 1) {
-				setPage(totalPages);
-				return;
-			}
-			// Only one page, render directly
-			setAllReplies(dedupeReplies(incoming));
-			return;
+		if (pendingResetRef.current || page === 1) {
+			pendingResetRef.current = false;
+			setAllReplies(incoming);
+		} else {
+			setAllReplies((prev) => [...incoming, ...prev]);
 		}
-
-		// Loading older pages (jumped to last page, or user clicked "Load earlier messages")
-		setAllReplies((prev) => dedupeReplies([...incoming, ...prev]));
 	}, [repliesData]);
 
 	useTicketSocket({
@@ -268,7 +262,9 @@ export default function TicketChatPanel({ ticket: propTicket, onTicketUpdated: p
 		},
 	});
 
-	const hasMore = page > 1;
+	const pagination = repliesData?.data?.pagination;
+	const hasMore = pagination && pagination.current_page < pagination.total_pages;
+	;
 
 	const handleSend = async () => {
 		if (!replyText.trim() || !ticket?.id || isClosed) return;
@@ -493,7 +489,7 @@ export default function TicketChatPanel({ ticket: propTicket, onTicketUpdated: p
 							variant="caption"
 							color="primary"
 							sx={{ cursor: "pointer", "&:hover": { textDecoration: "underline" } }}
-							onClick={() => setPage((p) => p - 1)}
+							onClick={() => setPage((p) => p + 1)}
 						>
 							{isFetching ? <CircularProgress size={14} /> : "Load earlier messages"}
 						</Typography>
@@ -555,7 +551,7 @@ export default function TicketChatPanel({ ticket: propTicket, onTicketUpdated: p
 			<div className="flex items-center gap-1">
 				<Box
 					sx={{
-						// px: 2.5,
+						px: 1.5,
 						width: "100%",
 						py: 1.5,
 						borderTop: `1px solid ${theme.palette.divider}`,
@@ -563,12 +559,15 @@ export default function TicketChatPanel({ ticket: propTicket, onTicketUpdated: p
 					}}
 				>
 					{isClosed ? (
-						<Stack direction="row" spacing={1} alignItems="center" justifyContent="center" py={1}>
-							<LockIcon sx={{ fontSize: 16, color: "text.secondary" }} />
-							<Typography variant="body2" color="text.secondary">
-								{t("messages.ticket.closed_no_reply")}
-							</Typography>
-						</Stack>
+						<div className="flex flex-col justify-center items-center">
+							<Stack direction="row" spacing={1} alignItems="center" justifyContent="center" py={1}>
+								<LockIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+								<Typography variant="body2" color="text.secondary">
+									{t("messages.ticket.closed_no_reply")}
+								</Typography>
+							</Stack>
+							<Button variant='text' color='primary' onClick={() => setOpenForm(prev => !prev)}>Create New Ticket</Button>
+						</div>
 					) : (
 						<>
 							{attachment && (
@@ -643,7 +642,7 @@ export default function TicketChatPanel({ ticket: propTicket, onTicketUpdated: p
 						</>
 					)}
 				</Box>
-				<div className="lg:hidden">
+				{!isModal ? <div className="lg:hidden">
 					<IconButton sx={{
 						bgcolor: (theme) => theme.palette.primary.main,
 						color: (theme) => theme.palette.primary.contrastText
@@ -652,11 +651,28 @@ export default function TicketChatPanel({ ticket: propTicket, onTicketUpdated: p
 					>
 						<People />
 					</IconButton>
-				</div>
+				</div> : ""}
 			</div>
-			{!isClosed ? <Typography variant="caption" color="text.secondary" mt={0.5} display="block">
-				Press Enter to send · Shift+Enter for new line
-			</Typography> : ""}
+			{!isClosed ? <>
+				<Typography variant="caption" color="text.secondary" px={1.5}
+					pb={1}
+					display="block" className="text-center">
+					Press Enter to send · Shift+Enter for new line
+				</Typography>
+			</>
+
+				: ""}
+
+			{openForm && (
+				<TicketForm
+					open={openForm}
+					onClose={() => setOpenForm(false)}
+					onSuccess={() => {
+						setOpenForm(false);
+						navigate(PATH.TICKET.ALL_TICKETS.ROOT)
+					}}
+				/>
+			)}
 		</Box>
 	);
 }

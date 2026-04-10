@@ -271,6 +271,7 @@ const router = createBrowserRouter([
             children: [
               { path: PATH.TICKET.ALL_TICKETS.ROOT, element: <AllTickets /> },
               { path: PATH.TICKET.CHATS.ROOT, element: <TicketChats /> },
+              { path: PATH.TICKET.CHATS.DETAIL.ROOT(), element: <TicketChats /> },
             ],
           },
         ]

@@ -2,10 +2,12 @@ import { Box, OutlinedInput } from "@mui/material";
 import { SearchNormal } from "iconsax-reactjs";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate, useParams } from "react-router-dom";
 import {
 	useGetAllTicketsQuery
 } from "../../../../services/ticketApi";
-import { STATUS_TABS, type TicketProps, type TicketStatus } from "../../../../types/ticket";
+import { PATH } from "../../../../routes/PATH";
+import { STATUS_TABS, type TicketStatus } from "../../../../types/ticket";
 import TabController from "../../../molecules/TabController";
 import EmptyRoute from "../../../organism/EmptyRoute";
 import PageHeader from "../../../organism/PageHeader";
@@ -16,12 +18,13 @@ import MessageCard from "./MessageCard";
 
 export default function TicketChats() {
 	const { t } = useTranslation();
+	const navigate = useNavigate();
+	const { ticketId } = useParams<{ ticketId: string }>();
 	const [openForm, setOpenForm] = useState(false);
 
 	const [statusTab, setStatusTab] = useState<TicketStatus | "">("");
 	const [search, setSearch] = useState("");
 	const [debouncedSearch, setDebouncedSearch] = useState("");
-	const [selectedTicket, setSelectedTicket] = useState<TicketProps | null>(null);
 	const [open, setOpen] = useState<boolean>(false);
 	const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	useEffect(() => {
@@ -39,11 +42,18 @@ export default function TicketChats() {
 		status: statusTab,
 	});
 
+	// Derive selected ticket from URL param; fall back to first ticket if no param
+	const tickets = data?.data?.data ?? [];
+	const selectedTicket = ticketId
+		? (tickets.find((t) => t.id === Number(ticketId)) ?? null)
+		: (tickets[0] ?? null);
+
+	// If no ticketId in URL but we have tickets, redirect to the first
 	useEffect(() => {
-		if (!selectedTicket && data?.data?.data?.length) {
-			setSelectedTicket(data.data.data[0]);
+		if (!ticketId && tickets.length) {
+			navigate(PATH.TICKET.CHATS.DETAIL.ROOT(tickets[0].id), { replace: true });
 		}
-	}, [data, selectedTicket]);
+	}, [ticketId, tickets, navigate]);
 
 	return (
 		<Box display="flex" flexDirection="column" height="100%" overflow="hidden">
@@ -96,7 +106,7 @@ export default function TicketChats() {
 									<MessageCard
 										key={ticket.id}
 										ticket={ticket}
-										onClick={() => { setSelectedTicket(ticket); setOpen(false) }}
+										onClick={() => { navigate(PATH.TICKET.CHATS.DETAIL.ROOT(ticket.id)); setOpen(false); }}
 										active={selectedTicket?.id === ticket.id} />
 								))}
 							</div>

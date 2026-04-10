@@ -1,6 +1,7 @@
 import { Box, Dialog, Grow, IconButton, Typography, useTheme } from '@mui/material';
 import { CloseSquare, MessageQuestion } from 'iconsax-reactjs';
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 interface ChatDialogLauncherProps {
     title?: string;
@@ -19,7 +20,11 @@ export default function ChatDialogLauncher({
 }: ChatDialogLauncherProps) {
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
+    const pathname = useLocation();
 
+    useEffect(() => {
+        setOpen(false);
+    }, [pathname])
     return (
         <>
             <Box

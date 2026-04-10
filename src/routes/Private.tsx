@@ -21,7 +21,7 @@ export default function Private() {
         <>
             <Outlet />
             <ChatDialogLauncher>
-                <TicketChatPanel />
+                <TicketChatPanel isModal/>
             </ChatDialogLauncher>
         </>
     );
