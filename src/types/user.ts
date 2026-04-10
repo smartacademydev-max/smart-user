@@ -61,11 +61,38 @@ export interface User extends RegisterUserProps {
 	// role: string[];
 }
 
+type NewDeviceDetectedData = {
+	new_device_detected: true;
+	has_pending_request: boolean;
+	device_location?: string;
+	user_id: string;
+	user: null;
+	token: null;
+};
+
+type AuthSuccessData = {
+	new_device_detected?: false;
+	user: User;
+	token: Token;
+};
+
 export interface UserResponse extends GlobalResponse {
+	data: NewDeviceDetectedData | AuthSuccessData;
+}
+
+// Returned by authBridge — always a successful auth, never triggers device detection.
+export interface AuthBridgeResponse extends GlobalResponse {
 	data: {
 		user: User;
 		token: Token;
 	};
+}
+
+export interface DeviceResetRequestPayload {
+	reason?: string;
+	situation: string;
+	user_id: string;
+	device_type: "web";
 }
 
 

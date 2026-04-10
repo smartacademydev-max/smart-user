@@ -16,6 +16,7 @@ import { setCredentials } from "../../../../slice/authSlice";
 import { showToast } from "../../../../slice/toastSlice";
 import { useAppDispatch, useAppSelector } from "../../../../store/hook";
 import AuthHeader from "../../../molecules/AuthHeader";
+import NewDeviceDetectedDialog from "../../../organism/Dialog/NewDeviceDetectedDialog";
 
 const validationSchema = Yup.object({
     otp: Yup.string()
@@ -36,6 +37,12 @@ export default function VerifyOTP() {
     const user = useAppSelector((state) => state.auth.user);
     const [verifyOtp, { isLoading }] = useVerifyOtpMutation();
     const [resendOtp, { isLoading: isSending }] = useResendOtpMutation();
+    const [newDeviceDialog, setNewDeviceDialog] = useState<{
+        open: boolean;
+        deviceLocation?: string;
+        hasPendingRequest?: boolean;
+        userId?: string;
+    }>({ open: false });
 
     // Initialize phone number
     useEffect(() => {
@@ -104,14 +111,16 @@ export default function VerifyOTP() {
             try {
                 const response = await verifyOtp({ phone, otp: values.otp }).unwrap();
 
+
+
                 dispatch(showToast({
                     message: response.message || "OTP verified successfully.",
                     severity: "success",
                 }));
 
                 dispatch(setCredentials({
-                    token: response?.data?.token,
-                    user: response?.data?.user
+                    token: response.data.token,
+                    user: response.data.user,
                 }));
 
                 if (redirectUrl) {
@@ -120,6 +129,12 @@ export default function VerifyOTP() {
                     navigate(PATH.AUTH.INTEREST.ROOT);
                 }
             } catch (e: any) {
+                setNewDeviceDialog({
+                    open: true,
+                    deviceLocation: e?.data?.data?.device_location,
+                    hasPendingRequest: e?.data?.data?.has_pending_request,
+                    userId: e?.data?.data?.user_id,
+                });
                 dispatch(showToast({
                     message: e?.data?.message || "Invalid OTP. Please try again.",
                     severity: "error",
@@ -202,6 +217,14 @@ export default function VerifyOTP() {
 
     return (
         <>
+            <NewDeviceDetectedDialog
+                open={newDeviceDialog.open}
+                onClose={() => setNewDeviceDialog({ open: false })}
+                deviceLocation={newDeviceDialog.deviceLocation}
+                hasPendingRequest={newDeviceDialog.hasPendingRequest}
+                userId={newDeviceDialog.userId}
+            />
+
             <AuthHeader
                 title="OTP Verification"
                 description="Enter the One-Time Password (OTP) sent to your registered email or phone number. <span class='font-bold'>The OTP is valid for 1 month</span>, so you can reuse a previously received OTP within this period."

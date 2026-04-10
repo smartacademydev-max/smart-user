@@ -28,6 +28,12 @@ export const PATH = {
         },
         INTEREST: {
             ROOT: "/auth/interest"
+        },
+        DEVICE_RESET: {
+            ROOT: "/auth/device-reset",
+            SUCCESS: {
+                ROOT: "/auth/device-reset/success",
+            },
         }
     },
     DASHBOARD: {

@@ -1,6 +1,8 @@
 
 import { createApi } from "@reduxjs/toolkit/query/react";
 import type {
+	AuthBridgeResponse,
+	DeviceResetRequestPayload,
 	GlobalResponse,
 	LoginUserProps,
 	RegisterUserProps,
@@ -33,7 +35,7 @@ export const authApi = createApi({
 				body: { phone },
 			}),
 		}),
-		authBridge: builder.mutation<UserResponse, { one_time_token: string }>({
+		authBridge: builder.mutation<AuthBridgeResponse, { one_time_token: string }>({
 			query: ({ one_time_token }) => ({
 				url: `/auth/bridge`,
 				method: "POST",
@@ -48,14 +50,22 @@ export const authApi = createApi({
 				method: "POST",
 				body
 			})
-		})
+		}),
+		requestDeviceReset: builder.mutation<GlobalResponse, DeviceResetRequestPayload>({
+			query: (body) => ({
+				url: `/reset-request`,
+				method: "POST",
+				body,
+			}),
+		}),
 	}),
 });
 
-export const { 
-	useRegisterMutation, 
-	useVerifyOtpMutation, 
-	useResendOtpMutation, 
-	useAuthBridgeMutation ,
-	useValidateUserExistanceMutation
+export const {
+	useRegisterMutation,
+	useVerifyOtpMutation,
+	useResendOtpMutation,
+	useAuthBridgeMutation,
+	useValidateUserExistanceMutation,
+	useRequestDeviceResetMutation,
 } = authApi;

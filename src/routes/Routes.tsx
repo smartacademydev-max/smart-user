@@ -67,6 +67,8 @@ import DiscussionDetail from "../components/pages/DiscussionManagement/Discussio
 import TicketManagementRoot from "../components/pages/TicketManagement";
 import AllTickets from "../components/pages/TicketManagement/allTickets";
 import TicketChats from "../components/pages/TicketManagement/chats";
+import DeviceResetForm from "../components/pages/auth/deviceReset";
+import DeviceResetSuccess from "../components/pages/auth/deviceReset/success";
 
 const router = createBrowserRouter([
   {
@@ -97,6 +99,22 @@ const router = createBrowserRouter([
         element: (
           <SingleFormAuthLayout>
             <InterestRoot />
+          </SingleFormAuthLayout>
+        ),
+      },
+      {
+        path: PATH.AUTH.DEVICE_RESET.ROOT,
+        element: (
+          <SingleFormAuthLayout>
+            <DeviceResetForm />
+          </SingleFormAuthLayout>
+        ),
+      },
+      {
+        path: PATH.AUTH.DEVICE_RESET.SUCCESS.ROOT,
+        element: (
+          <SingleFormAuthLayout>
+            <DeviceResetSuccess />
           </SingleFormAuthLayout>
         ),
       },

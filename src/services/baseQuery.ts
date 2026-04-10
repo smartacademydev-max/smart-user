@@ -4,17 +4,62 @@ import type {
 	FetchBaseQueryError,
 } from "@reduxjs/toolkit/query";
 import { fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { v4 as uuidv4 } from "uuid";
 import { showSessionExpired } from "../slice/sessionSlice";
 import type { RootState } from "../store/store";
 
-const getDeviceId = () => {
-	let deviceId = localStorage.getItem("device_id");
-	if (!deviceId) {
-		deviceId = uuidv4();
-		localStorage.setItem("device_id", deviceId);
+function collectHardwareSignals(): string {
+	const nav = navigator as Navigator & {
+		deviceMemory?: number;
+		userAgentData?: { platform: string };
+	};
+
+	const screen_res = `${screen.width}x${screen.height}x${screen.colorDepth}`;
+	const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+	const cpu_cores = String(nav.hardwareConcurrency ?? "");
+	const memory = String(nav.deviceMemory ?? "");
+	const platform = nav.userAgentData?.platform ?? nav.platform ?? "";
+
+	let webgl_vendor = "";
+	let webgl_renderer = "";
+	try {
+		const canvas = document.createElement("canvas");
+		const gl = canvas.getContext("webgl") ?? canvas.getContext("experimental-webgl");
+		if (gl) {
+			const dbgInfo = (gl as WebGLRenderingContext).getExtension("WEBGL_debug_renderer_info");
+			if (dbgInfo) {
+				webgl_vendor = (gl as WebGLRenderingContext).getParameter(dbgInfo.UNMASKED_VENDOR_WEBGL);
+				webgl_renderer = (gl as WebGLRenderingContext).getParameter(dbgInfo.UNMASKED_RENDERER_WEBGL);
+			}
+		}
+	} catch {
+		// WebGL unavailable — fingerprint still works with remaining signals
 	}
-	return deviceId;
+
+	return [screen_res, timezone, cpu_cores, memory, platform, webgl_vendor, webgl_renderer].join("|");
+}
+
+// FNV-1a 32-bit hash — fast, no external dependency, good distribution
+function fnv1a(str: string): string {
+	let hash = 2166136261;
+	for (let i = 0; i < str.length; i++) {
+		hash ^= str.charCodeAt(i);
+		hash = (hash * 16777619) >>> 0;
+	}
+	return hash.toString(16).padStart(8, "0");
+}
+
+const getDeviceId = (): string => {
+	const CACHE_KEY = "device_id";
+	const cached = localStorage.getItem(CACHE_KEY);
+	if (cached && cached.length === 8) return cached;
+
+	const fingerprint = fnv1a(collectHardwareSignals());
+	try {
+		localStorage.setItem(CACHE_KEY, fingerprint);
+	} catch {
+
+	}
+	return fingerprint;
 };
 
 const baseQueryConfig = fetchBaseQuery({
