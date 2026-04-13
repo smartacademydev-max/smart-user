@@ -4,16 +4,16 @@ import { useNavigate } from "react-router-dom";
 import { PATH } from "../../../routes/PATH";
 import { useGetAllLiveClassesQuery } from "../../../services/liveApi";
 
-const STATIC_NOTICE = {
-    title: "Your courses may expire soon — Renew now to continue learning!",
-    body: "Stay on track with your Loksewa preparation. Renew before Chaitra 30 and get 20% off on renewals.",
-};
+// const STATIC_NOTICE = {
+//     title: "Your courses may expire soon — Renew now to continue learning!",
+//     body: "Stay on track with your Loksewa preparation. Renew before Chaitra 30 and get 20% off on renewals.",
+// };
 
 export default function DashboardTopBanners() {
     const navigate = useNavigate();
 
     const [liveDismissed, setLiveDismissed] = useState(false);
-    const [noticeDismissed, setNoticeDismissed] = useState(false);
+    // const [noticeDismissed, setNoticeDismissed] = useState(false);
 
     const { data, isLoading } = useGetAllLiveClassesQuery({
         pageIndex: 1,
