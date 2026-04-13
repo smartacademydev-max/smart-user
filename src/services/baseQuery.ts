@@ -27,13 +27,27 @@ function collectHardwareSignals(): string {
 		if (gl) {
 			const dbgInfo = (gl as WebGLRenderingContext).getExtension("WEBGL_debug_renderer_info");
 			if (dbgInfo) {
-				webgl_vendor = (gl as WebGLRenderingContext).getParameter(dbgInfo.UNMASKED_VENDOR_WEBGL);
-				webgl_renderer = (gl as WebGLRenderingContext).getParameter(dbgInfo.UNMASKED_RENDERER_WEBGL);
+				const vendor = (gl as WebGLRenderingContext).getParameter(dbgInfo.UNMASKED_VENDOR_WEBGL) as string;
+				const renderer = (gl as WebGLRenderingContext).getParameter(dbgInfo.UNMASKED_RENDERER_WEBGL) as string;
+				// Firefox privacy.resistFingerprinting returns generic "Mozilla" strings — discard them
+				// as they add no hardware signal and would differ from real GPU strings on other browsers
+				if (vendor !== "Mozilla") webgl_vendor = vendor;
+				if (renderer !== "Mozilla") webgl_renderer = renderer;
 			}
 		}
 	} catch {
 		// WebGL unavailable — fingerprint still works with remaining signals
 	}
+
+	console.log("Fingerprint signals", {
+		screen_res,
+		timezone,
+		cpu_cores,
+		memory,
+		platform,
+		webgl_vendor,
+		webgl_renderer,
+	});
 
 	return [screen_res, timezone, cpu_cores, memory, platform, webgl_vendor, webgl_renderer].join("|");
 }
@@ -54,6 +68,8 @@ const getDeviceId = (): string => {
 	if (cached && cached.length === 8) return cached;
 
 	const fingerprint = fnv1a(collectHardwareSignals());
+
+	console.log("my fingerprint", fingerprint);
 	try {
 		localStorage.setItem(CACHE_KEY, fingerprint);
 	} catch {

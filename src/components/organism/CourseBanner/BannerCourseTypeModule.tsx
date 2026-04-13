@@ -47,9 +47,11 @@ export default function BannerCourseTypeModule({ courseType, courseExpiry, cours
 
     useEffect(() => {
         if (courseSubscription?.length && selectedPlan === undefined) {
-            setSelectedPlan(courseSubscription[0].subscription_id);
+            setSelectedPlan(courseSubscription[0].id);
         }
     }, [courseSubscription]);
+
+    console.log("selected plan", selectedPlan)
 
     const renderButtons = () => {
         if (courseType === "free") {
@@ -88,14 +90,14 @@ export default function BannerCourseTypeModule({ courseType, courseExpiry, cours
         return (
             <div className="actions flex flex-col gap-2">
                 {courseType === "subscription" && (() => {
-                    const plan = courseSubscription?.find(p => p.subscription_id === selectedPlan);
+                    const plan = courseSubscription?.find(p => p.id === selectedPlan);
                     return (
                         <Button
                             variant="contained"
                             className="black__btn"
                             fullWidth
                             disabled={selectedPlan === undefined}
-                            onClick={() => navigate(PATH.SUBSCRIPTION.PURCHASE.ROOT(selectedPlan))}
+                            onClick={() => navigate(PATH.SUBSCRIPTION.PURCHASE.ROOT(Number(id), selectedPlan))}
                         >
                             {plan ? `Purchase ${plan.name}` : "Select a Plan"}
                         </Button>
@@ -189,8 +191,14 @@ export default function BannerCourseTypeModule({ courseType, courseExpiry, cours
                                         <FormControlLabel
                                             control={
                                                 <Checkbox
-                                                    checked={selectedPlan !== undefined && plan.subscription_id === selectedPlan}
-                                                    onChange={() => setSelectedPlan(plan.subscription_id)}
+                                                    checked={selectedPlan !== undefined && plan.id === selectedPlan}
+                                                    onChange={() => setSelectedPlan(plan.id)}
+                                                    sx={(theme) => ({
+                                                        color: theme.palette.gray.gray2,
+                                                        "&.Mui-checked": {
+                                                            color: theme.palette.primary.main
+                                                        }
+                                                    })}
                                                 />
                                             }
                                             label={<Typography color="white" variant="subtitle2" fontWeight={400}>{plan.name}</Typography>}

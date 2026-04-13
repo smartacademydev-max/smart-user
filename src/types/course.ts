@@ -30,7 +30,7 @@ export interface CourseExpiry {
 
 export interface CourseSubscription {
     name: string
-    subscription_id: number;
+    id: number;
     price: string;
     billing_cycle: BillingCycle
     number: number;

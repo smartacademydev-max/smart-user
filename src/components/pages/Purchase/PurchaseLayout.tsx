@@ -1,8 +1,9 @@
 
 import { Phone } from '@mui/icons-material';
-import { Button } from '@mui/material';
+import { Button, Checkbox, Divider, FormControlLabel, Typography } from '@mui/material';
 import { useFormik } from 'formik';
 import { ArrowLeft } from 'iconsax-reactjs';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGetCourseByIdQuery, usePurchaseCourseWithEsewaMutation, usePurchaseWithKhaltiMutation } from "../../../services/courseApi";
 import { useGetBundleByOverviewQuery, useGetTestOverviewQuery } from '../../../services/testApi';
@@ -41,38 +42,53 @@ function submitEsewaForm(action: string, params: Record<string, any>) {
 export default function PurchaseLayout() {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const { id, type } = useParams();
+    // For subscription routes: /subscription/:courseId/:subscriptionId/purchase
+    // For other routes: /:type/:id/purchase
+    const { id, type, courseId, subscriptionId } = useParams();
+
+    const isSubscription = !!courseId && !!subscriptionId;
+    const [selectedSubscriptionId, setSelectedSubscriptionId] = useState<number | undefined>(
+        subscriptionId ? Number(subscriptionId) : undefined
+    );
+
     const paymentOptions: PaymentOption[] = [
         { id: 1, label: "Esewa", value: "esewa", image: "/esewa.svg" },
         { id: 2, label: "Khalti", value: "khalti", image: "/khalti.svg" },
     ];
 
     const { data: course } = useGetCourseByIdQuery({ id: Number(id) }, { skip: !id || type !== "course" });
+    const { data: subscriptionCourse } = useGetCourseByIdQuery({ id: Number(courseId) }, { skip: !isSubscription });
     const { data: test } = useGetTestOverviewQuery({ id: Number(id) }, { skip: !id || type !== "test" });
     const { data: bundle } = useGetBundleByOverviewQuery({ id: Number(id) }, { skip: !id || type !== "bundle" })
     const [payViaEsewa, { isLoading: payingViaEsewa }] = usePurchaseCourseWithEsewaMutation();
     const [payViaKhalti, { isLoading: isKhaltiLoading }] = usePurchaseWithKhaltiMutation();
 
+    const subscriptionPlans = subscriptionCourse?.data?.subscriptions || [];
+    const activePlan = subscriptionPlans.find(p => p.id === selectedSubscriptionId);
+
     let data;
     let price = 0;
 
-    switch (type) {
-        case "course":
-            data = course?.data;
-            price = Number(course?.data?.sale_price) || 0;
-            break;
-
-        case "test":
-            data = test?.data;
-            price = Number(test?.data?.sale_price) || 0;
-            break;
-        case "bundle":
-            data = bundle?.data;
-            price = Number(bundle?.data?.sale_price) || 0;
-            break;
-
-        default:
-            data = null;
+    if (isSubscription) {
+        data = subscriptionCourse?.data;
+        price = Number(activePlan?.price) || 0;
+    } else {
+        switch (type) {
+            case "course":
+                data = course?.data;
+                price = Number(course?.data?.sale_price) || 0;
+                break;
+            case "test":
+                data = test?.data;
+                price = Number(test?.data?.sale_price) || 0;
+                break;
+            case "bundle":
+                data = bundle?.data;
+                price = Number(bundle?.data?.sale_price) || 0;
+                break;
+            default:
+                data = null;
+        }
     }
     // const vat = price * 0.13;
     const vat = 0;
@@ -88,7 +104,10 @@ export default function PurchaseLayout() {
         onSubmit: async (values) => {
             try {
                 if (values.paymentOption === "esewa") {
-                    const coursePurchaseData = await payViaEsewa({ id: Number(id), moduleType: type as PurchaseModuleTypes }).unwrap();
+                    const coursePurchaseData = await payViaEsewa({
+                        id: isSubscription ? Number(courseId) : Number(id),
+                        moduleType: isSubscription ? "course" : type as PurchaseModuleTypes,
+                    }).unwrap();
 
                     if (coursePurchaseData) {
                         const paymentData = coursePurchaseData?.data;
@@ -110,10 +129,10 @@ export default function PurchaseLayout() {
                     }
                 } else if (values.paymentOption === "khalti") {
                     const response = await payViaKhalti({
-                        id: Number(id),
+                        id: isSubscription ? Number(courseId) : Number(id),
                         type: values.paymentOption,
-                        moduleType: type as PurchaseModuleTypes,
-                        amount: vat + price
+                        moduleType: isSubscription ? "course" : type as PurchaseModuleTypes,
+                        amount: vat + price,
                     }).unwrap();
 
                     const paymentUrl = response?.data?.payment_url;
@@ -139,7 +158,7 @@ export default function PurchaseLayout() {
                 startIcon={<ArrowLeft />}
                 onClick={() => navigate(-1)}
             >
-                Back to {type} Details
+                Back to {isSubscription ? "Course" : type} Details
             </Button>
 
             <PageHeader
@@ -150,6 +169,32 @@ export default function PurchaseLayout() {
             <form onSubmit={formik.handleSubmit}>
                 <div className="grid md:grid-cols-2 gap-10">
                     <div className="col-span-1">
+                        {isSubscription && subscriptionPlans.length > 0 && (
+                            <div className="mb-6 flex flex-col gap-3">
+                                <Typography variant="body2" fontWeight={500}>Subscription Plans</Typography>
+                                {subscriptionPlans.map((plan) => (
+                                    <div key={plan.id}>
+                                        <div className="grid grid-cols-2 gap-2 items-center">
+                                            <FormControlLabel
+                                                control={
+                                                    <Checkbox
+                                                        checked={plan.id === selectedSubscriptionId}
+                                                        onChange={() => setSelectedSubscriptionId(plan.id)}
+                                                        sx={(theme) => ({
+                                                            color: theme.palette.gray.gray2,
+                                                            "&.Mui-checked": { color: theme.palette.primary.main }
+                                                        })}
+                                                    />
+                                                }
+                                                label={<Typography variant="subtitle2">{plan.name}</Typography>}
+                                            />
+                                            <Typography variant="subtitle2">NRs. {plan.price} / {plan.number} {plan.billing_cycle}</Typography>
+                                        </div>
+                                        <Divider />
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                         <PurchasePaymentOption
                             options={paymentOptions}
                             selected={formik.values.paymentOption}
@@ -165,7 +210,7 @@ export default function PurchaseLayout() {
 
                     <div className="col-span-1">
                         <CoursePaymentCard
-                            data={data}
+                            data={isSubscription ? { ...data, sale_price: activePlan?.price ?? "0" } : data}
                             vat={vat}
                             isLoading={payingViaEsewa || isKhaltiLoading}
                         />

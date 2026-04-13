@@ -192,12 +192,12 @@ export const PATH = {
     },
     SUBSCRIPTION: {
         PURCHASE: {
-            ROOT: (subscriptionId?: number) => (subscriptionId ? `/subscription/${subscriptionId}/purchase` : "/subscription/:subscriptionId/purchase"),
+            ROOT: (courseId?: number, subscriptionId?: number) => (courseId && subscriptionId ? `/subscription/${courseId}/${subscriptionId}/purchase` : "/subscription/:courseId/:subscriptionId/purchase"),
             SUCCESS: {
-                ROOT: (subscriptionId?: number) => (subscriptionId ? `/subscription/${subscriptionId}/purchase/success` : "/subscription/:subscriptionId/purchase/success"),
+                ROOT: (courseId?: number, subscriptionId?: number) => (courseId && subscriptionId ? `/subscription/${courseId}/${subscriptionId}/purchase/success` : "/subscription/:courseId/:subscriptionId/purchase/success"),
             },
             FAILURE: {
-                ROOT: (subscriptionId?: number) => (subscriptionId ? `/subscription/${subscriptionId}/purchase/failure` : "/subscription/:subscriptionId/purchase/failure"),
+                ROOT: (courseId?: number, subscriptionId?: number) => (courseId && subscriptionId ? `/subscription/${courseId}/${subscriptionId}/purchase/failure` : "/subscription/:courseId/:subscriptionId/purchase/failure"),
             },
         },
     },

@@ -45,8 +45,7 @@ export default function DashboardTopBanners() {
     return (
         <Box sx={{ display: "flex", flexDirection: "column", gap: "10px" }}>
 
-            {/* ── Notice Banner (amber, closeable) ──────────────────────────── */}
-            {!noticeDismissed && (
+         {/**   {!noticeDismissed && (
                 <Box sx={{
                     background: "linear-gradient(135deg, #FFFBEB, #FEF3C7)",
                     border: "1px solid #FDE68A",
@@ -58,7 +57,6 @@ export default function DashboardTopBanners() {
                     gap: "12px",
                     position: "relative",
                 }}>
-                    {/* Warning icon box */}
                     <Box sx={{
                         width: 34, height: 34,
                         background: "#FEF3C7",
@@ -72,7 +70,6 @@ export default function DashboardTopBanners() {
                         </svg>
                     </Box>
 
-                    {/* Text */}
                     <Box sx={{ flex: 1, minWidth: 0 }}>
                         <Typography sx={{ fontSize: "13px", fontWeight: 700, color: "#78350F", mb: "3px" }}>
                             {STATIC_NOTICE.title}
@@ -82,7 +79,6 @@ export default function DashboardTopBanners() {
                         </Typography>
                     </Box>
 
-                    {/* Close */}
                     <Box
                         component="button"
                         onClick={() => setNoticeDismissed(true)}
@@ -102,8 +98,7 @@ export default function DashboardTopBanners() {
                     </Box>
                 </Box>
             )}
-
-            {/* ── Live Class Banner (red gradient, closeable) ───────────────── */}
+            */}
             {!liveDismissed && (isLoading || hasOngoing) && (
                 <Box sx={{
                     background: "linear-gradient(135deg, #8B0000 0%, #E21D48 60%, #F25077 100%)",

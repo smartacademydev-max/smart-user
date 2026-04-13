@@ -7,17 +7,16 @@ import TabController from "../../../../molecules/TabController";
 import CourseBanner from "../../../../organism/CourseBanner";
 import PurchaseCourseDialog from "../../../../organism/Dialog/PurchaseCourseDialog";
 import CourseMediaListing from "./courseMediaListing";
-import SinlgeCourseCurriculum from "./curriculum";
-import SinlgeCourseLiveClass from "./liveClass";
-import SinlgeCourseOverview from "./overview";
-import SinlgeCourseTest from "./test";
+import SingleCourseCurriculum from "./curriculum";
+import SingleCourseLiveClass from "./liveClass";
+import SingleCourseOverview from "./overview";
+import SingleCourseTest from "./test";
 
 export default function SingleCourse() {
     const { id } = useParams();
     const { t } = useTranslation();
 
     const [activeTab, setActiveTab] = useState("curriculum");
-    // const [havePurchesed, setHavePurchased] = useState(false);
     const [qpNotes, setQpNotes] = useState<QueryParams>({
         pageIndex: 1,
         pageSize: 12,
@@ -105,8 +104,8 @@ export default function SingleCourse() {
                 />
             </div>
 
-            {activeTab === "overview" && <SinlgeCourseOverview data={data?.data && data.data} isLoading={loadingOverview} />}
-            {activeTab === "curriculum" && <SinlgeCourseCurriculum havePurchased={havePurchased} />}
+            {activeTab === "overview" && <SingleCourseOverview data={data?.data && data.data} isLoading={loadingOverview} />}
+            {activeTab === "curriculum" && <SingleCourseCurriculum havePurchased={havePurchased} />}
             {activeTab === "notes" &&
                 <CourseMediaListing havePurchased={havePurchased} data={notes} isLoading={loadingNotes} type="temp_notes" qp={qpNotes} setQp={setQpNotes} totalPages={notes?.data?.pagination?.total_pages || 0} courseId={Number(id)} />
             }
@@ -117,11 +116,10 @@ export default function SingleCourse() {
                 <CourseMediaListing havePurchased={havePurchased} data={videos} isLoading={loadingVideos} type="temp_video" qp={qpVideos} setQp={setQpVideos} totalPages={videos?.data?.pagination?.total_pages || 0} courseId={Number(id)} />
             }
             {activeTab === "tests" &&
-
-                <SinlgeCourseTest havePurchased={havePurchased} />
+                <SingleCourseTest havePurchased={havePurchased} />
             }
             {activeTab === "live_classes" &&
-                <SinlgeCourseLiveClass havePurchased={havePurchased} data={liveClasses} isLoading={loadingLiveClass} qp={qpLiveClass} setQp={setQpLiveClass} totalPages={liveClasses?.data?.pagination?.total_pages || 0} />
+                <SingleCourseLiveClass havePurchased={havePurchased} data={liveClasses} isLoading={loadingLiveClass} qp={qpLiveClass} setQp={setQpLiveClass} totalPages={liveClasses?.data?.pagination?.total_pages || 0} />
             }
             <PurchaseCourseDialog type={courseBasic?.data?.course_type} />
         </div>
