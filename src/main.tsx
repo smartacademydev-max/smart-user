@@ -15,7 +15,7 @@ import Loading from "./Loading.tsx";
 import GlobalRoutes from "./routes/Routes.tsx";
 import { store } from "./store/store.ts";
 import "./style.scss";
-import SmartThemeProvider from "./ThemeProvider.tsx";
+import UdaanThemeProvider from "./ThemeProvider.tsx";
 
 i18n
   .use(HttpApi)
@@ -42,7 +42,7 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>
       <I18nextProvider i18n={i18n}>
-        <SmartThemeProvider>
+        <UdaanThemeProvider>
           <Suspense fallback={<Loading />}>
 
             <GoogleOAuthProvider clientId='361289665406-npg48sokjoqcdepd1qov5dq4l6meipri.apps.googleusercontent.com'>
@@ -54,7 +54,7 @@ createRoot(document.getElementById("root")!).render(
               </AppController>
             </GoogleOAuthProvider>
           </Suspense>
-        </SmartThemeProvider>
+        </UdaanThemeProvider>
       </I18nextProvider>
     </Provider>
   </StrictMode>,

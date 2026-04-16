@@ -7,7 +7,7 @@ import type { TransactionProps } from "../../../../types/transactions";
 import { formatDateForDisplay } from "../../../../utils/dateFormat";
 import { getTransactionStatus } from "../../../../utils/statusMap";
 import StatusPill from "../../../atom/StatusPill";
-import SmartTable from "../../../molecules/Table";
+import UdaanTable from "../../../molecules/Table";
 
 export default function UserTransactions() {
     const { t } = useTranslation();
@@ -92,7 +92,7 @@ export default function UserTransactions() {
     return (
         <div className="user__transactions__root mt-6 lg:mt-8">
             <Typography className="mb-4!" variant="h5" fontWeight={600}>{t("messages.transaction_information")}</Typography>
-            <SmartTable
+            <UdaanTable
                 data={courses}
                 columns={columns}
                 loading={isLoading}

@@ -17,7 +17,7 @@ const triggerDebugger = new Function('debugger');
 const ScreenProtection: React.FC<Props> = ({ children }) => {
     const [devToolsOpen, setDevToolsOpen] = useState(false);
     const devToolsRef = useRef(false);
-    const { mode } = useAppSelector((state) => state.smart_theme);
+    const { mode } = useAppSelector((state) => state.udaan_theme);
 
     useEffect(() => {
         // ── Basic content protections ────────────────────────────────────────
@@ -25,7 +25,7 @@ const ScreenProtection: React.FC<Props> = ({ children }) => {
         const handleSelectStart = (e: Event) => e.preventDefault();
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'PrintScreen') {
-                navigator.clipboard.writeText('').catch(() => {});
+                navigator.clipboard.writeText('').catch(() => { });
             }
             // Block Ctrl/Cmd + U (view-source), S (save), P (print)
             if ((e.ctrlKey || e.metaKey) && ['u', 's', 'p'].includes(e.key.toLowerCase())) {
@@ -62,7 +62,7 @@ const ScreenProtection: React.FC<Props> = ({ children }) => {
         // ── Docked DevTools size detection ───────────────────────────────────
         // DevTools docked to side/bottom increases outer vs inner dimensions.
         const sizeCheck = setInterval(() => {
-            const widthDiff  = window.outerWidth  - window.innerWidth;
+            const widthDiff = window.outerWidth - window.innerWidth;
             const heightDiff = window.outerHeight - window.innerHeight;
             if (widthDiff > SIZE_THRESHOLD || heightDiff > SIZE_THRESHOLD) {
                 markOpen();

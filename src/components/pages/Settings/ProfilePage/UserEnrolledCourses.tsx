@@ -6,7 +6,7 @@ import { useGetUserPurchasedCourseQuery } from "../../../../services/courseApi";
 import type { CourseProps } from "../../../../types/course";
 import { getCourseStatus } from "../../../../utils/statusMap";
 import StatusPill from "../../../atom/StatusPill";
-import SmartTable from "../../../molecules/Table";
+import UdaanTable from "../../../molecules/Table";
 
 export default function UserEnrolledCourses() {
     const { t } = useTranslation();
@@ -97,7 +97,7 @@ export default function UserEnrolledCourses() {
     return (
         <div className="user__enrolled__course__root mt-6 lg:mt-8">
             <Typography variant="h5" className="mb-4!" fontWeight={600}>{t("messages.enrolled_courses")}</Typography>
-            <SmartTable
+            <UdaanTable
                 data={courses}
                 columns={columns}
                 loading={isLoading}

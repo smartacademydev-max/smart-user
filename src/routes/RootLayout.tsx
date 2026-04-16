@@ -3,7 +3,7 @@ import ResponsiveDrawer from '../components/pages/layout/sidebar';
 
 export default function RootLayout() {
     return (
-        <div className='smart__root'>
+        <div className='udaan__root'>
             <ResponsiveDrawer >
                 <Outlet />
             </ResponsiveDrawer>

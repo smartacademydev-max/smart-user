@@ -1,9 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { authApi } from '../services/authApi';
-import { controlsApi } from '../services/controlsApi';
 import { categoryApi } from '../services/categoryApi';
 import { commentApi } from '../services/commentApi';
 import { contentApi } from '../services/contentApi';
+import { controlsApi } from '../services/controlsApi';
 import { countryApi } from '../services/countryApi';
 import { courseApi } from '../services/courseApi';
 import { dashboardApi } from '../services/dashboardApi';
@@ -24,7 +24,7 @@ import themeReducer from "../slice/themeSlice";
 import toastReducer from "../slice/toastSlice";
 export const store = configureStore({
     reducer: {
-        smart_theme: themeReducer,
+        udaan_theme: themeReducer,
         auth: authReducer,
         toast: toastReducer,
         readScreen: readingScreenReducer,
