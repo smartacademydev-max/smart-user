@@ -97,7 +97,7 @@ export default function DashboardPurchasedCourseListing() {
                     </Box>
                 )) :
                     courses.map((course) => (
-                        <div className="col-span-1">
+                        <div key={course.id} className="col-span-1">
                             <MyCourseCard course={course} />
                         </div>
                     ))

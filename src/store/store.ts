@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { authApi } from '../services/authApi';
+import { controlsApi } from '../services/controlsApi';
 import { categoryApi } from '../services/categoryApi';
 import { commentApi } from '../services/commentApi';
 import { contentApi } from '../services/contentApi';
@@ -45,7 +46,7 @@ export const store = configureStore({
         [ticketApi.reducerPath]: ticketApi.reducer,
         [discussionApi.reducerPath]: discussionApi.reducer,
         [commentApi.reducerPath]: commentApi.reducer,
-
+        [controlsApi.reducerPath]: controlsApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(authApi.middleware)
@@ -64,6 +65,7 @@ export const store = configureStore({
             .concat(ticketApi.middleware)
             .concat(discussionApi.middleware)
             .concat(commentApi.middleware)
+            .concat(controlsApi.middleware)
 })
 
 export type RootState = ReturnType<typeof store.getState>
