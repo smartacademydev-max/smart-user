@@ -162,7 +162,7 @@ export default function TicketChatPanel({ ticket: propTicket, onTicketUpdated: p
 	const [allReplies, setAllReplies] = useState<TicketReplyProps[]>([]);
 	const [selectedTicket, setSelectedTicket] = useState<TicketProps | null>(propTicket ?? null);
 
-	const { data: ticketsData, refetch: refetchTickets } = useGetAllTicketsQuery(
+	const { data: ticketsData, refetch: refetchTickets, isLoading: ticketsLoading } = useGetAllTicketsQuery(
 		{ pageIndex: 1, pageSize: 20 },
 		{ skip: !!propTicket }
 	);
@@ -175,12 +175,10 @@ export default function TicketChatPanel({ ticket: propTicket, onTicketUpdated: p
 		}
 	}, [ticketsData, propTicket, selectedTicket]);
 
-	// Default onTicketUpdated handler
 	const onTicketUpdated = useCallback(() => {
 		propOnTicketUpdated?.();
 		if (!propTicket) {
 			refetchTickets();
-			// Auto-select first ticket after update
 			setTimeout(() => {
 				refetchTickets();
 			}, 300);
@@ -306,6 +304,7 @@ export default function TicketChatPanel({ ticket: propTicket, onTicketUpdated: p
 	};
 
 	if (!ticket) {
+		const hasNoTickets = !propTicket && !ticketsLoading && ticketsData?.data?.data?.length === 0;
 		return (
 			<Box
 				display="flex"
@@ -314,11 +313,38 @@ export default function TicketChatPanel({ ticket: propTicket, onTicketUpdated: p
 				width="100%"
 				justifyContent="center"
 				alignItems="center"
+				gap={2}
 			>
-				<CircularProgress />
-				<Typography variant="body2" color="text.secondary" mt={2}>
-					{t("messages.loading")}
-				</Typography>
+				{hasNoTickets ? (
+					<>
+						<Typography variant="h6" color="text.secondary">
+							{t("messages.empty_states.tickets.title")}
+						</Typography>
+						<Typography variant="body2" color="text.secondary">
+							{t("messages.empty_states.tickets.description")}
+						</Typography>
+						<Button variant="contained" onClick={() => setOpenForm(true)}>
+							{t("messages.empty_states.tickets.action")}
+						</Button>
+						{openForm && (
+							<TicketForm
+								open={openForm}
+								onClose={() => setOpenForm(false)}
+								onSuccess={() => {
+									setOpenForm(false);
+									refetchTickets();
+								}}
+							/>
+						)}
+					</>
+				) : (
+					<>
+						<CircularProgress />
+						<Typography variant="body2" color="text.secondary" mt={2}>
+							{t("messages.loading")}
+						</Typography>
+					</>
+				)}
 			</Box>
 		);
 	}
