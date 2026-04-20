@@ -55,3 +55,31 @@ export interface DailyQuizSubmitResponse {
         stats: DailyQuizStats;
     };
 }
+
+export type ProgressRange = 7 | 30 | 90;
+
+export interface StudyTimeChartData {
+    chart_data: number[];
+    labels: string[];
+    total_this_week: number;
+    total_this_period: number;
+    change_percentage: number;
+}
+
+export interface StudyTimeResponse {
+    status: string;
+    data: StudyTimeChartData;
+}
+
+export interface TestScoreChartData {
+    chart_data: number[];
+    labels: string[];
+    total_tests: number;
+    avg_score: number;
+    best_score: number;
+}
+
+export interface TestScoreResponse {
+    status: string;
+    data: TestScoreChartData;
+}

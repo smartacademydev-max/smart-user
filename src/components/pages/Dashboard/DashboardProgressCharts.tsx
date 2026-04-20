@@ -1,28 +1,20 @@
-import { Box, MenuItem, Select, Typography, useTheme } from "@mui/material";
+import { Box, MenuItem, Select, Skeleton, Typography, useTheme } from "@mui/material";
 import { useState } from "react";
 import ReactApexChart from "react-apexcharts";
-
-const studyData: Record<number, number[]> = {
-    7: [1.5, 2, 1, 2.5, 3, 2, 2],
-    30: [1, 1.5, 2, 1, 2, 2.5, 1.5, 2, 3, 2, 1, 2.5, 2, 1.5, 2, 2.5, 1, 2, 3, 2.5, 1.5, 2, 1, 2, 3, 2, 1.5, 2.5, 2, 1],
-    90: [42, 55, 48, 60, 52, 58, 63, 49, 56, 61, 54, 59],
-};
-
-const scoreData: Record<number, number[]> = {
-    7: [65, 70, 72, 68, 75, 80, 73],
-    30: [60, 62, 65, 68, 65, 70, 72, 68, 75, 73, 76, 74, 78, 80, 76, 75, 79, 82, 80, 78, 82, 85, 83, 80, 84, 86, 85, 83, 87, 88],
-    90: [62, 65, 68, 70, 73, 76, 75, 78, 80, 82, 85, 88],
-};
-
-const chartLabels: Record<number, string[]> = {
-    7: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    30: Array.from({ length: 30 }, (_, i) => `${i + 1}`),
-    90: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-};
+import { useGetStudyTimeQuery, useGetTestScoresQuery } from "../../../services/dashboardApi";
+import type { ProgressRange } from "../../../types/dashboard";
 
 export default function DashboardProgressCharts() {
     const theme = useTheme();
-    const [range, setRange] = useState<7 | 30 | 90>(30);
+    const [range, setRange] = useState<ProgressRange>(30);
+
+    const { data: studyRes, isLoading: studyLoading } = useGetStudyTimeQuery(range);
+    const { data: scoreRes, isLoading: scoreLoading } = useGetTestScoresQuery(range);
+
+    const studyChartData = studyRes?.data.chart_data ?? [];
+    const studyLabels = studyRes?.data.labels ?? [];
+    const scoreChartData = scoreRes?.data.chart_data ?? [];
+    const scoreLabels = scoreRes?.data.labels ?? [];
 
     const primary = theme.palette.primary.main;
     const primaryLight = theme.palette.primary.light;
@@ -36,8 +28,6 @@ export default function DashboardProgressCharts() {
     const dividerColor = theme.palette.divider;
     const paperBg = theme.palette.background.paper;
     const fontFamily = theme.typography.fontFamily as string;
-    const labels = chartLabels[range];
-
     const baseChartConfig = {
         chart: {
             toolbar: { show: false },
@@ -53,7 +43,7 @@ export default function DashboardProgressCharts() {
             padding: { left: 4, right: 4, top: 0, bottom: 0 },
         },
         xaxis: {
-            categories: labels,
+            categories: [] as string[], // overridden per chart
             labels: {
                 style: { fontSize: "10px", colors: textSecondary, fontFamily },
             },
@@ -71,6 +61,7 @@ export default function DashboardProgressCharts() {
     const studyOptions = {
         ...baseChartConfig,
         chart: { ...baseChartConfig.chart, type: "bar" as const },
+        xaxis: { ...baseChartConfig.xaxis, categories: studyLabels },
         plotOptions: {
             bar: {
                 borderRadius: 5,
@@ -99,6 +90,7 @@ export default function DashboardProgressCharts() {
     const scoreOptions = {
         ...baseChartConfig,
         chart: { ...baseChartConfig.chart, type: "line" as const },
+        xaxis: { ...baseChartConfig.xaxis, categories: scoreLabels },
         colors: [secondary],
         stroke: { curve: "smooth" as const, width: 2.5 },
         markers: {
@@ -128,10 +120,12 @@ export default function DashboardProgressCharts() {
         },
     };
 
-    const weekStudy = studyData[7].reduce((a, b) => a + b, 0).toFixed(0);
-    const monthStudy = studyData[range].reduce((a, b) => a + b, 0).toFixed(0);
-    const avgScore = Math.round(scoreData[range].reduce((a, b) => a + b, 0) / scoreData[range].length);
-    const bestScore = Math.max(...scoreData[range]);
+    const weekStudy = studyRes?.data.total_this_week ?? 0;
+    const periodStudy = studyRes?.data.total_this_period ?? 0;
+    const changePct = studyRes?.data.change_percentage ?? 0;
+    const totalTests = scoreRes?.data.total_tests ?? 0;
+    const avgScore = scoreRes?.data.avg_score ?? 0;
+    const bestScore = scoreRes?.data.best_score ?? 0;
 
     return (
         <Box>
@@ -168,40 +162,55 @@ export default function DashboardProgressCharts() {
                     border: `1px solid ${dividerColor}`,
                     borderRadius: 2,
                     boxShadow: "0 1px 3px rgba(0,0,0,.06), 0 4px 6px rgba(0,0,0,.03)",
+                    opacity: studyLoading ? 0.5 : 1,
+                    transition: "opacity 0.2s",
                 }}>
                     <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                         <Typography variant="body2" fontWeight={700}>Study Time</Typography>
-                        <Box component="span" sx={{
-                            fontSize: "10px", fontWeight: 700,
-                            bgcolor: successLight, color: successMain,
-                            px: "8px", py: "2px", borderRadius: "99px",
-                        }}>
-                            +18% vs last month
-                        </Box>
+                        {studyLoading ? (
+                            <Skeleton variant="rounded" width={100} height={20} sx={{ borderRadius: "99px" }} />
+                        ) : (
+                            <Box component="span" sx={{
+                                fontSize: "10px", fontWeight: 700,
+                                bgcolor: changePct >= 0 ? successLight : "error.light",
+                                color: changePct >= 0 ? successMain : "error.main",
+                                px: "8px", py: "2px", borderRadius: "99px",
+                            }}>
+                                {changePct >= 0 ? "+" : ""}{changePct}% vs last period
+                            </Box>
+                        )}
                     </Box>
 
                     <ReactApexChart
                         options={studyOptions}
-                        series={[{ name: "Study Time", data: studyData[range] }]}
+                        series={[{ name: "Study Time", data: studyChartData }]}
                         type="bar"
                         height={160}
                     />
 
                     <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1, mt: 1 }}>
                         <Box sx={{ textAlign: "center", bgcolor: primaryLight, borderRadius: 1.5, py: 1 }}>
-                            <Typography fontWeight={800} sx={{ fontSize: "18px", lineHeight: 1, color: primaryDark }}>
-                                {weekStudy}h
-                            </Typography>
+                            {studyLoading ? (
+                                <Skeleton variant="text" width={40} height={28} sx={{ mx: "auto" }} />
+                            ) : (
+                                <Typography fontWeight={800} sx={{ fontSize: "18px", lineHeight: 1, color: primaryDark }}>
+                                    {weekStudy}h
+                                </Typography>
+                            )}
                             <Typography variant="caption" sx={{ color: "text.secondary", mt: "2px", display: "block" }}>
                                 This week
                             </Typography>
                         </Box>
                         <Box sx={{ textAlign: "center", bgcolor: primaryLight, borderRadius: 1.5, py: 1 }}>
-                            <Typography fontWeight={800} sx={{ fontSize: "18px", lineHeight: 1, color: primaryDark }}>
-                                {monthStudy}h
-                            </Typography>
+                            {studyLoading ? (
+                                <Skeleton variant="text" width={40} height={28} sx={{ mx: "auto" }} />
+                            ) : (
+                                <Typography fontWeight={800} sx={{ fontSize: "18px", lineHeight: 1, color: primaryDark }}>
+                                    {periodStudy}h
+                                </Typography>
+                            )}
                             <Typography variant="caption" sx={{ color: "text.secondary", mt: "2px", display: "block" }}>
-                                This month
+                                This period
                             </Typography>
                         </Box>
                     </Box>
@@ -214,38 +223,52 @@ export default function DashboardProgressCharts() {
                     border: `1px solid ${dividerColor}`,
                     borderRadius: 2,
                     boxShadow: "0 1px 3px rgba(0,0,0,.06), 0 4px 6px rgba(0,0,0,.03)",
+                    opacity: scoreLoading ? 0.5 : 1,
+                    transition: "opacity 0.2s",
                 }}>
                     <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                         <Typography variant="body2" fontWeight={700}>Test Scores</Typography>
-                        <Box component="span" sx={{
-                            fontSize: "10px", fontWeight: 700,
-                            bgcolor: secondaryLight, color: secondaryDark,
-                            px: "8px", py: "2px", borderRadius: "99px",
-                        }}>
-                            {scoreData[range].length} tests taken
-                        </Box>
+                        {scoreLoading ? (
+                            <Skeleton variant="rounded" width={90} height={20} sx={{ borderRadius: "99px" }} />
+                        ) : (
+                            <Box component="span" sx={{
+                                fontSize: "10px", fontWeight: 700,
+                                bgcolor: secondaryLight, color: secondaryDark,
+                                px: "8px", py: "2px", borderRadius: "99px",
+                            }}>
+                                {totalTests} tests taken
+                            </Box>
+                        )}
                     </Box>
 
                     <ReactApexChart
                         options={scoreOptions}
-                        series={[{ name: "Score", data: scoreData[range] }]}
+                        series={[{ name: "Score", data: scoreChartData }]}
                         type="line"
                         height={160}
                     />
 
                     <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1, mt: 1 }}>
                         <Box sx={{ textAlign: "center", bgcolor: secondaryLight, borderRadius: 1.5, py: 1 }}>
-                            <Typography fontWeight={800} sx={{ fontSize: "18px", lineHeight: 1, color: secondaryDark }}>
-                                {avgScore}%
-                            </Typography>
+                            {scoreLoading ? (
+                                <Skeleton variant="text" width={40} height={28} sx={{ mx: "auto" }} />
+                            ) : (
+                                <Typography fontWeight={800} sx={{ fontSize: "18px", lineHeight: 1, color: secondaryDark }}>
+                                    {avgScore}%
+                                </Typography>
+                            )}
                             <Typography variant="caption" sx={{ color: "text.secondary", mt: "2px", display: "block" }}>
                                 Avg score
                             </Typography>
                         </Box>
                         <Box sx={{ textAlign: "center", bgcolor: secondaryLight, borderRadius: 1.5, py: 1 }}>
-                            <Typography fontWeight={800} sx={{ fontSize: "18px", lineHeight: 1, color: secondaryDark }}>
-                                {bestScore}%
-                            </Typography>
+                            {scoreLoading ? (
+                                <Skeleton variant="text" width={40} height={28} sx={{ mx: "auto" }} />
+                            ) : (
+                                <Typography fontWeight={800} sx={{ fontSize: "18px", lineHeight: 1, color: secondaryDark }}>
+                                    {bestScore}%
+                                </Typography>
+                            )}
                             <Typography variant="caption" sx={{ color: "text.secondary", mt: "2px", display: "block" }}>
                                 Best score
                             </Typography>
