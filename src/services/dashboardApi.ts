@@ -1,12 +1,12 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import type { BannerList } from "../types/content";
-import type { AnalyticsList, DailyQuizResponse, DailyQuizSubmitPayload, DailyQuizSubmitResponse } from "../types/dashboard";
+import type { AnalyticsList, DailyQuizResponse, DailyQuizSubmitPayload, DailyQuizSubmitResponse, ProgressRange, StudyTimeResponse, TestScoreResponse } from "../types/dashboard";
 import { baseQuery } from "./baseQuery";
 
 export const dashboardApi = createApi({
     reducerPath: "dashboardApi",
     baseQuery: baseQuery,
-    tagTypes: ["Analytics", "DailyQuiz"],
+    tagTypes: ["Analytics", "DailyQuiz", "StudyTime", "TestScores"],
     endpoints: (builder) => ({
         getAnalytics: builder.query<AnalyticsList, void>({
             query: () => ({
@@ -34,7 +34,24 @@ export const dashboardApi = createApi({
                 body
             }),
             invalidatesTags: ["DailyQuiz"]
-        })
+        }),
+        getStudyTime: builder.query<StudyTimeResponse, ProgressRange>({
+            query: (range) => ({
+                url: `/progress/study-time`,
+                method: "GET",
+                params: { range }
+            }),
+            providesTags: ["StudyTime"]
+        }),
+        getTestScores: builder.query<TestScoreResponse, ProgressRange>({
+            query: (range) => ({
+                url: `/progress/test-scores`,
+                method: "GET",
+                params: { range }
+            }),
+            providesTags: ["TestScores"]
+        }),
+
     })
 })
 
@@ -42,5 +59,7 @@ export const {
     useGetAnalyticsQuery,
     useGetBannerQuery,
     useGetDailyQuizQuery,
-    useSubmitDailyQuizAnswerMutation
+    useSubmitDailyQuizAnswerMutation,
+    useGetStudyTimeQuery,
+    useGetTestScoresQuery
 } = dashboardApi;
