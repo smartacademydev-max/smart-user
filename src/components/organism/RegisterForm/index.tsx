@@ -5,12 +5,27 @@ import * as Yup from "yup";
 import { PATH } from "../../../routes/PATH";
 import { useRegisterMutation } from "../../../services/authApi";
 import { showToast } from "../../../slice/toastSlice";
-import { useAppDispatch } from "../../../store/hook";
+import { useAppDispatch, useAppSelector } from "../../../store/hook";
+import { useEffect } from "react";
+
 export default function RegisterForm() {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [registerUser, { isLoading }] = useRegisterMutation();
+    const user = useAppSelector((state) => state.auth.user);
+
+    // Redirect if user is already logged in
+    useEffect(() => {
+        if (user) {
+            const redirectUrl = getPendingRedirectUrl();
+            if (redirectUrl) {
+                navigate(redirectUrl);
+            } else {
+                navigate(PATH.DASHBOARD.ROOT);
+            }
+        }
+    }, [user, navigate]);
 
     const getPendingRedirectUrl = (): string => {
         const courseId = searchParams.get("course");
