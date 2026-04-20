@@ -1,6 +1,6 @@
 import { Button, FormHelperText, InputLabel, OutlinedInput } from "@mui/material";
 import { useFormik } from "formik";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import * as Yup from "yup";
 import { PATH } from "../../../routes/PATH";
 import { useRegisterMutation } from "../../../services/authApi";
@@ -9,7 +9,18 @@ import { useAppDispatch } from "../../../store/hook";
 export default function RegisterForm() {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const [registerUser, { isLoading }] = useRegisterMutation();
+
+    const getPendingRedirectUrl = (): string => {
+        const courseId = searchParams.get("course");
+        const testId = searchParams.get("test");
+        const bundleId = searchParams.get("bundle");
+        if (courseId) return PATH.COURSE_MANAGEMENT.COURSES.VIEW_COURSE.ROOT(Number(courseId));
+        if (testId) return PATH.TEST.VIEW_TEST.ROOT({ testId: Number(testId) });
+        if (bundleId) return PATH.TEST.EXPLORE_TEST.BUNDLE_TEST.VIEW_BUNDLE.ROOT(Number(bundleId));
+        return "";
+    };
 
     const validationSchema = Yup.object({
         name: Yup.string().required("Full name is required"),
@@ -38,7 +49,9 @@ export default function RegisterForm() {
                         severity: "success",
                     }),
                 );
-                navigate(`${PATH.AUTH.VERIFY_OTP.ROOT}?phone=${values.phone}`)
+                const redirectUrl = getPendingRedirectUrl();
+                const otpPath = `${PATH.AUTH.VERIFY_OTP.ROOT}?phone=${values.phone}${redirectUrl ? `&redirect_url=${encodeURIComponent(redirectUrl)}` : ""}`;
+                navigate(otpPath);
             } catch (e: any) {
                 dispatch(
                     showToast({
