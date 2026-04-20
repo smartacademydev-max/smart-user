@@ -1,12 +1,12 @@
 import { Button, FormHelperText, InputLabel, OutlinedInput } from "@mui/material";
 import { useFormik } from "formik";
+import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import * as Yup from "yup";
 import { PATH } from "../../../routes/PATH";
 import { useRegisterMutation } from "../../../services/authApi";
 import { showToast } from "../../../slice/toastSlice";
 import { useAppDispatch, useAppSelector } from "../../../store/hook";
-import { useEffect } from "react";
 
 export default function RegisterForm() {
     const dispatch = useAppDispatch();
@@ -32,7 +32,7 @@ export default function RegisterForm() {
         const testId = searchParams.get("test");
         const bundleId = searchParams.get("bundle");
         if (courseId) return PATH.COURSE_MANAGEMENT.COURSES.VIEW_COURSE.ROOT(Number(courseId));
-        if (testId) return PATH.TEST.VIEW_TEST.ROOT({ testId: Number(testId) });
+        if (testId) return PATH.TEST.ROOT;
         if (bundleId) return PATH.TEST.EXPLORE_TEST.BUNDLE_TEST.VIEW_BUNDLE.ROOT(Number(bundleId));
         return "";
     };
