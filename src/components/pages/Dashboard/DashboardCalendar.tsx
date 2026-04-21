@@ -151,7 +151,7 @@ export default function DashboardCalendar({
     const errorMain = theme.palette.error.main;
     const infoMain = theme.palette.info.main;
     const bgDefault = theme.palette.background.default;
-    const bgPaper = theme.palette.background.paper;
+    // const bgPaper = theme.palette.background.paper;
 
     const navBtn: React.CSSProperties = {
         width: '26px', height: '26px', borderRadius: '6px',
