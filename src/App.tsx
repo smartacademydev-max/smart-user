@@ -19,7 +19,7 @@ export default function App() {
         }}
       >
         {/* Left column */}
-        <Box className="col-span-8" sx={{ display: "flex", flexDirection: "column", gap: "18px", overflow: "hidden" }}>
+        <Box className="xl:col-span-8" sx={{ display: "flex", flexDirection: "column", gap: "18px", overflow: "hidden" }}>
           <DashboardTopBanners />
           <DashboardAnalytics />
           <DashboardProgressCharts />
@@ -28,8 +28,8 @@ export default function App() {
           <DashboardDailyQuiz />
         </Box>
 
-        {/* Right column — Calendar at top, notices + live below */}
-        <Box className="col-span-4" sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+
+        <Box className="xl:col-span-4 w-full" sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <LiveClassAndTestFilter />
         </Box>
       </Box>

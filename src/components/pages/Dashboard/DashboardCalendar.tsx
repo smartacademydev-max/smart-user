@@ -1,169 +1,22 @@
 import { useTheme } from '@mui/material/styles';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-/**
- * Production-Ready Nepali Calendar Component
- * Based on official Bikram Sambat calendar data
- * Accurate BS to AD conversion and vice versa
- */
-
-// Comprehensive BS calendar data (2000 BS to 2100 BS)
-// Each array contains the number of days in each month for that year
-const BS_CALENDAR_DATA: { [key: number]: number[] } = {
-    // mo  B   Je  As  Sh  Bh  Aw  K   M   P   Mg  F   C
-    2082: [31, 31, 32, 31, 31, 31, 30, 30, 29, 30, 29, 30],
-    2083: [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
-};
-
-const BS_AD_REFERENCE = {
-    bsYear: 2083,
-    bsMonth: 1,
-    bsDay: 1,
-    adDate: new Date(2026, 3, 14),
-};
-
-const NEPALI_MONTHS = [
-    'बैशाख', 'जेष्ठ', 'आषाढ', 'श्रावण', 'भाद्र', 'आश्विन',
-    'कार्तिक', 'मंसिर', 'पौष', 'माघ', 'फाल्गुन', 'चैत्र'
-];
-
-const ENGLISH_MONTHS = [
-    'Baisakh', 'Jestha', 'Ashadh', 'Shrawan', 'Bhadra', 'Ashwin',
-    'Kartik', 'Mangsir', 'Poush', 'Magh', 'Falgun', 'Chaitra'
-];
-
-const AD_MONTHS_FULL = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-];
+import {
+    BS_CALENDAR_DATA,
+    ENGLISH_MONTHS,
+    NEPALI_MONTHS,
+    SHORT_WEEKDAYS_ENGLISH,
+    SHORT_WEEKDAYS_NEPALI,
+    adToBs,
+    bsToAd,
+    getDaysInBSMonth,
+    getFirstDayOfBSMonth,
+    toNepaliNumber,
+    type BSDate,
+} from '../../../utils/nepaliCalendar';
 
 const AD_MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-const SHORT_WEEKDAYS_NEPALI = ['आइत', 'सोम', 'मंगल', 'बुध', 'बिहि', 'शुक्र', 'शनि'];
-const SHORT_WEEKDAYS_ENGLISH = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-interface BSDate {
-    year: number;
-    month: number;
-    day: number;
-}
-
-const toNepaliNumber = (num: number | string): string => {
-    const nepaliDigits = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
-    return num.toString().split('').map(digit => {
-        return digit >= '0' && digit <= '9' ? nepaliDigits[parseInt(digit)] : digit;
-    }).join('');
-};
-
-
-const countBSDays = (fromYear: number, fromMonth: number, fromDay: number,
-    toYear: number, toMonth: number, toDay: number): number => {
-    let totalDays = 0;
-
-    if (fromYear === toYear && fromMonth === toMonth && fromDay === toDay) {
-        return 0;
-    }
-
-    if (toYear > fromYear || (toYear === fromYear && toMonth > fromMonth) ||
-        (toYear === fromYear && toMonth === fromMonth && toDay > fromDay)) {
-
-        totalDays += (BS_CALENDAR_DATA[fromYear][fromMonth - 1] - fromDay);
-
-        let currentYear = fromYear;
-        let currentMonth = fromMonth + 1;
-
-        while (currentYear < toYear || (currentYear === toYear && currentMonth < toMonth)) {
-            if (currentMonth > 12) {
-                currentMonth = 1;
-                currentYear++;
-            }
-
-            if (BS_CALENDAR_DATA[currentYear]) {
-                totalDays += BS_CALENDAR_DATA[currentYear][currentMonth - 1];
-            }
-            currentMonth++;
-        }
-
-        totalDays += toDay;
-
-        return totalDays;
-    }
-
-    return -countBSDays(toYear, toMonth, toDay, fromYear, fromMonth, fromDay);
-};
-
-const bsToAd = (bsYear: number, bsMonth: number, bsDay: number): Date => {
-    const { bsYear: refBsYear, bsMonth: refBsMonth, bsDay: refBsDay, adDate: refAdDate } = BS_AD_REFERENCE;
-
-    const daysDiff = countBSDays(refBsYear, refBsMonth, refBsDay, bsYear, bsMonth, bsDay);
-
-    const resultDate = new Date(refAdDate);
-    resultDate.setDate(resultDate.getDate() + daysDiff);
-
-    return resultDate;
-};
-
-const adToBs = (adDate: Date): BSDate => {
-    const { bsYear: refBsYear, bsMonth: refBsMonth, bsDay: refBsDay, adDate: refAdDate } = BS_AD_REFERENCE;
-
-    const timeDiff = adDate.getTime() - refAdDate.getTime();
-    const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-
-    let currentYear = refBsYear;
-    let currentMonth = refBsMonth;
-    let currentDay = refBsDay;
-    let remainingDays = daysDiff;
-
-    if (daysDiff >= 0) {
-        while (remainingDays > 0) {
-            const daysInCurrentMonth = BS_CALENDAR_DATA[currentYear][currentMonth - 1];
-            const daysLeftInMonth = daysInCurrentMonth - currentDay + 1;
-
-            if (remainingDays >= daysLeftInMonth) {
-                remainingDays -= daysLeftInMonth;
-                currentDay = 1;
-                currentMonth++;
-
-                if (currentMonth > 12) {
-                    currentMonth = 1;
-                    currentYear++;
-                }
-            } else {
-                currentDay += remainingDays;
-                remainingDays = 0;
-            }
-        }
-    } else {
-        remainingDays = Math.abs(daysDiff);
-
-        while (remainingDays > 0) {
-            if (remainingDays >= currentDay) {
-                remainingDays -= currentDay;
-                currentMonth--;
-
-                if (currentMonth < 1) {
-                    currentMonth = 12;
-                    currentYear--;
-                }
-
-                currentDay = BS_CALENDAR_DATA[currentYear][currentMonth - 1];
-            } else {
-                currentDay -= remainingDays;
-                remainingDays = 0;
-            }
-        }
-    }
-
-    return { year: currentYear, month: currentMonth, day: currentDay };
-};
-
-
-const getFirstDayOfBSMonth = (year: number, month: number): number => {
-    const adDate = bsToAd(year, month, 1);
-    return adDate.getDay();
-};
-
+const AD_MONTHS_FULL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 interface DashboardCalendarProps {
     onDateSelect?: (adDate: Date) => void;
@@ -173,15 +26,18 @@ interface DashboardCalendarProps {
 }
 
 const formatAD = (d: Date) =>
-    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
-export default function DashboardCalendar({ onDateSelect, onMonthChange, liveClassDates = [], testDates = [] }: DashboardCalendarProps) {
+export default function DashboardCalendar({
+    onDateSelect,
+    onMonthChange,
+    liveClassDates = [],
+    testDates = [],
+}: DashboardCalendarProps) {
     const theme = useTheme();
     const today = new Date();
     const todayBS = useMemo(() => adToBs(new Date()), []);
 
-
-    // Calendar mode: 'bs' = Bikram Sambat, 'ad' = Anno Domini (Gregorian)
     const [calMode, setCalMode] = useState<'bs' | 'ad'>('bs');
 
     // BS state
@@ -192,22 +48,28 @@ export default function DashboardCalendar({ onDateSelect, onMonthChange, liveCla
 
     // AD state
     const [adYear, setAdYear] = useState(today.getFullYear());
-    const [adMonth, setAdMonth] = useState(today.getMonth()); // 0-indexed
+    const [adMonth, setAdMonth] = useState(today.getMonth());
     const [adViewMode, setAdViewMode] = useState<'month' | 'year'>('month');
     const [selectedADDay, setSelectedADDay] = useState<number | null>(null);
 
-    const daysInMonth = BS_CALENDAR_DATA[currentYear]?.[currentMonth - 1] || 30;
-    const firstDayOfMonth = useMemo(() =>
-        getFirstDayOfBSMonth(currentYear, currentMonth),
-        [currentYear, currentMonth]
-    );
+    const { i18n } = useTranslation();
+    const useNepaliScript = i18n.language === 'np';
 
-    // AD helpers
+    const daysInMonth = getDaysInBSMonth(currentYear, currentMonth);
+    const firstDayOfMonth = useMemo(() => getFirstDayOfBSMonth(currentYear, currentMonth), [currentYear, currentMonth]);
+    const firstAdDate = useMemo(() => bsToAd(currentYear, currentMonth, 1), [currentYear, currentMonth]);
+
     const daysInADMonth = new Date(adYear, adMonth + 1, 0).getDate();
     const firstDayOfADMonth = new Date(adYear, adMonth, 1).getDay();
 
-    const { i18n } = useTranslation();
-    const useNepaliScript = i18n.language === 'np';
+    const adRangeLabel = useMemo(() => {
+        const last = new Date(firstAdDate.getTime() + (daysInMonth - 1) * 86400000);
+        const m1 = AD_MONTHS_SHORT[firstAdDate.getMonth()];
+        const m2 = AD_MONTHS_SHORT[last.getMonth()];
+        return firstAdDate.getMonth() === last.getMonth()
+            ? `${m1} ${last.getFullYear()}`
+            : `${m1}/${m2} ${last.getFullYear()}`;
+    }, [firstAdDate, daysInMonth]);
 
     // Notify parent when BS month changes
     useEffect(() => {
@@ -225,7 +87,6 @@ export default function DashboardCalendar({ onDateSelect, onMonthChange, liveCla
         onMonthChange(start, end);
     }, [adYear, adMonth, calMode]);
 
-    // Notify parent on mode switch
     useEffect(() => {
         if (!onMonthChange) return;
         if (calMode === 'bs') {
@@ -241,112 +102,39 @@ export default function DashboardCalendar({ onDateSelect, onMonthChange, liveCla
 
     // BS navigation
     const handlePrevMonth = () => {
-        if (currentMonth === 1) {
-            if (BS_CALENDAR_DATA[currentYear - 1]) {
-                setCurrentMonth(12);
-                setCurrentYear(currentYear - 1);
-            }
-        } else {
-            setCurrentMonth(currentMonth - 1);
-        }
+        if (currentMonth === 1) { if (BS_CALENDAR_DATA[currentYear - 1]) { setCurrentMonth(12); setCurrentYear(currentYear - 1); } }
+        else setCurrentMonth(currentMonth - 1);
     };
-
     const handleNextMonth = () => {
-        if (currentMonth === 12) {
-            if (BS_CALENDAR_DATA[currentYear + 1]) {
-                setCurrentMonth(1);
-                setCurrentYear(currentYear + 1);
-            }
-        } else {
-            setCurrentMonth(currentMonth + 1);
-        }
+        if (currentMonth === 12) { if (BS_CALENDAR_DATA[currentYear + 1]) { setCurrentMonth(1); setCurrentYear(currentYear + 1); } }
+        else setCurrentMonth(currentMonth + 1);
     };
-
-    const handlePrevYear = () => {
-        if (BS_CALENDAR_DATA[currentYear - 1]) {
-            setCurrentYear(currentYear - 1);
-        }
-    };
-
-    const handleNextYear = () => {
-        if (BS_CALENDAR_DATA[currentYear + 1]) {
-            setCurrentYear(currentYear + 1);
-        }
-    };
+    const handlePrevYear = () => { if (BS_CALENDAR_DATA[currentYear - 1]) setCurrentYear(currentYear - 1); };
+    const handleNextYear = () => { if (BS_CALENDAR_DATA[currentYear + 1]) setCurrentYear(currentYear + 1); };
 
     // AD navigation
-    const handleADPrevMonth = () => {
-        if (adMonth === 0) { setAdMonth(11); setAdYear(adYear - 1); }
-        else setAdMonth(adMonth - 1);
-    };
-
-    const handleADNextMonth = () => {
-        if (adMonth === 11) { setAdMonth(0); setAdYear(adYear + 1); }
-        else setAdMonth(adMonth + 1);
-    };
-
+    const handleADPrevMonth = () => { if (adMonth === 0) { setAdMonth(11); setAdYear(adYear - 1); } else setAdMonth(adMonth - 1); };
+    const handleADNextMonth = () => { if (adMonth === 11) { setAdMonth(0); setAdYear(adYear + 1); } else setAdMonth(adMonth + 1); };
     const handleADPrevYear = () => setAdYear(adYear - 1);
     const handleADNextYear = () => setAdYear(adYear + 1);
 
     const handleDateClick = (day: number) => {
         setSelectedDate({ year: currentYear, month: currentMonth, day });
-        const adDate = bsToAd(currentYear, currentMonth, day);
-        onDateSelect?.(adDate);
+        onDateSelect?.(new Date(firstAdDate.getTime() + (day - 1) * 86400000));
     };
-
     const handleADDateClick = (day: number) => {
         setSelectedADDay(day);
         onDateSelect?.(new Date(adYear, adMonth, day));
     };
 
-    const handleMonthClick = (month: number) => {
-        setCurrentMonth(month);
-        setViewMode('month');
-    };
-
-    const handleADMonthClick = (month: number) => {
-        setAdMonth(month);
-        setAdViewMode('month');
-    };
-
-    const isToday = (day: number) => {
-        return todayBS.year === currentYear &&
-            todayBS.month === currentMonth &&
-            todayBS.day === day;
-    };
-
-    const isTodayAD = (day: number) =>
-        today.getFullYear() === adYear && today.getMonth() === adMonth && today.getDate() === day;
-
-    const isSelected = (day: number) => {
-        return selectedDate?.year === currentYear &&
-            selectedDate?.month === currentMonth &&
-            selectedDate?.day === day;
-    };
-
-    const isSelectedAD = (day: number) => selectedADDay === day;
-
-    const isSaturday = (day: number) => {
-        const date = bsToAd(currentYear, currentMonth, day);
-        return date.getDay() === 6;
-    };
-
-    const isSaturdayAD = (day: number) => new Date(adYear, adMonth, day).getDay() === 6;
-
     const calendarDays = useMemo(() => {
-        const days: (number | null)[] = [];
-        for (let i = 0; i < firstDayOfMonth; i++) {
-            days.push(null);
-        }
-        for (let day = 1; day <= daysInMonth; day++) {
-            days.push(day);
-        }
+        const days: (number | null)[] = Array(firstDayOfMonth).fill(null);
+        for (let d = 1; d <= daysInMonth; d++) days.push(d);
         return days;
     }, [firstDayOfMonth, daysInMonth]);
 
     const adCalendarDays = useMemo(() => {
-        const days: (number | null)[] = [];
-        for (let i = 0; i < firstDayOfADMonth; i++) days.push(null);
+        const days: (number | null)[] = Array(firstDayOfADMonth).fill(null);
         for (let d = 1; d <= daysInADMonth; d++) days.push(d);
         return days;
     }, [firstDayOfADMonth, daysInADMonth]);
@@ -354,7 +142,7 @@ export default function DashboardCalendar({ onDateSelect, onMonthChange, liveCla
     const formatADDay = (day: number) =>
         `${adYear}-${String(adMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
-    // Theme-driven style tokens
+    // Theme tokens
     const dividerColor = theme.palette.divider;
     const textMuted = theme.palette.text.secondary;
     const textPrimary = theme.palette.text.primary;
@@ -363,85 +151,69 @@ export default function DashboardCalendar({ onDateSelect, onMonthChange, liveCla
     const errorMain = theme.palette.error.main;
     const infoMain = theme.palette.info.main;
     const bgDefault = theme.palette.background.default;
+    const bgPaper = theme.palette.background.paper;
 
-    const navBtnStyle: React.CSSProperties = {
+    const navBtn: React.CSSProperties = {
         width: '26px', height: '26px', borderRadius: '6px',
         border: `1px solid ${dividerColor}`, background: 'transparent',
         cursor: 'pointer', display: 'flex', alignItems: 'center',
         justifyContent: 'center', color: textMuted, flexShrink: 0,
     };
 
-    // AD | BS toggle pill styles
     const toggleBase: React.CSSProperties = {
-        padding: '2px 7px', fontSize: '10px', fontWeight: 700,
+        padding: '2px 8px', fontSize: '10px', fontWeight: 700,
         cursor: 'pointer', border: 'none', borderRadius: '4px',
-        fontFamily: 'inherit', lineHeight: 1.6,
-        transition: 'all 0.15s',
+        fontFamily: 'inherit', lineHeight: 1.6, transition: 'all 0.15s',
     };
-
-    const weekdayHeaders = useNepaliScript ? SHORT_WEEKDAYS_NEPALI : SHORT_WEEKDAYS_ENGLISH;
 
     return (
         <div className="w-full">
-            {/* AD | BS toggle — always visible at top */}
-            <div style={{
-                display: 'flex', justifyContent: 'flex-end', marginBottom: '8px',
-            }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '8px' }}>
                 <div style={{
                     display: 'flex', alignItems: 'center',
-                    border: `1px solid ${dividerColor}`,
-                    borderRadius: '6px', overflow: 'hidden',
-                    background: bgDefault,
+                    border: `1px solid ${dividerColor}`, borderRadius: '6px',
+                    overflow: 'hidden', background: bgDefault,
                 }}>
-                    <button
-                        onClick={() => setCalMode('ad')}
-                        style={{
-                            ...toggleBase,
-                            background: calMode === 'ad' ? primaryMain : 'transparent',
-                            color: calMode === 'ad' ? '#fff' : textMuted,
-                        }}
-                    >
-                        AD
-                    </button>
-                    <button
-                        onClick={() => setCalMode('bs')}
-                        style={{
-                            ...toggleBase,
-                            background: calMode === 'bs' ? primaryMain : 'transparent',
-                            color: calMode === 'bs' ? '#fff' : textMuted,
-                        }}
-                    >
-                        BS
-                    </button>
+                    <button onClick={() => setCalMode('ad')} style={{
+                        ...toggleBase,
+                        background: calMode === 'ad' ? primaryMain : 'transparent',
+                        color: calMode === 'ad' ? '#fff' : textMuted,
+                    }}>AD</button>
+                    <button onClick={() => setCalMode('bs')} style={{
+                        ...toggleBase,
+                        background: calMode === 'bs' ? primaryMain : 'transparent',
+                        color: calMode === 'bs' ? '#fff' : textMuted,
+                    }}>BS</button>
                 </div>
             </div>
 
-            {/* ── BS CALENDAR ── */}
             {calMode === 'bs' && (
                 viewMode === 'year' ? (
                     <div>
-                        <div className="flex items-center justify-between mb-3">
-                            <button onClick={handlePrevYear} style={navBtnStyle}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                            <button onClick={handlePrevYear} style={navBtn}>
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
                             </button>
-                            <button onClick={() => setViewMode('month')} className="text-center hover:opacity-70 transition-opacity">
-                                <div style={{ fontSize: '14px', fontWeight: 700, color: textPrimary }}>{useNepaliScript ? toNepaliNumber(currentYear) : currentYear}</div>
+                            <button onClick={() => setViewMode('month')} style={{ background: 'none', border: 'none', cursor: 'pointer', textAlign: 'center' }}>
+                                <div style={{ fontSize: '14px', fontWeight: 700, color: textPrimary }}>
+                                    {useNepaliScript ? toNepaliNumber(currentYear) : currentYear}
+                                </div>
                                 <div style={{ fontSize: '11px', color: textMuted, marginTop: '1px' }}>Select Month</div>
                             </button>
-                            <button onClick={handleNextYear} style={navBtnStyle}>
+                            <button onClick={handleNextYear} style={navBtn}>
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M9 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
                             </button>
                         </div>
                         <div className="grid grid-cols-3 gap-2">
-                            {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => {
-                                const isCurrentMonth = month === todayBS.month && currentYear === todayBS.year;
-                                const isSelectedMonth = month === currentMonth;
+                            {Array.from({ length: 12 }, (_, i) => i + 1).map(month => {
+                                const isCur = month === todayBS.month && currentYear === todayBS.year;
+                                const isSel = month === currentMonth;
                                 return (
-                                    <button key={month} onClick={() => handleMonthClick(month)} style={{
+                                    <button key={month} onClick={() => { setCurrentMonth(month); setViewMode('month'); }} style={{
                                         padding: '7px 4px', borderRadius: '6px', textAlign: 'center',
                                         fontSize: '11px', fontWeight: 600, cursor: 'pointer', border: 'none',
-                                        background: isCurrentMonth ? primaryMain : isSelectedMonth ? `${primaryMain}1A` : bgDefault,
-                                        color: isCurrentMonth ? '#fff' : isSelectedMonth ? primaryMain : textPrimary,
+                                        background: isCur ? primaryMain : isSel ? `${primaryMain}1A` : bgDefault,
+                                        color: isCur ? '#fff' : isSel ? primaryMain : textPrimary,
                                         transition: 'all .15s',
                                     }}>
                                         {useNepaliScript ? NEPALI_MONTHS[month - 1] : ENGLISH_MONTHS[month - 1]}
@@ -451,64 +223,104 @@ export default function DashboardCalendar({ onDateSelect, onMonthChange, liveCla
                         </div>
                     </div>
                 ) : (
+                    /* Month view — image-style layout */
                     <div>
-                        {/* BS Header */}
-                        <div className="flex items-center justify-between mb-3">
-                            <button onClick={() => setViewMode('year')} className="text-left hover:opacity-70 transition-opacity">
-                                <div style={{ fontSize: '14px', fontWeight: 700, color: textPrimary }}>
-                                    {useNepaliScript ? NEPALI_MONTHS[currentMonth - 1] : ENGLISH_MONTHS[currentMonth - 1]}{' '}
-                                    {useNepaliScript ? toNepaliNumber(currentYear) : currentYear}
-                                </div>
-                                {/* <div style={{ fontSize: '11px', color: textMuted, marginTop: '1px' }}>Bikram Sambat</div> */}
+                        {/* Header: BS month name (left) | nav arrows | AD range (right) */}
+                        <div style={{
+                            display: 'flex', alignItems: 'center',
+                            justifyContent: 'space-between', marginBottom: '8px',
+                        }}>
+                            <button onClick={() => setViewMode('year')} style={{
+                                background: 'none', border: 'none', cursor: 'pointer',
+                                padding: 0, textAlign: 'left',
+                            }}>
+                                <span style={{ fontSize: '15px', fontWeight: 700, color: textPrimary }}>
+                                    {useNepaliScript ? NEPALI_MONTHS[currentMonth - 1] : ENGLISH_MONTHS[currentMonth - 1]}
+                                </span>
                             </button>
 
-                            <div className="flex gap-1">
-                                <button onClick={handlePrevMonth} style={navBtnStyle}>
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
-                                </button>
-                                <button onClick={handleNextMonth} style={navBtnStyle}>
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M9 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
-                                </button>
-                            </div>
+                            <span style={{ fontSize: '11px', color: textMuted, fontWeight: 500 }}>
+                                {adRangeLabel}
+                            </span>
                         </div>
 
-                        {/* Day headers */}
-                        <div className="grid grid-cols-7 gap-0.5 text-center mb-1">
-                            {weekdayHeaders.map((day, index) => (
-                                <div key={index} style={{ fontSize: '10px', fontWeight: 600, color: textMuted, padding: '3px 0', textTransform: 'uppercase' }}>{day}</div>
+                        {/* Navigation row */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                            <button onClick={handlePrevMonth} style={navBtn}>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+                            </button>
+                            <button onClick={handleNextMonth} style={navBtn}>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M9 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+                            </button>
+                        </div>
+
+                        {/* Weekday headers */}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', marginBottom: '4px' }}>
+                            {SHORT_WEEKDAYS_NEPALI.map((label, i) => (
+                                <div key={i} style={{
+                                    textAlign: 'center', fontSize: '11px', fontWeight: 600, padding: '2px 0',
+                                    color: i === 6 ? errorMain : textMuted,
+                                }}>
+                                    {label}
+                                </div>
                             ))}
                         </div>
 
-                        {/* BS Calendar days */}
-                        <div className="grid grid-cols-7 gap-0.5 text-center">
+                        {/* Calendar cells */}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', rowGap: '2px' }}>
                             {calendarDays.map((day, index) => {
                                 if (!day) return <div key={index} />;
-                                const adStr = formatAD(bsToAd(currentYear, currentMonth, day));
-                                const hasLive = liveClassDates.some(d => d === adStr);
-                                const hasTest = testDates.some(d => d === adStr);
-                                const hasDots = hasLive || hasTest;
-                                const todayCell = isToday(day);
+
+                                const dayOfWeek = (firstDayOfMonth + day - 1) % 7;
+                                const isSat = dayOfWeek === 6;
+                                const adDayDate = new Date(firstAdDate.getTime() + (day - 1) * 86400000);
+                                const adDayNum = adDayDate.getDate();
+                                const adStr = formatAD(adDayDate);
+                                const hasLive = liveClassDates.includes(adStr);
+                                const hasTest = testDates.includes(adStr);
+                                const isToday = todayBS.year === currentYear && todayBS.month === currentMonth && todayBS.day === day;
+                                const isSel = selectedDate?.year === currentYear && selectedDate?.month === currentMonth && selectedDate?.day === day;
+
+                                const dayColor = isToday ? '#fff'
+                                    : isSel ? primaryMain
+                                        : isSat ? errorMain
+                                            : textPrimary;
+
                                 return (
-                                    <button key={index} onClick={() => handleDateClick(day)} style={{
-                                        fontSize: '11.5px',
-                                        padding: hasDots ? '5px 2px 3px' : '5px 2px',
-                                        borderRadius: '6px',
-                                        cursor: 'pointer', border: 'none',
-                                        fontWeight: todayCell ? 700 : 500,
-                                        background: todayCell ? successMain : isSelected(day) ? `${primaryMain}1A` : 'transparent',
-                                        color: todayCell ? '#fff' : isSelected(day) ? primaryMain : isSaturday(day) ? errorMain : textPrimary,
-                                        transition: 'background .12s',
-                                        display: 'flex', flexDirection: 'column', alignItems: 'center',
-                                    }}>
-                                        {useNepaliScript ? toNepaliNumber(day) : day}
-                                        {hasDots && (
-                                            <div style={{ display: 'flex', gap: '2px', marginTop: '2px' }}>
-                                                {hasLive && (
-                                                    <div style={{ width: 4, height: 4, borderRadius: '50%', background: errorMain, flexShrink: 0 }} />
-                                                )}
-                                                {hasTest && (
-                                                    <div style={{ width: 4, height: 4, borderRadius: '50%', background: infoMain, flexShrink: 0 }} />
-                                                )}
+                                    <button
+                                        key={index}
+                                        onClick={() => handleDateClick(day)}
+                                        style={{
+                                            display: 'flex', flexDirection: 'column', alignItems: 'center',
+                                            padding: '3px 1px', border: 'none', background: 'transparent',
+                                            cursor: 'pointer', borderRadius: '6px',
+                                        }}
+                                    >
+                                        {/* BS numeral in circle (today gets filled circle) */}
+                                        <span style={{
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            width: '22px', height: '22px', borderRadius: '50%',
+                                            background: isToday ? successMain : isSel ? `${primaryMain}20` : 'transparent',
+                                            fontSize: '13px', fontWeight: 700, lineHeight: 1,
+                                            color: dayColor,
+                                            transition: 'background .12s',
+                                        }}>
+                                            {toNepaliNumber(day)}
+                                        </span>
+
+                                        {/* AD date */}
+                                        <span style={{
+                                            fontSize: '9px', lineHeight: 1.3,
+                                            color: isSat ? errorMain : textMuted,
+                                        }}>
+                                            {adDayNum}
+                                        </span>
+
+                                        {/* Event dots */}
+                                        {(hasLive || hasTest) && (
+                                            <div style={{ display: 'flex', gap: '2px', marginTop: '1px' }}>
+                                                {hasLive && <div style={{ width: 3, height: 3, borderRadius: '50%', background: errorMain }} />}
+                                                {hasTest && <div style={{ width: 3, height: 3, borderRadius: '50%', background: infoMain }} />}
                                             </div>
                                         )}
                                     </button>
@@ -517,25 +329,16 @@ export default function DashboardCalendar({ onDateSelect, onMonthChange, liveCla
                         </div>
 
                         {/* Legend */}
-                        <div className="flex gap-3 mt-2.5">
-                            <div className="flex items-center gap-1.5" style={{ fontSize: '11px', color: textMuted }}>
-                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: errorMain, flexShrink: 0 }} />
+                        <div style={{ display: 'flex', gap: '12px', marginTop: '10px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: textMuted }}>
+                                <div style={{ width: 7, height: 7, borderRadius: '50%', background: errorMain }} />
                                 Live Class
                             </div>
-                            <div className="flex items-center gap-1.5" style={{ fontSize: '11px', color: textMuted }}>
-                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: infoMain, flexShrink: 0 }} />
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: textMuted }}>
+                                <div style={{ width: 7, height: 7, borderRadius: '50%', background: infoMain }} />
                                 Test / Exam
                             </div>
                         </div>
-
-                        {/* Footer */}
-                        {/* <div style={{
-                            marginTop: '10px', paddingTop: '10px',
-                            borderTop: `1px solid ${dividerColor}`,
-                            fontSize: '10.5px', color: textMuted, textAlign: 'center',
-                        }}>
-                            Bikram Sambat · 2000 BS – 2100 BS
-                        </div> */}
                     </div>
                 )
             )}
@@ -544,32 +347,30 @@ export default function DashboardCalendar({ onDateSelect, onMonthChange, liveCla
             {calMode === 'ad' && (
                 adViewMode === 'year' ? (
                     <div>
-                        <div className="flex items-center justify-between mb-3">
-                            <button onClick={handleADPrevYear} style={navBtnStyle}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                            <button onClick={handleADPrevYear} style={navBtn}>
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
                             </button>
-                            <button onClick={() => setAdViewMode('month')} className="text-center hover:opacity-70 transition-opacity">
+                            <button onClick={() => setAdViewMode('month')} style={{ background: 'none', border: 'none', cursor: 'pointer', textAlign: 'center' }}>
                                 <div style={{ fontSize: '14px', fontWeight: 700, color: textPrimary }}>{adYear}</div>
                                 <div style={{ fontSize: '11px', color: textMuted, marginTop: '1px' }}>Select Month</div>
                             </button>
-                            <button onClick={handleADNextYear} style={navBtnStyle}>
+                            <button onClick={handleADNextYear} style={navBtn}>
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M9 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
                             </button>
                         </div>
                         <div className="grid grid-cols-3 gap-2">
                             {AD_MONTHS_SHORT.map((name, i) => {
-                                const isCurrentMonth = i === today.getMonth() && adYear === today.getFullYear();
-                                const isSelectedMonth = i === adMonth;
+                                const isCur = i === today.getMonth() && adYear === today.getFullYear();
+                                const isSel = i === adMonth;
                                 return (
-                                    <button key={i} onClick={() => handleADMonthClick(i)} style={{
+                                    <button key={i} onClick={() => { setAdMonth(i); setAdViewMode('month'); }} style={{
                                         padding: '7px 4px', borderRadius: '6px', textAlign: 'center',
                                         fontSize: '11px', fontWeight: 600, cursor: 'pointer', border: 'none',
-                                        background: isCurrentMonth ? primaryMain : isSelectedMonth ? `${primaryMain}1A` : bgDefault,
-                                        color: isCurrentMonth ? '#fff' : isSelectedMonth ? primaryMain : textPrimary,
+                                        background: isCur ? primaryMain : isSel ? `${primaryMain}1A` : bgDefault,
+                                        color: isCur ? '#fff' : isSel ? primaryMain : textPrimary,
                                         transition: 'all .15s',
-                                    }}>
-                                        {name}
-                                    </button>
+                                    }}>{name}</button>
                                 );
                             })}
                         </div>
@@ -577,61 +378,62 @@ export default function DashboardCalendar({ onDateSelect, onMonthChange, liveCla
                 ) : (
                     <div>
                         {/* AD Header */}
-                        <div className="flex items-center justify-between mb-3">
-                            <button onClick={() => setAdViewMode('year')} className="text-left hover:opacity-70 transition-opacity">
-                                <div style={{ fontSize: '14px', fontWeight: 700, color: textPrimary }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                            <button onClick={() => setAdViewMode('year')} style={{ background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: 0 }}>
+                                <div style={{ fontSize: '15px', fontWeight: 700, color: textPrimary }}>
                                     {AD_MONTHS_FULL[adMonth]} {adYear}
                                 </div>
-                                <div style={{ fontSize: '11px', color: textMuted, marginTop: '1px' }}>Anno Domini</div>
+                                <div style={{ fontSize: '10px', color: textMuted }}>Anno Domini</div>
                             </button>
-
-                            <div className="flex gap-1">
-                                <button onClick={handleADPrevMonth} style={navBtnStyle}>
+                            <div style={{ display: 'flex', gap: '4px' }}>
+                                <button onClick={handleADPrevMonth} style={navBtn}>
                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
                                 </button>
-                                <button onClick={handleADNextMonth} style={navBtnStyle}>
+                                <button onClick={handleADNextMonth} style={navBtn}>
                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M9 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
                                 </button>
                             </div>
                         </div>
 
-                        {/* Day headers */}
-                        <div className="grid grid-cols-7 gap-0.5 text-center mb-1">
-                            {SHORT_WEEKDAYS_ENGLISH.map((day, index) => (
-                                <div key={index} style={{ fontSize: '10px', fontWeight: 600, color: textMuted, padding: '3px 0', textTransform: 'uppercase' }}>{day}</div>
+                        {/* Weekday headers */}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', marginBottom: '4px' }}>
+                            {SHORT_WEEKDAYS_ENGLISH.map((d, i) => (
+                                <div key={i} style={{
+                                    textAlign: 'center', fontSize: '10px', fontWeight: 600, padding: '3px 0',
+                                    color: i === 6 ? errorMain : textMuted, textTransform: 'uppercase',
+                                }}>{d}</div>
                             ))}
                         </div>
 
-                        {/* AD Calendar days */}
-                        <div className="grid grid-cols-7 gap-0.5 text-center">
+                        {/* AD Calendar cells */}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', rowGap: '2px' }}>
                             {adCalendarDays.map((day, index) => {
                                 if (!day) return <div key={index} />;
                                 const adStr = formatADDay(day);
-                                const hasLive = liveClassDates.some(d => d === adStr);
-                                const hasTest = testDates.some(d => d === adStr);
-                                const hasDots = hasLive || hasTest;
-                                const todayCell = isTodayAD(day);
+                                const hasLive = liveClassDates.includes(adStr);
+                                const hasTest = testDates.includes(adStr);
+                                const isToday = today.getFullYear() === adYear && today.getMonth() === adMonth && today.getDate() === day;
+                                const isSel = selectedADDay === day;
+                                const isSat = new Date(adYear, adMonth, day).getDay() === 6;
+                                const dayColor = isToday ? '#fff' : isSel ? primaryMain : isSat ? errorMain : textPrimary;
+
                                 return (
                                     <button key={index} onClick={() => handleADDateClick(day)} style={{
-                                        fontSize: '11.5px',
-                                        padding: hasDots ? '5px 2px 3px' : '5px 2px',
-                                        borderRadius: '6px',
-                                        cursor: 'pointer', border: 'none',
-                                        fontWeight: todayCell ? 700 : 500,
-                                        background: todayCell ? successMain : isSelectedAD(day) ? `${primaryMain}1A` : 'transparent',
-                                        color: todayCell ? '#fff' : isSelectedAD(day) ? primaryMain : isSaturdayAD(day) ? errorMain : textPrimary,
-                                        transition: 'background .12s',
                                         display: 'flex', flexDirection: 'column', alignItems: 'center',
+                                        padding: '3px 1px', border: 'none', background: 'transparent',
+                                        cursor: 'pointer', borderRadius: '6px',
                                     }}>
-                                        {day}
-                                        {hasDots && (
+                                        <span style={{
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            width: '22px', height: '22px', borderRadius: '50%',
+                                            background: isToday ? successMain : isSel ? `${primaryMain}20` : 'transparent',
+                                            fontSize: '12px', fontWeight: isToday ? 700 : 500, lineHeight: 1,
+                                            color: dayColor, transition: 'background .12s',
+                                        }}>{day}</span>
+                                        {(hasLive || hasTest) && (
                                             <div style={{ display: 'flex', gap: '2px', marginTop: '2px' }}>
-                                                {hasLive && (
-                                                    <div style={{ width: 4, height: 4, borderRadius: '50%', background: errorMain, flexShrink: 0 }} />
-                                                )}
-                                                {hasTest && (
-                                                    <div style={{ width: 4, height: 4, borderRadius: '50%', background: infoMain, flexShrink: 0 }} />
-                                                )}
+                                                {hasLive && <div style={{ width: 3, height: 3, borderRadius: '50%', background: errorMain }} />}
+                                                {hasTest && <div style={{ width: 3, height: 3, borderRadius: '50%', background: infoMain }} />}
                                             </div>
                                         )}
                                     </button>
@@ -640,24 +442,15 @@ export default function DashboardCalendar({ onDateSelect, onMonthChange, liveCla
                         </div>
 
                         {/* Legend */}
-                        <div className="flex gap-3 mt-2.5">
-                            <div className="flex items-center gap-1.5" style={{ fontSize: '11px', color: textMuted }}>
-                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: errorMain, flexShrink: 0 }} />
+                        <div style={{ display: 'flex', gap: '12px', marginTop: '10px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: textMuted }}>
+                                <div style={{ width: 7, height: 7, borderRadius: '50%', background: errorMain }} />
                                 Live Class
                             </div>
-                            <div className="flex items-center gap-1.5" style={{ fontSize: '11px', color: textMuted }}>
-                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: infoMain, flexShrink: 0 }} />
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: textMuted }}>
+                                <div style={{ width: 7, height: 7, borderRadius: '50%', background: infoMain }} />
                                 Test / Exam
                             </div>
-                        </div>
-
-                        {/* Footer */}
-                        <div style={{
-                            marginTop: '10px', paddingTop: '10px',
-                            borderTop: `1px solid ${dividerColor}`,
-                            fontSize: '10.5px', color: textMuted, textAlign: 'center',
-                        }}>
-                            Anno Domini · Gregorian Calendar
                         </div>
                     </div>
                 )

@@ -358,9 +358,9 @@ export default function LiveClassAndTestFilter() {
     };
 
     return (
-        <>
-            {/* ── Calendar Card ─────────────────────────────────────────────── */}
-            <Box sx={cardSx}>
+        <div className="flex gap-4 flex-col md:flex-row xl:flex-col">
+
+            <Box sx={cardSx} className="w-full">
                 <Typography variant="subtitle1" fontWeight={700} mb={1.5} sx={{ fontSize: "14.5px" }}>
                     Calendar
                 </Typography>
@@ -384,80 +384,80 @@ export default function LiveClassAndTestFilter() {
                 />
             </Box>
 
-            {/* ── Today's Live Classes ──────────────────────────────────────── */}
-            {(liveLoading || todayClasses.length > 0) && (
-                <Box sx={cardSx}>
-                    <div className="flex items-center justify-between mb-2.5">
-                        <Typography variant="subtitle1" fontWeight={700} sx={{ fontSize: "14.5px" }}>
-                            {t("menus.liveClasses")}
-                        </Typography>
-                        <Box component="span" sx={{
-                            fontSize: "10px", fontWeight: 700,
-                            padding: "2px 8px", borderRadius: "99px",
-                            background: theme.palette.success.light,
-                            color: theme.palette.success.main,
-                        }}>
-                            Today
-                        </Box>
-                    </div>
-                    {liveLoading ? (
-                        <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
-                            <CircularProgress size={20} />
-                        </Box>
-                    ) : (
-                        <div className="flex flex-col gap-3 max-h-72 overflow-auto">
-                            {todayClasses.map((item) => (
-                                <LiveClassCard key={item.id} data={item} />
-                            ))}
+            <div className="w-full">
+                {(liveLoading || todayClasses.length > 0) && (
+                    <Box sx={cardSx}>
+                        <div className="flex items-center justify-between mb-2.5">
+                            <Typography variant="subtitle1" fontWeight={700} sx={{ fontSize: "14.5px" }}>
+                                {t("menus.liveClasses")}
+                            </Typography>
+                            <Box component="span" sx={{
+                                fontSize: "10px", fontWeight: 700,
+                                padding: "2px 8px", borderRadius: "99px",
+                                background: theme.palette.success.light,
+                                color: theme.palette.success.main,
+                            }}>
+                                Today
+                            </Box>
                         </div>
-                    )}
-                </Box>
-            )}
+                        {liveLoading ? (
+                            <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
+                                <CircularProgress size={20} />
+                            </Box>
+                        ) : (
+                            <div className="flex flex-col gap-3 max-h-72 overflow-auto">
+                                {todayClasses.map((item) => (
+                                    <LiveClassCard key={item.id} data={item} />
+                                ))}
+                            </div>
+                        )}
+                    </Box>
+                )}
 
-            {/* ── Notice Board ──────────────────────────────────────────────── */}
-            {(noticesLoading || notices.length > 0) && (
-                <Box sx={cardSx}>
-                    <div className="flex justify-between items-center">
-                        <Typography variant="subtitle1" fontWeight={700} mb={1.5} sx={{ fontSize: "14.5px" }}>
-                            Notice Board
-                        </Typography>
-                        <Box
-                            component="span"
-                            onClick={() => navigate(PATH.NOTICE.ROOT)}
-                            sx={{
-                                fontSize: '12px',
-                                color: 'primary.main',
-                                fontWeight: 600,
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '3px',
-                                '&:hover': { opacity: 0.7 },
-                            }}
-                        >
-                            {t("actions.view_all")} →
-                        </Box>
-                    </div>
-                    {noticesLoading ? (
-                        <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
-                            <CircularProgress size={20} />
-                        </Box>
-                    ) : (
-                        <Box sx={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                            {notices.map((notice) => (
-                                <NoticeItem
-                                    key={notice.id}
-                                    notice={notice}
-                                    showDismiss={showNoticeDismiss}
-                                    onDismiss={() =>
-                                        setDismissedNoticeIds(prev => new Set([...prev, notice.id]))
-                                    }
-                                />
-                            ))}
-                        </Box>
-                    )}
-                </Box>
-            )}
-        </>
+                {(noticesLoading || notices.length > 0) && (
+                    <Box sx={cardSx}>
+                        <div className="flex justify-between items-center">
+                            <Typography variant="subtitle1" fontWeight={700} mb={1.5} sx={{ fontSize: "14.5px" }}>
+                                Notice Board
+                            </Typography>
+                            <Box
+                                component="span"
+                                onClick={() => navigate(PATH.NOTICE.ROOT)}
+                                sx={{
+                                    fontSize: '12px',
+                                    color: 'primary.main',
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '3px',
+                                    '&:hover': { opacity: 0.7 },
+                                }}
+                            >
+                                {t("actions.view_all")} →
+                            </Box>
+                        </div>
+                        {noticesLoading ? (
+                            <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
+                                <CircularProgress size={20} />
+                            </Box>
+                        ) : (
+                            <Box sx={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                                {notices.map((notice) => (
+                                    <NoticeItem
+                                        key={notice.id}
+                                        notice={notice}
+                                        showDismiss={showNoticeDismiss}
+                                        onDismiss={() =>
+                                            setDismissedNoticeIds(prev => new Set([...prev, notice.id]))
+                                        }
+                                    />
+                                ))}
+                            </Box>
+                        )}
+                    </Box>
+                )}
+            </div>
+        </div>
     );
 }
