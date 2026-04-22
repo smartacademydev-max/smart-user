@@ -1,7 +1,5 @@
 import React from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import ChatDialogLauncher from '../components/organism/ChatDialogLauncher';
-import TicketChatPanel from '../components/pages/TicketManagement/allTickets/TicketChatPanel';
 import { useAppSelector } from '../store/hook';
 import { PATH } from './PATH';
 
@@ -20,9 +18,7 @@ export default function Private() {
     return (
         <>
             <Outlet />
-            <ChatDialogLauncher>
-                <TicketChatPanel isModal/>
-            </ChatDialogLauncher>
+
         </>
     );
 }
