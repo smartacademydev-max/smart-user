@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import type { QueryParams } from "../types";
-import type { LiveClassList } from "../types/liveClass";
+import type { LiveClassList, ZoomAccount } from "../types/liveClass";
 import { buildQueryParams } from "../utils/buildQueryParams";
 import { baseQuery } from "./baseQuery";
 
@@ -22,7 +22,13 @@ export const liveClassApi = createApi({
                 method: "GET",
             }),
         }),
+        getZoomAccounts: builder.query<{ data: ZoomAccount[] }, void>({
+            query: () => ({
+                url: `/zoom-accounts`,
+                method: "GET",
+            }),
+        }),
     }),
 });
 
-export const { useGetAllLiveClassesQuery } = liveClassApi;
+export const { useGetAllLiveClassesQuery, useGetZoomAccountsQuery } = liveClassApi;

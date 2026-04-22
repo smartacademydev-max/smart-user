@@ -12,6 +12,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { PATH } from "../../../../../routes/PATH";
 import { useGetMeetingSignatureMutation, useGetSingleLiveClassQuery } from "../../../../../services/courseApi";
+import { useGetZoomAccountsQuery } from "../../../../../services/liveApi";
 import { useAppSelector } from "../../../../../store/hook";
 import { renderHtml } from "../../../../../utils/renderHtml";
 import WaterMark from "../../../../../Watermark";
@@ -41,6 +42,8 @@ export default function SingleLiveClassRoot() {
         skip: !courseId || !liveId,
     });
 
+    const { data: zoomAccountsData, isLoading: isLoadingZoomAccounts } = useGetZoomAccountsQuery();
+
     const [generateSignature] = useGetMeetingSignatureMutation();
 
 
@@ -60,7 +63,7 @@ export default function SingleLiveClassRoot() {
     };
 
     useEffect(() => {
-        if (isLoadingLiveClass) {
+        if (isLoadingLiveClass || isLoadingZoomAccounts) {
             setMeetingStatus("initial_loading");
             return;
         }
@@ -94,21 +97,14 @@ export default function SingleLiveClassRoot() {
 
                 const meetingNumber = meetingData.start_url.match(/\/j\/(\d+)/)?.[1];
                 const password = new URL(meetingData.start_url).searchParams.get("pwd");
-                let sdkKey: string;
 
-                if (meetingData.account_id === 1) {
-                    sdkKey = import.meta.env.VITE_ZOOM_MEETING_SDK_SECRET1;
-                } else if (meetingData.account_id === 2) {
-                    sdkKey = import.meta.env.VITE_ZOOM_MEETING_SDK_SECRET2;
-                } else if (meetingData.account_id === 3) {
-                    sdkKey = import.meta.env.VITE_ZOOM_MEETING_SDK_SECRET3;
-                }
-                else {
-                    sdkKey = import.meta.env.VITE_ZOOM_MEETING_SDK_SECRET4;
-                }
+                const zoomAccount = zoomAccountsData?.data?.find(
+                    (acc) => acc.id === meetingData.account_id
+                );
+                const sdkKey = zoomAccount?.sdk_key;
 
                 if (!meetingNumber) throw new Error("Invalid Meeting URL in server data.");
-                if (!sdkKey) throw new Error("Zoom SDK Key is not configured.");
+                if (!sdkKey) throw new Error("Zoom SDK Key not found for this account.");
 
                 const sigRes = await generateSignature({
                     meeting_id: Number(meetingNumber),
@@ -149,7 +145,7 @@ export default function SingleLiveClassRoot() {
 
         if (liveClassData) checkStatusAndPrepare();
 
-    }, [liveClassData, isLoadingLiveClass, generateSignature, user, courseId]);
+    }, [liveClassData, isLoadingLiveClass, zoomAccountsData, isLoadingZoomAccounts, generateSignature, user, courseId]);
 
 
     const handleClose = () => {

@@ -1,5 +1,17 @@
 import type { Pagination } from ".";
 
+export interface ZoomAccount {
+    id: number;
+    name: string;
+    is_active: boolean;
+    email: string;
+    account_id: string;
+    client_id: string;
+    client_secret: string;
+    sdk_key: string;
+    sdk_secret: string;
+}
+
 export interface LiveClassProps {
     id: number;
     name: string;
