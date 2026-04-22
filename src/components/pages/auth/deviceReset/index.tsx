@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import { useFormik } from "formik";
 import { useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import * as Yup from "yup";
 import { PATH } from "../../../../routes/PATH";
 import { useRequestDeviceResetMutation } from "../../../../services/authApi";
@@ -42,8 +42,9 @@ export default function DeviceResetForm() {
     const dispatch = useAppDispatch();
     const [requestDeviceReset, { isLoading }] = useRequestDeviceResetMutation();
 
+    const [searchParams] = useSearchParams();
     const hasPendingRequest = location.state?.has_pending_request as boolean | undefined;
-    const userId = location.state?.user_id as string | undefined;
+    const userId = (location.state?.user_id ?? searchParams.get("user_id")) as string | undefined;
 
     // If user already has a pending request, skip the form and go straight to success
     useEffect(() => {

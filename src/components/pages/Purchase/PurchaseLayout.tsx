@@ -107,8 +107,9 @@ export default function PurchaseLayout() {
                     const coursePurchaseData = await payViaEsewa({
                         id: isSubscription ? Number(courseId) : Number(id),
                         moduleType: isSubscription ? "course" : type as PurchaseModuleTypes,
+                        subscriptionId: isSubscription ? selectedSubscriptionId : undefined,
                     }).unwrap();
-
+                    debugger;
                     if (coursePurchaseData) {
                         const paymentData = coursePurchaseData?.data;
 
@@ -133,6 +134,7 @@ export default function PurchaseLayout() {
                         type: values.paymentOption,
                         moduleType: isSubscription ? "course" : type as PurchaseModuleTypes,
                         amount: vat + price,
+                        subscriptionId: isSubscription ? selectedSubscriptionId : undefined,
                     }).unwrap();
 
                     const paymentUrl = response?.data?.payment_url;

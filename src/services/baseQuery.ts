@@ -29,14 +29,11 @@ function collectHardwareSignals(): string {
 			if (dbgInfo) {
 				const vendor = (gl as WebGLRenderingContext).getParameter(dbgInfo.UNMASKED_VENDOR_WEBGL) as string;
 				const renderer = (gl as WebGLRenderingContext).getParameter(dbgInfo.UNMASKED_RENDERER_WEBGL) as string;
-				// Firefox privacy.resistFingerprinting returns generic "Mozilla" strings — discard them
-				// as they add no hardware signal and would differ from real GPU strings on other browsers
 				if (vendor !== "Mozilla") webgl_vendor = vendor;
 				if (renderer !== "Mozilla") webgl_renderer = renderer;
 			}
 		}
 	} catch {
-		// WebGL unavailable — fingerprint still works with remaining signals
 	}
 
 	console.log("Fingerprint signals", {

@@ -150,26 +150,28 @@ export const courseApi = createApi({
                 { type: "Media" as const, id: "LIST" },
             ],
         }),
-        purchaseCourseWithEsewa: builder.mutation<GlobalResponse & { data: EsewaPaymentPayload }, { id: number, moduleType: PurchaseModuleTypes }>({
-            query: ({ id, moduleType }) => ({
+        purchaseCourseWithEsewa: builder.mutation<GlobalResponse & { data: EsewaPaymentPayload }, { id: number, moduleType: PurchaseModuleTypes; subscriptionId?: number }>({
+            query: ({ id, moduleType, subscriptionId }) => ({
                 url: `/payment/esewa`,
                 method: "POST",
                 body: {
                     module_type: moduleType,
                     module_id: id,
+                    ...(subscriptionId && { subscription_id: subscriptionId }),
                 },
             }),
             invalidatesTags: (_result, _error, { id }) => [{ type: "Course" as const, id }],
         }),
-        purchaseWithKhalti: builder.mutation<GlobalResponse & { data: { payment_url: string; pidx: string; order_id: string } }, { id: number, type: string, amount: number, moduleType: PurchaseModuleTypes }>({
-            query: ({ id, type, amount, moduleType }) => ({
+        purchaseWithKhalti: builder.mutation<GlobalResponse & { data: { payment_url: string; pidx: string; order_id: string } }, { id: number, type: string, amount: number, moduleType: PurchaseModuleTypes; subscriptionId?: number }>({
+            query: ({ id, type, amount, moduleType, subscriptionId }) => ({
                 url: `/payment/khalti`,
                 method: "POST",
                 body: {
                     type,
                     amount,
                     module_id: id,
-                    module_type: moduleType
+                    module_type: moduleType,
+                    ...(subscriptionId && { subscription_id: subscriptionId }),
                 }
             }),
             invalidatesTags: (_result, _error, { id }) => [
