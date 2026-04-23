@@ -52,7 +52,7 @@ export default function PurchaseLayout() {
         subscriptionId ? Number(subscriptionId) : undefined
     );
 
-    const { paymentOptions, activeGateways, isLoading: gatewaysLoading } = usePaymentGateways();
+    const { paymentOptions, activeGateways } = usePaymentGateways();
 
     const defaultPaymentOption = useMemo<PaymentMethods>(() => {
         return (activeGateways[0]?.slug as PaymentMethods) ?? "esewa";
