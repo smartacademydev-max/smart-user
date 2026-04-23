@@ -34,7 +34,15 @@ export const PATH = {
             SUCCESS: {
                 ROOT: "/auth/device-reset/success",
             },
-        }
+        },
+        SET_PASSWORD: {
+            ROOT: "/auth/set-password",
+        },
+        FORGOT_PASSWORD: {
+            ROOT: "/auth/forgot-password",
+            VERIFY: { ROOT: "/auth/forgot-password/verify" },
+            RESET: { ROOT: "/auth/forgot-password/reset" },
+        },
     },
     DASHBOARD: {
         ROOT: "/dashboard",

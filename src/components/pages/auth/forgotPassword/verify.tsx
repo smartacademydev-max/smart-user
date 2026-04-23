@@ -11,12 +11,10 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import * as Yup from "yup";
 import { PATH } from "../../../../routes/PATH";
-import { useResendOtpMutation, useVerifyOtpMutation } from "../../../../services/authApi";
-import { setCredentials } from "../../../../slice/authSlice";
+import { useResendOtpMutation } from "../../../../services/authApi";
 import { showToast } from "../../../../slice/toastSlice";
-import { useAppDispatch, useAppSelector } from "../../../../store/hook";
+import { useAppDispatch } from "../../../../store/hook";
 import AuthHeader from "../../../molecules/AuthHeader";
-import NewDeviceDetectedDialog from "../../../organism/Dialog/NewDeviceDetectedDialog";
 
 const validationSchema = Yup.object({
     otp: Yup.string()
@@ -25,124 +23,65 @@ const validationSchema = Yup.object({
         .required("Please enter the OTP"),
 });
 
-export default function VerifyOTP() {
+export default function ForgotPasswordVerify() {
+    const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const [phone, setPhone] = useState<string>("");
-    const [redirectUrl, setRedirectUrl] = useState<string>("");
+    const [phone, setPhone] = useState("");
     const [isCheckingPhone, setIsCheckingPhone] = useState(true);
     const [timer, setTimer] = useState(0);
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-    const dispatch = useAppDispatch();
-    const user = useAppSelector((state) => state.auth.user);
-    const [verifyOtp, { isLoading }] = useVerifyOtpMutation();
-    const [resendOtp, { isLoading: isSending }] = useResendOtpMutation();
-    const { loginType } = useLoginType();
-    const [newDeviceDialog, setNewDeviceDialog] = useState<{
-        open: boolean;
-        deviceLocation?: string;
-        hasPendingRequest?: boolean;
-        userId?: string;
-    }>({ open: false });
 
-    // Initialize phone number
+    const [resendOtp, { isLoading: isSending }] = useResendOtpMutation();
+
     useEffect(() => {
         const phoneNumber = searchParams.get("phone");
-        const redirect_url = searchParams.get("redirect_url");
         if (!phoneNumber) {
-            dispatch(showToast({ message: "Phone number not found. Please login again.", severity: "error" }));
-            navigate(PATH.AUTH.LOGIN.ROOT, { replace: true });
+            dispatch(showToast({ message: "Phone number not found.", severity: "error" }));
+            navigate(PATH.AUTH.FORGOT_PASSWORD.ROOT, { replace: true });
             return;
-        }
-        if (redirect_url) {
-            setRedirectUrl(redirect_url);
         }
         setPhone(phoneNumber);
         setIsCheckingPhone(false);
     }, [searchParams, navigate, dispatch]);
 
     useEffect(() => {
-        if (user) {
-            if (redirectUrl) {
-                navigate(redirectUrl, { replace: true });
-            } else {
-                navigate(PATH.AUTH.INTEREST.ROOT, { replace: true });
-            }
-        }
-    }, [user, redirectUrl, navigate]);
-
-    useEffect(() => {
-        const timerEnd = localStorage.getItem("otpTimerEnd");
+        const timerEnd = localStorage.getItem("fpOtpTimerEnd");
         if (timerEnd) {
             const remaining = Math.floor((parseInt(timerEnd) - Date.now()) / 1000);
             if (remaining > 0) setTimer(remaining);
-            else localStorage.removeItem("otpTimerEnd");
+            else localStorage.removeItem("fpOtpTimerEnd");
         }
     }, []);
 
-    // Timer countdown
     useEffect(() => {
         if (timer <= 0) return;
-
         const interval = setInterval(() => {
             setTimer((prev) => {
                 if (prev <= 1) {
-                    localStorage.removeItem("otpTimerEnd");
+                    localStorage.removeItem("fpOtpTimerEnd");
                     clearInterval(interval);
                     return 0;
                 }
                 return prev - 1;
             });
         }, 1000);
-
         return () => clearInterval(interval);
     }, [timer]);
 
-    // Formik setup
+    const startTimer = (seconds: number) => {
+        localStorage.setItem("fpOtpTimerEnd", (Date.now() + seconds * 1000).toString());
+        setTimer(seconds);
+    };
+
     const formik = useFormik({
         initialValues: { otp: "" },
         validationSchema,
-        onSubmit: async (values) => {
-            if (!phone) {
-                dispatch(showToast({ message: "Phone number not found.", severity: "error" }));
-                navigate(PATH.AUTH.LOGIN.ROOT, { replace: true });
-                return;
-            }
-
-            try {
-                const response = await verifyOtp({ phone, otp: values.otp }).unwrap();
-
-
-
-                dispatch(showToast({
-                    message: response.message || "OTP verified successfully.",
-                    severity: "success",
-                }));
-
-                dispatch(setCredentials({
-                    token: response.data.token,
-                    user: response.data.user,
-                }));
-
-                if (redirectUrl) {
-                    navigate(redirectUrl, { replace: true });
-                } else {
-                    navigate(PATH.AUTH.INTEREST.ROOT);
-                }
-            } catch (e: any) {
-                setNewDeviceDialog({
-                    open: e?.data?.data?.user_id ? true : false,
-                    deviceLocation: e?.data?.data?.device_location,
-                    hasPendingRequest: e?.data?.data?.has_pending_request,
-                    userId: e?.data?.data?.user_id,
-                });
-                dispatch(showToast({
-                    message: e?.data?.message || "Invalid OTP. Please try again.",
-                    severity: "error",
-                }));
-            }
-        }
-
+        onSubmit: (values) => {
+            navigate(PATH.AUTH.FORGOT_PASSWORD.RESET.ROOT, {
+                state: { phone, otp: values.otp },
+            });
+        },
     });
 
     const getOtpArray = (otp: string) => {
@@ -155,19 +94,16 @@ export default function VerifyOTP() {
 
     const handleChange = (value: string, index: number) => {
         if (!/^\d*$/.test(value)) return;
-
         const newOtpArray = [...otpArray];
         newOtpArray[index] = value;
-        const newOtp = newOtpArray.join("").replace(/\s/g, "");
-
-        formik.setFieldValue("otp", newOtp);
-
-        if (value && index < 5) {
-            inputRefs.current[index + 1]?.focus();
-        }
+        formik.setFieldValue("otp", newOtpArray.join("").replace(/\s/g, ""));
+        if (value && index < 5) inputRefs.current[index + 1]?.focus();
     };
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>, index: number) => {
+    const handleKeyDown = (
+        e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
+        index: number,
+    ) => {
         if (e.key === "Backspace" && !otpArray[index] && index > 0) {
             inputRefs.current[index - 1]?.focus();
         }
@@ -175,28 +111,14 @@ export default function VerifyOTP() {
 
     const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
         e.preventDefault();
-        const pastedData = e.clipboardData.getData("text").trim();
-        if (!/^\d+$/.test(pastedData)) return;
-
-        const digits = pastedData.slice(0, 6);
+        const pasted = e.clipboardData.getData("text").trim();
+        if (!/^\d+$/.test(pasted)) return;
+        const digits = pasted.slice(0, 6);
         formik.setFieldValue("otp", digits);
-
-        const nextIndex = Math.min(digits.length, 5);
-        inputRefs.current[nextIndex]?.focus();
-    };
-
-    const startTimer = (seconds: number) => {
-        const endTime = Date.now() + seconds * 1000;
-        localStorage.setItem("otpTimerEnd", endTime.toString());
-        setTimer(seconds);
+        inputRefs.current[Math.min(digits.length, 5)]?.focus();
     };
 
     const handleResendOTP = async () => {
-        if (!phone) {
-            dispatch(showToast({ message: "Phone number not found.", severity: "error" }));
-            navigate(PATH.AUTH.LOGIN.ROOT, { replace: true });
-            return;
-        }
         try {
             const response = await resendOtp({ phone }).unwrap();
             dispatch(showToast({ message: response.message || "OTP sent successfully.", severity: "success" }));
@@ -218,17 +140,9 @@ export default function VerifyOTP() {
 
     return (
         <>
-            <NewDeviceDetectedDialog
-                open={newDeviceDialog.open}
-                onClose={() => setNewDeviceDialog({ open: false })}
-                deviceLocation={newDeviceDialog.deviceLocation}
-                hasPendingRequest={newDeviceDialog.hasPendingRequest}
-                userId={newDeviceDialog.userId}
-            />
-
             <AuthHeader
                 title="OTP Verification"
-                description="Enter the One-Time Password (OTP) sent to your registered email or phone number. <span class='font-bold'>The OTP is valid for 1 month</span>, so you can reuse a previously received OTP within this period."
+                description="Enter the One-Time Password (OTP) sent to your registered phone number."
             />
 
             <Typography textAlign="center" className="mb-3!" sx={{ fontSize: { xs: 14, lg: 16 } }}>
@@ -257,20 +171,23 @@ export default function VerifyOTP() {
                                 height: { xs: 50, sm: 60 },
                                 p: { xs: 0, md: "10px 16px" },
                                 "& input": { height: "100%" },
-                                "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#1976d2", borderWidth: 2 },
+                                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                                    borderColor: "#1976d2",
+                                    borderWidth: 2,
+                                },
                             }}
                         />
                     ))}
                 </Box>
 
                 {formik.touched.otp && formik.errors.otp && (
-                    <FormHelperText error={true} sx={{ mb: 2, textAlign: "center" }}>
+                    <FormHelperText error sx={{ mb: 2, textAlign: "center" }}>
                         {formik.errors.otp}
                     </FormHelperText>
                 )}
 
                 <Typography variant="subtitle2" textAlign="end" color="text.secondary" className="my-2!">
-                    Didn't get the code?
+                    Didn't get the code?{" "}
                     {timer > 0 ? (
                         <strong style={{ marginLeft: 4 }}>Resend in {timer}s</strong>
                     ) : (
@@ -286,13 +203,15 @@ export default function VerifyOTP() {
                     )}
                 </Typography>
 
-                <Button fullWidth size="large" type="submit" variant="contained" disabled={isLoading || !formik.isValid} sx={{ mb: 3, py: 1.5 }}>
-                    {isLoading ? (
-                        <>
-                            <CircularProgress size={20} sx={{ mr: 1 }} color="inherit" />
-                            Verifying...
-                        </>
-                    ) : "Verify OTP"}
+                <Button
+                    fullWidth
+                    size="large"
+                    type="submit"
+                    variant="contained"
+                    disabled={!formik.isValid || !formik.dirty}
+                    sx={{ mb: 3, py: 1.5 }}
+                >
+                    Continue
                 </Button>
             </form>
         </>

@@ -69,6 +69,10 @@ import AllTickets from "../components/pages/TicketManagement/allTickets";
 import TicketChats from "../components/pages/TicketManagement/chats";
 import DeviceResetForm from "../components/pages/auth/deviceReset";
 import DeviceResetSuccess from "../components/pages/auth/deviceReset/success";
+import ForgotPasswordPage from "../components/pages/auth/forgotPassword";
+import ForgotPasswordVerify from "../components/pages/auth/forgotPassword/verify";
+import ForgotPasswordReset from "../components/pages/auth/forgotPassword/reset";
+import SetPasswordPage from "../components/pages/auth/setPassword";
 
 const router = createBrowserRouter([
   {
@@ -119,6 +123,22 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: PATH.AUTH.FORGOT_PASSWORD.VERIFY.ROOT,
+        element: (
+          <SingleFormAuthLayout>
+            <ForgotPasswordVerify />
+          </SingleFormAuthLayout>
+        ),
+      },
+      {
+        path: PATH.AUTH.FORGOT_PASSWORD.RESET.ROOT,
+        element: (
+          <SingleFormAuthLayout>
+            <ForgotPasswordReset />
+          </SingleFormAuthLayout>
+        ),
+      },
+      {
         element: <AuthLayout />,
         children: [
           {
@@ -133,6 +153,10 @@ const router = createBrowserRouter([
             path: PATH.AUTH.BRIDGE.ROOT,
             element: <AuthBridge />,
           },
+          {
+            path: PATH.AUTH.FORGOT_PASSWORD.ROOT,
+            element: <ForgotPasswordPage />,
+          },
         ],
       },
     ],
@@ -140,6 +164,10 @@ const router = createBrowserRouter([
   {
     element: <Private />,
     children: [
+      {
+        path: PATH.AUTH.SET_PASSWORD.ROOT,
+        element: <SetPasswordPage />,
+      },
       {
         element: <RootLayout />,
         children: [

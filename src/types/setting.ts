@@ -75,6 +75,12 @@ export interface LinkedDeviceList {
     }
 }
 
+export type LoginType = "otp" | "password" | "both";
+
+export interface LoginTypeSettingProps {
+    login_type: LoginType;
+}
+
 export interface ThemeSettingProps {
     company_name: string;
     brand_name: string;

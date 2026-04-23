@@ -51,6 +51,7 @@ export interface GlobalResponse {
 
 export type Gender = "male" | "female" | "other";
 export interface User extends RegisterUserProps {
+	has_password?: boolean;
 	permissions: PermissionProps;
 	joined_date: string;
 	gender: Gender

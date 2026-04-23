@@ -58,6 +58,27 @@ export const authApi = createApi({
 				body,
 			}),
 		}),
+		loginWithPassword: builder.mutation<UserResponse, { phone: string; password: string }>({
+			query: (body) => ({
+				url: "/auth/login",
+				method: "POST",
+				body,
+			}),
+		}),
+		setPassword: builder.mutation<GlobalResponse, { password: string; password_confirmation: string }>({
+			query: (body) => ({
+				url: "/auth/set-password",
+				method: "POST",
+				body,
+			}),
+		}),
+		resetPassword: builder.mutation<GlobalResponse, { phone: string; otp: string; password: string; password_confirmation: string }>({
+			query: (body) => ({
+				url: "/auth/reset-password",
+				method: "POST",
+				body,
+			}),
+		}),
 	}),
 });
 
@@ -68,4 +89,7 @@ export const {
 	useAuthBridgeMutation,
 	useValidateUserExistanceMutation,
 	useRequestDeviceResetMutation,
+	useLoginWithPasswordMutation,
+	useSetPasswordMutation,
+	useResetPasswordMutation,
 } = authApi;

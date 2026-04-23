@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import type { QueryParams } from "../types";
-import type { AppSettingProps, LinkedDeviceList, PaymentGateway, ThemeSettingProps } from "../types/setting";
+import type { AppSettingProps, LinkedDeviceList, LoginTypeSettingProps, PaymentGateway, ThemeSettingProps } from "../types/setting";
 import type { GlobalResponse, User } from "../types/user";
 import { buildQueryParams } from "../utils/buildQueryParams";
 import { baseQuery } from "./baseQuery";
@@ -8,13 +8,18 @@ import { baseQuery } from "./baseQuery";
 export const settingApi = createApi({
     reducerPath: "settingApi",
     baseQuery: baseQuery,
-    tagTypes: ["LinkedDevice", "ApiSetting", "Theme"],
+    tagTypes: ["LinkedDevice", "ApiSetting", "Theme", "LoginType"],
     endpoints: (builder) => ({
         getAppSettings: builder.query<GlobalResponse & { data: AppSettingProps }, void>({
             query: () => ({
                 url: `/settings`,
                 method: "GET",
             }),
+        }),
+
+        getLoginTypeSetting: builder.query<GlobalResponse & { data: LoginTypeSettingProps }, void>({
+            query: () => ({ url: `/settings/login-type`, method: "GET" }),
+            providesTags: ["LoginType"],
         }),
 
         getThemeSettings: builder.query<GlobalResponse & { data: ThemeSettingProps }, void>({
@@ -61,6 +66,7 @@ export const settingApi = createApi({
 
 export const {
     useGetAppSettingsQuery,
+    useGetLoginTypeSettingQuery,
     useGetThemeSettingsQuery,
     useUpdateProfileMutation,
     useGetAllLinkedDevicesQuery,
