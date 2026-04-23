@@ -37,7 +37,6 @@ export default function VerifyOTP() {
     const user = useAppSelector((state) => state.auth.user);
     const [verifyOtp, { isLoading }] = useVerifyOtpMutation();
     const [resendOtp, { isLoading: isSending }] = useResendOtpMutation();
-    const { loginType } = useLoginType();
     const [newDeviceDialog, setNewDeviceDialog] = useState<{
         open: boolean;
         deviceLocation?: string;
