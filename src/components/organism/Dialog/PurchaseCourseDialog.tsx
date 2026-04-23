@@ -1,6 +1,7 @@
 import { Box, Button, Dialog, DialogContent, IconButton, Typography, useTheme } from "@mui/material";
 import { CloseCircle } from "iconsax-reactjs";
 import { useNavigate, useParams } from "react-router-dom";
+import { usePaymentGateways } from "../../../hooks/usePaymentGateways";
 import { PATH } from "../../../routes/PATH";
 import { resetPurchase } from "../../../slice/purchaseSlice";
 import { useAppDispatch, useAppSelector } from "../../../store/hook";
@@ -10,11 +11,12 @@ const renderButton = (
     type: CourseTypeProps,
     id: string | undefined,
     navigate: (url: string) => void,
-    dispatch: AppDispatch
+    dispatch: AppDispatch,
+    canPurchase: boolean
 ) => {
     switch (type) {
         case "expiry":
-            return (
+            return canPurchase ? (
                 <Button
                     variant="contained"
                     size="small"
@@ -27,7 +29,7 @@ const renderButton = (
                 >
                     Purchase Course
                 </Button>
-            );
+            ) : null;
 
         case "subscription":
             return (
@@ -70,6 +72,8 @@ export default function PurchaseCourseDialog({ type }: { type?: CourseTypeProps 
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const purchase = useAppSelector((state) => state.purchase);
+    const { anyActive, isLoading: gatewaysLoading } = usePaymentGateways();
+    const canPurchase = gatewaysLoading || anyActive;
 
     const handlePurchaseClose = () => {
         dispatch(resetPurchase());
@@ -121,7 +125,7 @@ export default function PurchaseCourseDialog({ type }: { type?: CourseTypeProps 
                 </Typography>
 
                 <div className="action__group flex gap-4 mt-8">
-                    {type && renderButton(type, id, navigate, dispatch)}
+                    {type && renderButton(type, id, navigate, dispatch, canPurchase)}
                     <Button
                         variant="contained"
                         size="small"

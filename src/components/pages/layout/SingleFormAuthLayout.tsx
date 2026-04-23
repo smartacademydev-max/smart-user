@@ -2,6 +2,7 @@ import { Button } from "@mui/material";
 import { ArrowLeft } from "iconsax-reactjs";
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useThemeSettings } from "../../../hooks/useThemeSettings";
 import { useAppSelector } from "../../../store/hook";
 
 export default function SingleFormAuthLayout({
@@ -13,13 +14,15 @@ export default function SingleFormAuthLayout({
 	const location = useLocation();
 	const route = location.pathname.split("/");
 	const currentRoute = route[route.length - 1];
-	const { mode } = useAppSelector((state) => state.udaan_theme)
+	const { mode } = useAppSelector((state) => state.udaan_theme);
+	const { logoUrl, logoDarkUrl } = useThemeSettings();
+	const logo = mode === "light" ? logoDarkUrl : logoUrl;
 
 	return (
 		<>
 			{currentRoute === "verify-otp" ? <Button onClick={() => navigate(-1)} variant="text" color="primary" startIcon={<ArrowLeft />} className="mb-8! lg:mb-16!">Change the number</Button> : ""}
 
-			{currentRoute === "verify-otp" ? <img src={mode === "light" ? "/logo-dark.svg" : "/logo.svg"} alt="" width={132} height={70} className="mb-8" /> : ""}
+			{currentRoute === "verify-otp" ? <img src={logo} alt="" width={132} height={70} className="mb-8" /> : ""}
 			{children}
 		</>
 	);

@@ -2,6 +2,7 @@ import { Button, Checkbox, Divider, FormControlLabel, Typography } from "@mui/ma
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
+import { usePaymentGateways } from "../../../hooks/usePaymentGateways";
 import { PATH } from "../../../routes/PATH";
 import { usePurchaseCourseMutation } from "../../../services/courseApi";
 import { setPurchase } from "../../../slice/purchaseSlice";
@@ -31,6 +32,8 @@ export default function BannerCourseTypeModule({ courseType, courseExpiry, cours
     const [purchaseCourse, isLoading] = usePurchaseCourseMutation();
     const user = useAppSelector((state) => state.auth.user);
     const [selectedPlan, setSelectedPlan] = useState<number | undefined>(undefined);
+    const { anyActive, isLoading: gatewaysLoading } = usePaymentGateways();
+    const canPurchase = gatewaysLoading || anyActive;
 
     const getFreeTrialLabel = () => {
         if (!purchaseStatus?.has_taken_freetrial) {
@@ -89,7 +92,7 @@ export default function BannerCourseTypeModule({ courseType, courseExpiry, cours
         }
         return (
             <div className="actions flex flex-col gap-2">
-                {courseType === "subscription" && (() => {
+                {courseType === "subscription" && canPurchase && (() => {
                     const plan = courseSubscription?.find(p => p.id === selectedPlan);
                     return (
                         <Button
@@ -103,7 +106,7 @@ export default function BannerCourseTypeModule({ courseType, courseExpiry, cours
                         </Button>
                     );
                 })()}
-                {courseType === "expiry" && <Button variant="contained" className="black__btn" fullWidth onClick={() => dispatch(
+                {courseType === "expiry" && canPurchase && <Button variant="contained" className="black__btn" fullWidth onClick={() => dispatch(
                     setPurchase({
                         courseId: Number(id),
                         open: true

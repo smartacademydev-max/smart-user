@@ -2,6 +2,7 @@ import { Box, Button, FormControlLabel, Radio, Typography } from "@mui/material"
 import { useEffect } from "react";
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from "react-router-dom";
+import { useThemeSettings } from "../../../../hooks/useThemeSettings";
 import { PATH } from "../../../../routes/PATH";
 import { setLanguage } from "../../../../slice/themeSlice";
 import { useAppDispatch, useAppSelector } from "../../../../store/hook";
@@ -24,6 +25,8 @@ export default function SelectPreferedLanguage() {
     ]
 
     const { lang: selectedLanguage, mode } = useAppSelector((state) => state.udaan_theme);
+    const { brandName, logoUrl, logoDarkUrl } = useThemeSettings();
+    const logo = mode === "light" ? logoDarkUrl : logoUrl;
 
     const handleLanguageSelect = (lang: "en" | "np") => {
         dispatch(setLanguage(lang));
@@ -40,11 +43,13 @@ export default function SelectPreferedLanguage() {
             <div className="container mx-auto px-4">
                 <div className="content w-full lg:max-w-[592px] mx-auto">
                     <div className="header text-center">
-                        <img src={mode === "light" ? "/logo-dark.svg" : "/logo.svg"} alt="" className='h-auto max-w-[210px] mx-auto' />
-                        <div className="mt-6">
-                            <Typography variant='h4' color='primary'>{t("messages.welcome_to_udaan")}</Typography>
-                            <Typography variant='h4' color='primary'>{t("messages.welcom_message_udaan")}</Typography>
-                        </div>
+                        <img src={logo} alt="" className='h-auto max-w-[210px] mx-auto' />
+                        {brandName && (
+                            <div className="mt-6">
+                                <Typography variant='h4' color='primary'>Welcome to {brandName}</Typography>
+                                <Typography variant='h4' color='primary'>{t("messages.welcom_message_udaan")}</Typography>
+                            </div>
+                        )}
                     </div>
                     <div className="label mt-4 md:mt-8 mb-4 md:mb-6">
                         <Typography variant="subtitle2" className="font-medium">{t("messages.select_your_prefered_language")}</Typography>

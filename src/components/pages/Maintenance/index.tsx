@@ -1,10 +1,13 @@
 import { Box, Divider, Stack, Typography, useTheme } from "@mui/material";
+import { useThemeSettings } from "../../../hooks/useThemeSettings";
 import { useGetAppSettingsQuery } from "../../../services/settingApi";
 
 export default function MaintenancePage() {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   const { data: settingsData } = useGetAppSettingsQuery();
+  const { companyName, logoUrl, logoDarkUrl } = useThemeSettings();
+  const logo = isDark ? logoDarkUrl : logoUrl;
 
   const phones = settingsData?.data?.phones ?? [];
   const emails = settingsData?.data?.emails ?? [];
@@ -27,8 +30,8 @@ export default function MaintenancePage() {
       {/* Logo */}
       <Box sx={{ mb: 5 }}>
         <img
-          src={isDark ? "/logo-dark.svg" : "/logo.svg"}
-          alt="UDAAN LMS"
+          src={logo}
+          alt=""
           style={{ height: 48, objectFit: "contain" }}
         />
       </Box>
@@ -145,9 +148,11 @@ export default function MaintenancePage() {
           background: "linear-gradient(90deg, #1D82F5, #F59E0B)",
         }}
       />
-      <Typography variant="caption" sx={{ mt: 2, color: (t) => t.palette.text.disabled }}>
-        © {new Date().getFullYear()} UDAAN LMS. All rights reserved.
-      </Typography>
+      {companyName && (
+        <Typography variant="caption" sx={{ mt: 2, color: (t) => t.palette.text.disabled }}>
+          © {new Date().getFullYear()} {companyName}. All rights reserved.
+        </Typography>
+      )}
     </Box>
   );
 }

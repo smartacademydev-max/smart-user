@@ -2,6 +2,7 @@ import { Box, Button, Divider, Stack, Typography } from "@mui/material";
 import { Calendar, Clock, Medal, Notepad2 } from "iconsax-reactjs";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { usePaymentGateways } from "../../../hooks/usePaymentGateways";
 import { PATH } from "../../../routes/PATH";
 import type { TestProps } from "../../../types/question";
 import { formatDateTime } from "../../../utils/dateFormat";
@@ -11,6 +12,7 @@ import StatusPillWithBorder from "../../atom/StatusPillWithBorder";
 export default function ExploreTestCard({ test, showAction = true }: { test: TestProps;  showAction?: boolean }) {
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const { anyActive, isLoading: gatewaysLoading } = usePaymentGateways();
 
     const variant = getTestProgressStatus(test?.has_taken_test ? "completed" : "not_started");
 
@@ -83,7 +85,7 @@ export default function ExploreTestCard({ test, showAction = true }: { test: Tes
                     {sellingPrice ? <Typography variant='subtitle1' fontWeight={600} className='text-nowrap'>{t("messages.npr")} {sellingPrice}</Typography> : ""}
                     {markedPrice ? <Typography variant='caption' color='text.middle' className='text-nowrap'><del>{t("messages.npr")} {markedPrice}</del></Typography> : ""}
                 </div>
-                {showAction ? <Button variant="contained" color="primary" onClick={() => navigate(PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.ROOT(test?.id ? Number(test.id) : undefined, "test"))}>
+                {showAction && (gatewaysLoading || anyActive) ? <Button variant="contained" color="primary" onClick={() => navigate(PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.ROOT(test?.id ? Number(test.id) : undefined, "test"))}>
                     Buy Now
                 </Button> : ""}
             </div>

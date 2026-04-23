@@ -1,5 +1,36 @@
 import type { Pagination } from ".";
 
+export type PaymentMode = "test" | "live";
+
+export interface PaymentGateway {
+    slug: string;
+    name: string;
+    is_active: boolean;
+}
+
+export interface EsewaSettingProps {
+    merchant_id: string | null;
+    product_code: string | null;
+    secret_key: string | null;
+    merchant_secret: string | null;
+    mode: PaymentMode;
+    is_active: boolean;
+    urls?: {
+        payment_check_url: string;
+        checkurl_mobile: string;
+    };
+}
+
+export interface KhaltiSettingProps {
+    public_key: string | null;
+    secret_key: string | null;
+    mode: PaymentMode;
+    is_active: boolean;
+    urls?: {
+        api_url: string;
+    };
+}
+
 export interface PhoneItem {
     label: string;
     value: string;
@@ -42,4 +73,14 @@ export interface LinkedDeviceList {
         data: LinkedDeviceProps[],
         pagination: Pagination
     }
+}
+
+export interface ThemeSettingProps {
+    company_name: string;
+    brand_name: string;
+    tagline: string;
+    meta_description: string;
+    logo_url?: string;
+    logo_dark_url?: string;
+    favicon_url?: string;
 }

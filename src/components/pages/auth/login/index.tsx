@@ -1,14 +1,16 @@
 import { Typography } from "@mui/material";
 import { Link } from "react-router-dom";
+import { useThemeSettings } from "../../../../hooks/useThemeSettings";
 import { PATH } from "../../../../routes/PATH";
 import AuthHeader from "../../../molecules/AuthHeader";
 import LoginForm from "../../../organism/LoginForm";
 
 export default function Login() {
+    const { brandName } = useThemeSettings();
     return (
         <>
             <AuthHeader
-                title="Welcome to Udaan 👋🏻 "
+                title={brandName ? `Welcome to ${brandName} 👋🏻` : ""}
                 description="You're one step closer to exponential growth"
             />
             <LoginForm />

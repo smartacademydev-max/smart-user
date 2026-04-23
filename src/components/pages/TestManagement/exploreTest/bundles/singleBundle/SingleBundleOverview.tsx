@@ -2,6 +2,7 @@ import { Box, Button, Divider, IconButton, Typography } from "@mui/material";
 import { Notepad2, PlayCircle, Profile2User, StatusUp, TickCircle, Timer } from "iconsax-reactjs";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { usePaymentGateways } from "../../../../../../hooks/usePaymentGateways";
 import { PATH } from "../../../../../../routes/PATH";
 import type { QuestionTypeProps, SetOveriew } from "../../../../../../types/question";
 import { renderHtml } from "../../../../../../utils/renderHtml";
@@ -12,6 +13,7 @@ import StatusPillWithBorder from "../../../../../atom/StatusPillWithBorder";
 export default function SingleBundleOverview({ data }: { data: SetOveriew }) {
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const { anyActive, isLoading: gatewaysLoading } = usePaymentGateways();
     return (
         <div className="flex flex-col gap-4 lg:gap-0 2xl:grid lg:grid-cols-12 items-stretch">
             <Box className=" 2xl:col-span-8 overview__wrapper p-4 lg:rounded-tl-md lg:rounded-bl-md flex gap-2" sx={{
@@ -106,7 +108,7 @@ export default function SingleBundleOverview({ data }: { data: SetOveriew }) {
                     <Typography variant="h3" color="primary" fontWeight={600}>{t("messages.npr")}{data.sale_price}</Typography>
                     <Typography variant="subtitle2" color="error" className="line-through mt-1.5">{t("messages.npr")}{data.marked_price}</Typography>
                     <Typography variant="caption" color="text.middle">One time payment</Typography>
-                    <Button fullWidth variant="contained" color="primary" onClick={() => navigate(PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.ROOT(Number(data.id), "bundle"))} className="mt-4!">{t("messages.purchase_now")}</Button>
+                    {(gatewaysLoading || anyActive) && <Button fullWidth variant="contained" color="primary" onClick={() => navigate(PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.ROOT(Number(data.id), "bundle"))} className="mt-4!">{t("messages.purchase_now")}</Button>}
                     {data?.discount ? <Box className="absolute -top-15 -right-15 w-30! h-30! flex justify-center items-end rotate-45 pb-2" sx={{
                         background: (theme) => theme.palette.error.main,
                     }}>

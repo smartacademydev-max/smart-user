@@ -695,7 +695,9 @@ const commonThemeOptions: ThemeOptions = {
     },
     MuiAutocomplete: {
       styleOverrides: {
-
+        popper: ({ theme }) => ({
+          zIndex: theme.zIndex.appBar - 1,
+        }),
         option: ({ theme }) => ({
           ...theme.typography.body2,
           padding: "8px 12px",

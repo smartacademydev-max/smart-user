@@ -7,6 +7,7 @@ import {
 } from "@mui/material";
 import { ArrowRight, DocumentDownload } from "iconsax-reactjs";
 import { useNavigate } from "react-router-dom";
+import { useThemeSettings } from "../../../../hooks/useThemeSettings";
 import { PATH } from "../../../../routes/PATH";
 import { useAppSelector } from "../../../../store/hook";
 
@@ -15,6 +16,7 @@ export default function ChoosePlatform() {
     const navigate = useNavigate();
     const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
     const { lang: selectedLanguage } = useAppSelector((state) => state.udaan_theme);
+    const { logoUrl } = useThemeSettings();
     const handleContinueWeb = () => {
         if (selectedLanguage) {
             navigate(PATH.AUTH.LOGIN.ROOT);
@@ -58,7 +60,7 @@ export default function ChoosePlatform() {
             >
                 {/* Left Content */}
                 <Box>
-                    <img src="/logo.svg" alt="" className="max-w-[120px]" />
+                    <img src={logoUrl} alt="" className="max-w-[120px]" />
                     <Typography variant="h3" fontWeight={800} mb={2}>
                         Continue Your Learning
                     </Typography>

@@ -3,13 +3,14 @@ import { Phone } from '@mui/icons-material';
 import { Button, Checkbox, Divider, FormControlLabel, Typography } from '@mui/material';
 import { useFormik } from 'formik';
 import { ArrowLeft } from 'iconsax-reactjs';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGetCourseByIdQuery, usePurchaseCourseWithEsewaMutation, usePurchaseWithKhaltiMutation } from "../../../services/courseApi";
+import { usePaymentGateways } from "../../../hooks/usePaymentGateways";
 import { useGetBundleByOverviewQuery, useGetTestOverviewQuery } from '../../../services/testApi';
 import { showToast } from '../../../slice/toastSlice';
 import { useAppDispatch } from '../../../store/hook';
-import type { PaymentOption, PurchaseFormValues, PurchaseModuleTypes } from "../../../types/purchase";
+import type { PaymentMethods, PurchaseFormValues, PurchaseModuleTypes } from "../../../types/purchase";
 import Quote from '../../molecules/Quote';
 import PageHeader from '../../organism/PageHeader';
 import CoursePaymentCard from './CoursePaymentCard';
@@ -51,10 +52,11 @@ export default function PurchaseLayout() {
         subscriptionId ? Number(subscriptionId) : undefined
     );
 
-    const paymentOptions: PaymentOption[] = [
-        { id: 1, label: "Esewa", value: "esewa", image: "/esewa.svg" },
-        { id: 2, label: "Khalti", value: "khalti", image: "/khalti.svg" },
-    ];
+    const { paymentOptions, activeGateways, isLoading: gatewaysLoading } = usePaymentGateways();
+
+    const defaultPaymentOption = useMemo<PaymentMethods>(() => {
+        return (activeGateways[0]?.slug as PaymentMethods) ?? "esewa";
+    }, [activeGateways]);
 
     const { data: course } = useGetCourseByIdQuery({ id: Number(id) }, { skip: !id || type !== "course" });
     const { data: subscriptionCourse } = useGetCourseByIdQuery({ id: Number(courseId) }, { skip: !isSubscription });
@@ -97,7 +99,7 @@ export default function PurchaseLayout() {
 
     const formik = useFormik<PurchaseFormValues>({
         initialValues: {
-            paymentOption: "esewa",
+            paymentOption: defaultPaymentOption,
             amount: vat + price,
         },
         enableReinitialize: true,

@@ -4,6 +4,7 @@ import * as React from "react";
 
 import Toolbar from "@mui/material/Toolbar";
 import { Link, useLocation } from "react-router-dom";
+import { useThemeSettings } from "../../../../hooks/useThemeSettings";
 import CustomAppbar from "../appbar";
 import PrimaryMenu from "./PrimaryMenu";
 
@@ -22,6 +23,7 @@ export default function ResponsiveDrawer(props: Props) {
     const [isClosing, setIsClosing] = React.useState(false);
     const [desktopCollapsed, setDesktopCollapsed] = React.useState(false);
     const location = useLocation();
+    const { logoUrl, faviconUrl } = useThemeSettings();
 
     const handleDrawerClose = () => {
         setIsClosing(true);
@@ -60,7 +62,7 @@ export default function ResponsiveDrawer(props: Props) {
                     minHeight: "72px !important",
                 }}>
                 <Link to={"/"}>
-                    <img src="/logo.svg" alt="" style={{ height: 40, width: "auto", margin: "0 auto" }} />
+                    <img src={logoUrl} alt="" style={{ height: 40, width: "auto", margin: "0 auto" }} />
                 </Link>
             </Toolbar>
             <PrimaryMenu isCollapsed={false} />
@@ -79,7 +81,7 @@ export default function ResponsiveDrawer(props: Props) {
                 }}>
                 <Link to={"/"}>
                     <img
-                        src={desktopCollapsed ? "/favicon.svg" : "/logo.svg"}
+                        src={desktopCollapsed ? faviconUrl : logoUrl}
                         alt=""
                         style={{
                             height: 40,

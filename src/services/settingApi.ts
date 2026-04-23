@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import type { QueryParams } from "../types";
-import type { AppSettingProps, LinkedDeviceList } from "../types/setting";
+import type { AppSettingProps, LinkedDeviceList, PaymentGateway, ThemeSettingProps } from "../types/setting";
 import type { GlobalResponse, User } from "../types/user";
 import { buildQueryParams } from "../utils/buildQueryParams";
 import { baseQuery } from "./baseQuery";
@@ -8,13 +8,26 @@ import { baseQuery } from "./baseQuery";
 export const settingApi = createApi({
     reducerPath: "settingApi",
     baseQuery: baseQuery,
-    tagTypes: ["LinkedDevice"],
+    tagTypes: ["LinkedDevice", "ApiSetting", "Theme"],
     endpoints: (builder) => ({
         getAppSettings: builder.query<GlobalResponse & { data: AppSettingProps }, void>({
             query: () => ({
                 url: `/settings`,
                 method: "GET",
             }),
+        }),
+
+        getThemeSettings: builder.query<GlobalResponse & { data: ThemeSettingProps }, void>({
+            query: () => ({
+                url: `/settings/theme`,
+                method: "GET",
+            }),
+            providesTags: ["Theme"],
+        }),
+
+        getPaymentGateways: builder.query<GlobalResponse & { data: PaymentGateway[] }, void>({
+            query: () => ({ url: `/settings/api/payment-gateways`, method: "GET" }),
+            providesTags: ["ApiSetting"],
         }),
         updateProfile: builder.mutation<GlobalResponse & { data: User }, FormData>({
             query: (body) => ({
@@ -48,7 +61,9 @@ export const settingApi = createApi({
 
 export const {
     useGetAppSettingsQuery,
+    useGetThemeSettingsQuery,
     useUpdateProfileMutation,
     useGetAllLinkedDevicesQuery,
-    useLogoutFromLinkedDeviceMutation
+    useLogoutFromLinkedDeviceMutation,
+    useGetPaymentGatewaysQuery,
 } = settingApi;

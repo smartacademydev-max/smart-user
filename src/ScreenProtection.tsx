@@ -1,5 +1,6 @@
 import { Box, CircularProgress, Typography } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
+import { useThemeSettings } from './hooks/useThemeSettings';
 import { useAppSelector } from './store/hook';
 
 type Props = {
@@ -18,6 +19,8 @@ const ScreenProtection: React.FC<Props> = ({ children }) => {
     const [devToolsOpen, setDevToolsOpen] = useState(false);
     const devToolsRef = useRef(false);
     const { mode } = useAppSelector((state) => state.udaan_theme);
+    const { logoUrl, logoDarkUrl } = useThemeSettings();
+    const logo = mode === 'dark' ? logoUrl : logoDarkUrl;
 
     useEffect(() => {
         // ── Basic content protections ────────────────────────────────────────
@@ -115,8 +118,8 @@ const ScreenProtection: React.FC<Props> = ({ children }) => {
                     }}
                 >
                     <img
-                        src={mode === 'dark' ? '/logo.svg' : '/logo-dark.svg'}
-                        alt="UDAAN LMS"
+                        src={logo}
+                        alt=""
                         style={{ height: 52, objectFit: 'contain' }}
                     />
                     <CircularProgress size={36} thickness={3.5} />
