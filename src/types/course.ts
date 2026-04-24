@@ -32,6 +32,8 @@ export interface CourseSubscription {
     name: string
     id: number;
     price: string;
+    marked_price?: string | null;
+    sale_price?: string | null;
     billing_cycle: BillingCycle
     number: number;
 }

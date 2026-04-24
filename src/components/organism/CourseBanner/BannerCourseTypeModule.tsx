@@ -207,7 +207,27 @@ export default function BannerCourseTypeModule({ courseType, courseExpiry, cours
                                             label={<Typography color="white" variant="subtitle2" fontWeight={400}>{plan.name}</Typography>}
                                         />
                                     </div>
-                                    <Typography color="white" variant="subtitle2">NRs. {plan.price} / {plan.number} {plan.billing_cycle}</Typography>
+                                    <div className="flex flex-col">
+                                        {plan.sale_price ? (
+                                            <>
+                                                <Typography color="white" variant="subtitle2" fontWeight={600}>
+                                                    NRs. {plan.sale_price} / {plan.number} {plan.billing_cycle}
+                                                </Typography>
+                                                {plan.marked_price && plan.marked_price !== plan.sale_price && (
+                                                    <Typography
+                                                        variant="caption"
+                                                        sx={{ color: "error.main", textDecoration: "line-through" }}
+                                                    >
+                                                        NRs. {plan.marked_price}
+                                                    </Typography>
+                                                )}
+                                            </>
+                                        ) : (
+                                            <Typography color="white" variant="subtitle2">
+                                                NRs. {plan.price} / {plan.number} {plan.billing_cycle}
+                                            </Typography>
+                                        )}
+                                    </div>
                                 </div>
                                 <Divider sx={{
                                     borderColor: (theme) => theme.palette.gray.gray2
