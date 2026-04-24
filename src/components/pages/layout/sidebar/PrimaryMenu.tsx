@@ -85,10 +85,11 @@ export default function PrimaryMenu({ isCollapsed = false }: PrimaryMenuProps) {
           maxHeight: "calc(100vh - 72px - 72px)",
           overflow: "auto",
           flex: 1,
+          scrollbarWidth: "none",
+          "&::-webkit-scrollbar": { display: "none" },
         }}
         className="primary__menu relative"
       >
-        {/* ── MAIN ── */}
         {!isCollapsed && (
           <div className="flex items-center gap-2 overflow-hidden mb-1">
             <Typography variant="overline" mb={1} sx={{
@@ -177,7 +178,6 @@ export default function PrimaryMenu({ isCollapsed = false }: PrimaryMenuProps) {
           )}
         </List>
 
-        {/* ── LEARNING ── */}
         <SectionLabel label={t("messages.learning")} />
 
         <List sx={{ px: isCollapsed ? 0 : undefined }}>
