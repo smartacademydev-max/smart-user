@@ -14,7 +14,7 @@ export default function SingleFormAuthLayout({
 	const location = useLocation();
 	const route = location.pathname.split("/");
 	const currentRoute = route[route.length - 1];
-	const { mode } = useAppSelector((state) => state.udaan_theme);
+	const { mode } = useAppSelector((state) => state.smart_theme);
 	const { logoUrl, logoDarkUrl } = useThemeSettings();
 	const logo = mode === "light" ? logoDarkUrl : logoUrl;
 

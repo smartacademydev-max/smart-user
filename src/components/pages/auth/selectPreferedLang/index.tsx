@@ -24,7 +24,7 @@ export default function SelectPreferedLanguage() {
         },
     ]
 
-    const { lang: selectedLanguage, mode } = useAppSelector((state) => state.udaan_theme);
+    const { lang: selectedLanguage, mode } = useAppSelector((state) => state.smart_theme);
     const { brandName, logoUrl, logoDarkUrl } = useThemeSettings();
     const logo = mode === "light" ? logoDarkUrl : logoUrl;
 
@@ -47,7 +47,7 @@ export default function SelectPreferedLanguage() {
                         {brandName && (
                             <div className="mt-6">
                                 <Typography variant='h4' color='primary'>Welcome to {brandName}</Typography>
-                                <Typography variant='h4' color='primary'>{t("messages.welcom_message_udaan")}</Typography>
+                                <Typography variant='h4' color='primary'>{t("messages.welcom_message_smart")}</Typography>
                             </div>
                         )}
                     </div>

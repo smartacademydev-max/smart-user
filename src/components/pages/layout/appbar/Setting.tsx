@@ -29,7 +29,7 @@ export default function SettingMenu() {
     const theme = useTheme();
     const dispatch = useAppDispatch();
     const { i18n } = useTranslation();
-    const { mode, lang } = useAppSelector((state) => state.udaan_theme);
+    const { mode, lang } = useAppSelector((state) => state.smart_theme);
 
     const [open, setOpen] = useState(false);
     const anchorRef = useRef<HTMLDivElement | null>(null);

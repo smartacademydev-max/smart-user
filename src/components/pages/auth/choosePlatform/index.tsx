@@ -15,7 +15,7 @@ export default function ChoosePlatform() {
     const theme = useTheme();
     const navigate = useNavigate();
     const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
-    const { lang: selectedLanguage } = useAppSelector((state) => state.udaan_theme);
+    const { lang: selectedLanguage } = useAppSelector((state) => state.smart_theme);
     const { logoUrl } = useThemeSettings();
     const handleContinueWeb = () => {
         if (selectedLanguage) {

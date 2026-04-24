@@ -44,10 +44,10 @@ export default function MaintenancePage() {
           viewBox="0 0 120 120"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          style={{ animation: "udaan-spin 8s linear infinite" }}
+          style={{ animation: "smart-spin 8s linear infinite" }}
         >
           <style>{`
-            @keyframes udaan-spin {
+            @keyframes smart-spin {
               from { transform: rotate(0deg); }
               to { transform: rotate(360deg); }
             }
