@@ -101,14 +101,16 @@ export default function CustomAppbar({
                                 sx={{ display: "flex", flexDirection: "column", lineHeight: 1.3, fontWeight: 700 }}
                             >
                                 <span>
-                                    {t(getGreetingKey())},{" "}
+                                    {t(getGreetingKey(user?.dob as string))},{" "}
                                     <Box component="span" className="text-nowrap">
                                         {user?.name}
                                     </Box>
                                 </span>
                             </Typography>
                             <Typography variant="subtitle2" className="mt-1! hidden md:block" fontWeight={400} sx={{ opacity: 0.85 }}>
-                                You're making great progress. Keep exploring!
+                                {getGreetingKey(user?.dob as string) === "messages.birthday"
+                                    ? "Wishing you a wonderful day filled with joy!"
+                                    : "You're making great progress. Keep exploring!"}
                             </Typography>
                         </div>
                     </div>
