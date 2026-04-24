@@ -5,7 +5,7 @@ import TicketChatPanel from '../components/pages/TicketManagement/allTickets/Tic
 
 export default function RootLayout() {
     return (
-        <div className='udaan__root'>
+        <div className='smart__root'>
             <ResponsiveDrawer >
                 <Outlet />
                 <ChatDialogLauncher>

@@ -5,8 +5,8 @@ import { useFormik } from 'formik';
 import { ArrowLeft } from 'iconsax-reactjs';
 import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useGetCourseByIdQuery, usePurchaseCourseWithEsewaMutation, usePurchaseWithKhaltiMutation } from "../../../services/courseApi";
 import { usePaymentGateways } from "../../../hooks/usePaymentGateways";
+import { useGetCourseByIdQuery, usePurchaseCourseWithEsewaMutation, usePurchaseWithKhaltiMutation } from "../../../services/courseApi";
 import { useGetBundleByOverviewQuery, useGetTestOverviewQuery } from '../../../services/testApi';
 import { showToast } from '../../../slice/toastSlice';
 import { useAppDispatch } from '../../../store/hook';
@@ -138,10 +138,16 @@ export default function PurchaseLayout() {
                         amount: vat + price,
                         subscriptionId: isSubscription ? selectedSubscriptionId : undefined,
                     }).unwrap();
-
+                    debugger;
                     const paymentUrl = response?.data?.payment_url;
                     if (paymentUrl) {
                         window.location.replace(paymentUrl);
+                    }
+                    else {
+                        dispatch(showToast({
+                            message: "Unable to proceed for payment. Try Again Later.",
+                            severity: "error"
+                        }));
                     }
                 }
 
