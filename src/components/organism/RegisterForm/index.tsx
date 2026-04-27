@@ -3,10 +3,12 @@ import { useFormik } from "formik";
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import * as Yup from "yup";
+import { useLoginType } from "../../../hooks/useLoginType";
 import { PATH } from "../../../routes/PATH";
 import { useRegisterMutation } from "../../../services/authApi";
 import { showToast } from "../../../slice/toastSlice";
 import { useAppDispatch, useAppSelector } from "../../../store/hook";
+import Password from "../../atom/Password";
 
 export default function RegisterForm() {
     const dispatch = useAppDispatch();
@@ -14,6 +16,8 @@ export default function RegisterForm() {
     const [searchParams] = useSearchParams();
     const [registerUser, { isLoading }] = useRegisterMutation();
     const user = useAppSelector((state) => state.auth.user);
+    const { loginType } = useLoginType();
+    const isPasswordBased = loginType === "password" || loginType === "both";
 
     // Redirect if user is already logged in
     useEffect(() => {
@@ -46,6 +50,14 @@ export default function RegisterForm() {
             .matches(/^\d+$/, "Phone must contain only digits")
             .min(7, "Phone number too short")
             .required("Phone number is required"),
+        ...(isPasswordBased && {
+            password: Yup.string()
+                .min(8, "Password must be at least 8 characters")
+                .required("Password is required"),
+            password_confirmation: Yup.string()
+                .oneOf([Yup.ref("password")], "Passwords do not match")
+                .required("Confirm password is required"),
+        }),
     });
 
     const formik = useFormik({
@@ -53,11 +65,16 @@ export default function RegisterForm() {
             name: "",
             email: "",
             phone: "",
+            password: "",
+            password_confirmation: "",
         },
         validationSchema,
         onSubmit: async (values) => {
             try {
-                const response = await registerUser(values).unwrap();
+                const payload = isPasswordBased
+                    ? values
+                    : { name: values.name, email: values.email, phone: values.phone };
+                const response = await registerUser(payload).unwrap();
                 dispatch(
                     showToast({
                         message: response?.message || "Registered Succesfully.",
@@ -65,7 +82,7 @@ export default function RegisterForm() {
                     }),
                 );
                 const redirectUrl = getPendingRedirectUrl();
-                const otpPath = `${PATH.AUTH.VERIFY_OTP.ROOT}?phone=${values.phone}${redirectUrl ? `&redirect_url=${encodeURIComponent(redirectUrl)}` : ""}`;
+                const otpPath = isPasswordBased ? PATH.AUTH.LOGIN.ROOT : `${PATH.AUTH.VERIFY_OTP.ROOT}?phone=${values.phone}${redirectUrl ? `&redirect_url=${encodeURIComponent(redirectUrl)}` : ""}`;
                 navigate(otpPath);
             } catch (e: any) {
                 dispatch(
@@ -135,6 +152,37 @@ export default function RegisterForm() {
                     </FormHelperText>
                 )}
             </div>
+
+            {/* Password — only shown for password-based login types */}
+            {isPasswordBased && (
+                <>
+                    <div className="input__field mb-6">
+                        <InputLabel>Password</InputLabel>
+                        <Password
+                            name="password"
+                            placeholder="Enter your password"
+                            value={formik.values.password}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            error={formik.touched.password && Boolean(formik.errors.password)}
+                            helperText={formik.touched.password ? formik.errors.password : ""}
+                        />
+                    </div>
+
+                    <div className="input__field mb-6">
+                        <InputLabel>Confirm Password</InputLabel>
+                        <Password
+                            name="password_confirmation"
+                            placeholder="Confirm your password"
+                            value={formik.values.password_confirmation}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            error={formik.touched.password_confirmation && Boolean(formik.errors.password_confirmation)}
+                            helperText={formik.touched.password_confirmation ? formik.errors.password_confirmation : ""}
+                        />
+                    </div>
+                </>
+            )}
 
             <Button
                 variant="contained"
