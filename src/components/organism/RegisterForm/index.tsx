@@ -98,7 +98,7 @@ export default function RegisterForm() {
         <form onSubmit={formik.handleSubmit}>
             {/* Full Name */}
             <div className="input__field mb-6">
-                <InputLabel>Full Name</InputLabel>
+                <InputLabel className="required">Full Name</InputLabel>
                 <OutlinedInput
                     fullWidth
                     name="name"
@@ -117,7 +117,7 @@ export default function RegisterForm() {
 
             {/* Email */}
             <div className="input__field mb-6">
-                <InputLabel>Email Address</InputLabel>
+                <InputLabel className="required">Email Address</InputLabel>
                 <OutlinedInput
                     fullWidth
                     name="email"
@@ -136,7 +136,7 @@ export default function RegisterForm() {
 
             {/* Phone */}
             <div className="input__field mb-6">
-                <InputLabel>Phone No.</InputLabel>
+                <InputLabel className="required">Phone No.</InputLabel>
                 <OutlinedInput
                     fullWidth
                     name="phone"
@@ -157,7 +157,7 @@ export default function RegisterForm() {
             {isPasswordBased && (
                 <>
                     <div className="input__field mb-6">
-                        <InputLabel>Password</InputLabel>
+                        <InputLabel className="required">Password</InputLabel>
                         <Password
                             name="password"
                             placeholder="Enter your password"
@@ -170,7 +170,7 @@ export default function RegisterForm() {
                     </div>
 
                     <div className="input__field mb-6">
-                        <InputLabel>Confirm Password</InputLabel>
+                        <InputLabel className="required">Confirm Password</InputLabel>
                         <Password
                             name="password_confirmation"
                             placeholder="Confirm your password"
