@@ -26,7 +26,7 @@ export default function CustomAppbar({
     desktopCollapsed: boolean;
 }) {
     const theme = useTheme();
-    const { mode, lang } = useAppSelector((state) => state.udaan_theme);
+    const { mode, lang } = useAppSelector((state) => state.smart_theme);
     const { user } = useAppSelector((state) => state.auth);
     const { t } = useTranslation();
 

@@ -12,7 +12,7 @@ import type { CourseExpiry, CourseSubscription, CourseTypeProps } from '../../..
 
 interface Props {
     courseType?: CourseTypeProps;
-    courseExpiry?: CourseExpiry;
+courseExpiry?: CourseExpiry;
     courseSubscription?: CourseSubscription[];
     purchaseStatus?: {
         has_taken_freetrial: false,
@@ -66,8 +66,8 @@ export default function BannerCourseTypeModule({ courseType, courseExpiry, cours
                             payment_method: "free",
                             transaction_amount: "0",
                             transaction_status: "success",
-                            transaction_id: `UDAAN-TXN-${new Date()}-${user?.id}-${id}`,
-                            reference_id: `UDAAN-INVOICE-${new Date()}-${user?.id}-${id}`,
+                            transaction_id: `SMART-TXN-${new Date()}-${user?.id}-${id}`,
+                            reference_id: `SMART-INVOICE-${new Date()}-${user?.id}-${id}`,
                             is_trial: false,
                         },
                         id: Number(id),

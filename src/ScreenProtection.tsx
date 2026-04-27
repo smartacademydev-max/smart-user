@@ -18,7 +18,7 @@ const triggerDebugger = new Function('debugger');
 const ScreenProtection: React.FC<Props> = ({ children }) => {
     const [devToolsOpen, setDevToolsOpen] = useState(false);
     const devToolsRef = useRef(false);
-    const { mode } = useAppSelector((state) => state.udaan_theme);
+    const { mode } = useAppSelector((state) => state.smart_theme);
     const { logoUrl, logoDarkUrl } = useThemeSettings();
     const logo = mode === 'dark' ? logoUrl : logoDarkUrl;
 

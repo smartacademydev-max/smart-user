@@ -33,7 +33,7 @@ export default function SetPasswordPage() {
     const navigate = useNavigate();
     const user = useAppSelector((state) => state.auth.user);
     const { logoUrl, logoDarkUrl } = useThemeSettings();
-    const { mode } = useAppSelector((state) => state.udaan_theme);
+    const { mode } = useAppSelector((state) => state.smart_theme);
     const logo = mode === "light" ? logoDarkUrl : logoUrl;
 
     const [setPassword, { isLoading }] = useSetPasswordMutation();

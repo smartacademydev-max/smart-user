@@ -3,7 +3,7 @@ import { useThemeSettings } from './hooks/useThemeSettings';
 import { useAppSelector } from './store/hook';
 
 export default function Loading() {
-    const { mode } = useAppSelector((state) => state.udaan_theme);
+    const { mode } = useAppSelector((state) => state.smart_theme);
     const { brandName, logoUrl, logoDarkUrl } = useThemeSettings();
     const logo = mode === "light" ? logoDarkUrl : logoUrl;
 

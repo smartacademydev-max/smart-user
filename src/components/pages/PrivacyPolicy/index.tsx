@@ -7,13 +7,13 @@ export default function PrivacyPolicyRoot() {
                     <h1>Privacy Policy</h1>
 
                     <p>
-                        Welcome to <strong>Udaan Academy</strong>, a modern digital learning platform.
-                        Udaan Academy's website and services, including (without limitation)
-                        <a href="https://udaanacademy.com/" target="_blank" rel="noopener noreferrer">
-                            https://Udaanacademy.com/
+                        Welcome to <strong>Smart Academy</strong>, a modern digital learning platform.
+                        Smart Academy's website and services, including (without limitation)
+                        <a href="https://smartacademyhq.com/" target="_blank" rel="noopener noreferrer">
+                            https://smartacademyhq.com/
                         </a>
-                        (the “Site”) and mobile applications (collectively, the “Services”),
-                        are owned and operated by Udaan Academy ("we," "us," or "our").
+                        (the "Site") and mobile applications (collectively, the "Services"),
+                        are owned and operated by Smart Academy ("we," "us," or "our").
                         By using our Services, you agree to the terms outlined in this Privacy Policy.
                     </p>
 
@@ -61,7 +61,7 @@ export default function PrivacyPolicyRoot() {
                             To comply with legal obligations or official requests
                         </li>
                         <li>
-                            To protect the rights, safety, and integrity of Udaan Academy
+                            To protect the rights, safety, and integrity of Smart Academy
                         </li>
                     </ul>
 
@@ -84,7 +84,7 @@ export default function PrivacyPolicyRoot() {
                     <h2>No Government Affiliation</h2>
 
                     <p>
-                        Udaan Academy is an independent educational platform and is not affiliated
+                        Smart Academy is an independent educational platform and is not affiliated
                         with or operated by any government entity.
                     </p>
 
@@ -99,7 +99,7 @@ export default function PrivacyPolicyRoot() {
 
                     <p>
                         If you have any questions regarding this Privacy Policy, please contact us at:
-                        <a href="mailto:info@udaanacademy.com.np">info@udaanacademy.com.np</a>
+                        <a href="mailto:info@smartacademyhq.com">info@smartacademyhq.com</a>
                     </p>
                 </div>
             </div>
