@@ -5,10 +5,11 @@ import { formatDate } from "../../../utils/dateFormat";
 interface Props {
     vat: number;
     isLoading?: boolean;
-    data?: any
+    data?: any;
+    discountAmount?: number;
 }
 
-export default function CoursePaymentCard({ vat, isLoading, data }: Props) {
+export default function CoursePaymentCard({ vat, isLoading, data, discountAmount = 0 }: Props) {
     const theme = useTheme();
     const { t } = useTranslation();
     return (
@@ -93,10 +94,19 @@ export default function CoursePaymentCard({ vat, isLoading, data }: Props) {
                     }}
                 />
 
+                {discountAmount > 0 && (
+                    <div className="grid grid-cols-2">
+                        <Typography variant="subtitle1" color="success.main">Discount:</Typography>
+                        <Typography variant="subtitle1" color="success.main" fontWeight={600} className="text-end">
+                            − {t("messages.npr")} {discountAmount.toLocaleString()}
+                        </Typography>
+                    </div>
+                )}
+
                 <div className="grid grid-cols-2">
                     <Typography variant="subtitle1" color="text.middle">Total</Typography>
                     <Typography variant="subtitle1" color="text.dark" fontWeight={600} className="text-end font-medium">
-                        {t("messages.npr")} {data?.sale_price + vat.toLocaleString()}
+                        {t("messages.npr")} {Math.max(0, Number(data?.sale_price ?? 0) + vat - discountAmount).toLocaleString()}
                     </Typography>
                 </div>
             </div>

@@ -8,6 +8,7 @@ import { PATH } from "../../../routes/PATH";
 import { useRegisterMutation } from "../../../services/authApi";
 import { showToast } from "../../../slice/toastSlice";
 import { useAppDispatch, useAppSelector } from "../../../store/hook";
+import { captureAttribution, clearAttribution, getAttribution } from "../../../utils/attribution";
 import Password from "../../atom/Password";
 
 export default function RegisterForm() {
@@ -18,6 +19,11 @@ export default function RegisterForm() {
     const user = useAppSelector((state) => state.auth.user);
     const { loginType } = useLoginType();
     const isPasswordBased = loginType === "password" || loginType === "both";
+
+    // Capture attribution from URL on register page mount (handles direct navigation)
+    useEffect(() => {
+        captureAttribution(new URLSearchParams(window.location.search));
+    }, []);
 
     // Redirect if user is already logged in
     useEffect(() => {
@@ -71,10 +77,19 @@ export default function RegisterForm() {
         validationSchema,
         onSubmit: async (values) => {
             try {
-                const payload = isPasswordBased
+                const basePayload = isPasswordBased
                     ? values
                     : { name: values.name, email: values.email, phone: values.phone };
+
+                const attribution = getAttribution();
+                const payload = {
+                    ...basePayload,
+                    ...(attribution?.type === "referral" && { referral_code: attribution.code }),
+                    ...(attribution?.type === "marketing" && { campaign_code: attribution.code }),
+                };
+
                 const response = await registerUser(payload).unwrap();
+                clearAttribution();
                 dispatch(
                     showToast({
                         message: response?.message || "Registered Succesfully.",

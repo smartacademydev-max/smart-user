@@ -1,15 +1,34 @@
 
-import { Phone } from '@mui/icons-material';
-import { Button, Checkbox, Divider, FormControlLabel, Typography } from '@mui/material';
+import { LocalOffer, Phone, Toll } from '@mui/icons-material';
+import {
+    Box,
+    Button,
+    Checkbox,
+    CircularProgress,
+    Divider,
+    FormControlLabel,
+    InputAdornment,
+    OutlinedInput,
+    ToggleButton,
+    ToggleButtonGroup,
+    Typography,
+} from '@mui/material';
 import { useFormik } from 'formik';
 import { ArrowLeft } from 'iconsax-reactjs';
 import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { usePaymentGateways } from "../../../hooks/usePaymentGateways";
 import { useGetCourseByIdQuery, usePurchaseCourseWithEsewaMutation, usePurchaseWithKhaltiMutation } from "../../../services/courseApi";
+import {
+    useApplyPointsMutation,
+    useGetPointsBalanceQuery,
+    useGetPointsConfigQuery,
+    useValidateCouponMutation,
+} from '../../../services/referralApi';
 import { useGetBundleByOverviewQuery, useGetTestOverviewQuery } from '../../../services/testApi';
 import { showToast } from '../../../slice/toastSlice';
 import { useAppDispatch } from '../../../store/hook';
+import type { CouponValidateResponse } from '../../../types/referral';
 import type { PaymentMethods, PurchaseFormValues, PurchaseModuleTypes } from "../../../types/purchase";
 import Quote from '../../molecules/Quote';
 import PageHeader from '../../organism/PageHeader';
@@ -65,6 +84,20 @@ export default function PurchaseLayout() {
     const [payViaEsewa, { isLoading: payingViaEsewa }] = usePurchaseCourseWithEsewaMutation();
     const [payViaKhalti, { isLoading: isKhaltiLoading }] = usePurchaseWithKhaltiMutation();
 
+    // ── Discount state ────────────────────────────────────────────────────────
+    const [discountMode, setDiscountMode] = useState<"none" | "points" | "coupon">("none");
+    const [couponInput, setCouponInput] = useState("");
+    const [couponResult, setCouponResult] = useState<CouponValidateResponse["data"] | null>(null);
+    const [pointsApplied, setPointsApplied] = useState(false);
+
+    const { data: balanceData } = useGetPointsBalanceQuery();
+    const { data: configData } = useGetPointsConfigQuery();
+    const [applyPoints, { isLoading: applyingPoints }] = useApplyPointsMutation();
+    const [validateCoupon, { isLoading: validatingCoupon }] = useValidateCouponMutation();
+
+    const pointsBalance = balanceData?.data?.balance ?? 0;
+    const conversionRate = configData?.data?.conversion_rate ?? 100;
+
     const subscriptionPlans = subscriptionCourse?.data?.subscriptions || [];
     const activePlan = subscriptionPlans.find(p => p.id === selectedSubscriptionId);
 
@@ -95,6 +128,13 @@ export default function PurchaseLayout() {
     // const vat = price * 0.13;
     const vat = 0;
 
+    // Max points discount: min(balance → Rs., order value) — never below Rs. 0
+    const maxPointsDiscountRs = Math.min(Math.floor(pointsBalance / conversionRate), price + vat);
+    const pointsDiscount = discountMode === "points" && pointsApplied ? maxPointsDiscountRs : 0;
+    const couponDiscount = discountMode === "coupon" && couponResult ? couponResult.discount_amount : 0;
+    const totalDiscount = pointsDiscount + couponDiscount;
+    const finalPrice = Math.max(0, price + vat - totalDiscount);
+
 
 
     const formik = useFormik<PurchaseFormValues>({
@@ -105,11 +145,19 @@ export default function PurchaseLayout() {
         enableReinitialize: true,
         onSubmit: async (values) => {
             try {
+                // Apply points on the server before initiating payment
+                if (discountMode === "points" && pointsApplied && maxPointsDiscountRs > 0) {
+                    await applyPoints({ points: maxPointsDiscountRs * conversionRate }).unwrap();
+                }
+
+                const couponCode = discountMode === "coupon" && couponResult ? couponResult.code : undefined;
+
                 if (values.paymentOption === "esewa") {
                     const coursePurchaseData = await payViaEsewa({
                         id: isSubscription ? Number(courseId) : Number(id),
                         moduleType: isSubscription ? "course" : type as PurchaseModuleTypes,
                         subscriptionId: isSubscription ? selectedSubscriptionId : undefined,
+                        coupon_code: couponCode,
                     }).unwrap();
                     debugger;
                     if (coursePurchaseData) {
@@ -135,8 +183,9 @@ export default function PurchaseLayout() {
                         id: isSubscription ? Number(courseId) : Number(id),
                         type: values.paymentOption,
                         moduleType: isSubscription ? "course" : type as PurchaseModuleTypes,
-                        amount: vat + price,
+                        amount: finalPrice,
                         subscriptionId: isSubscription ? selectedSubscriptionId : undefined,
+                        coupon_code: couponCode,
                     }).unwrap();
                     debugger;
                     const paymentUrl = response?.data?.payment_url;
@@ -190,7 +239,7 @@ export default function PurchaseLayout() {
                                                     <Checkbox
                                                         checked={plan.id === selectedSubscriptionId}
                                                         onChange={() => setSelectedSubscriptionId(plan.id)}
-                                                        sx={(theme) => ({
+                                                        sx={(theme: any) => ({
                                                             color: theme.palette.gray.gray2,
                                                             "&.Mui-checked": { color: theme.palette.primary.main }
                                                         })}
@@ -210,6 +259,120 @@ export default function PurchaseLayout() {
                             selected={formik.values.paymentOption}
                             onSelect={(value) => formik.setFieldValue("paymentOption", value)}
                         />
+
+                        {/* ── Discount section ─────────────────────────────── */}
+                        <Box sx={{ border: "1px solid", borderColor: "divider", borderRadius: 2, p: 2.5, mt: 3 }}>
+                            <Typography variant="subtitle2" fontWeight={600} mb={1.5}>
+                                Apply Discount
+                            </Typography>
+
+                            <ToggleButtonGroup
+                                value={discountMode}
+                                exclusive
+                                size="small"
+                                onChange={(_e, val) => {
+                                    if (!val) return;
+                                    setDiscountMode(val);
+                                    // clear the other side
+                                    if (val !== "points") { setPointsApplied(false); }
+                                    if (val !== "coupon") { setCouponInput(""); setCouponResult(null); }
+                                }}
+                                sx={{ mb: 2 }}
+                            >
+                                <ToggleButton value="none">None</ToggleButton>
+                                <ToggleButton value="points" disabled={pointsBalance === 0}>
+                                    <Toll fontSize="small" sx={{ mr: 0.5 }} /> Points
+                                </ToggleButton>
+                                <ToggleButton value="coupon">
+                                    <LocalOffer fontSize="small" sx={{ mr: 0.5 }} /> Coupon
+                                </ToggleButton>
+                            </ToggleButtonGroup>
+
+                            {discountMode === "points" && (
+                                <Box>
+                                    <Typography variant="body2" color="text.secondary" mb={1}>
+                                        Balance: <strong>{pointsBalance} pts</strong>{" "}
+                                        ≈ Rs. {Math.floor(pointsBalance / conversionRate)}
+                                    </Typography>
+                                    {pointsApplied ? (
+                                        <Box display="flex" alignItems="center" gap={1}>
+                                            <Typography variant="body2" color="success.main" fontWeight={600}>
+                                                − Rs. {maxPointsDiscountRs} applied
+                                            </Typography>
+                                            <Button
+                                                size="small"
+                                                color="error"
+                                                variant="text"
+                                                onClick={() => setPointsApplied(false)}
+                                            >
+                                                Remove
+                                            </Button>
+                                        </Box>
+                                    ) : (
+                                        <Button
+                                            size="small"
+                                            variant="outlined"
+                                            onClick={() => setPointsApplied(true)}
+                                            disabled={maxPointsDiscountRs === 0}
+                                        >
+                                            Apply {maxPointsDiscountRs > 0 ? `(−Rs. ${maxPointsDiscountRs})` : "(no balance)"}
+                                        </Button>
+                                    )}
+                                </Box>
+                            )}
+
+                            {discountMode === "coupon" && (
+                                <Box>
+                                    <Box display="flex" gap={1} mb={1}>
+                                        <OutlinedInput
+                                            size="small"
+                                            placeholder="Enter coupon code"
+                                            value={couponInput}
+                                            onChange={(e) => {
+                                                setCouponInput(e.target.value.toUpperCase());
+                                                setCouponResult(null);
+                                            }}
+                                            startAdornment={
+                                                <InputAdornment position="start">
+                                                    <LocalOffer fontSize="small" />
+                                                </InputAdornment>
+                                            }
+                                            sx={{ flex: 1 }}
+                                        />
+                                        <Button
+                                            variant="outlined"
+                                            size="small"
+                                            disabled={!couponInput || validatingCoupon}
+                                            onClick={async () => {
+                                                try {
+                                                    const res = await validateCoupon({
+                                                        code: couponInput,
+                                                        order_amount: price + vat,
+                                                    }).unwrap();
+                                                    setCouponResult(res.data);
+                                                    dispatch(showToast({ message: "Coupon applied!", severity: "success" }));
+                                                } catch (e: any) {
+                                                    setCouponResult(null);
+                                                    dispatch(showToast({
+                                                        message: e?.data?.message || "Invalid coupon code.",
+                                                        severity: "error",
+                                                    }));
+                                                }
+                                            }}
+                                        >
+                                            {validatingCoupon ? <CircularProgress size={16} /> : "Apply"}
+                                        </Button>
+                                    </Box>
+                                    {couponResult && (
+                                        <Typography variant="body2" color="success.main" fontWeight={600}>
+                                            − Rs. {couponResult.discount_amount} discount applied
+                                        </Typography>
+                                    )}
+                                </Box>
+                            )}
+                        </Box>
+                        {/* ──────────────────────────────────────────────────── */}
+
                         <div className="mt-6 hidden lg:block">
                             <PurchaseGuideLines />
                             <div className="mt-4 lg:mt-6">
@@ -222,7 +385,8 @@ export default function PurchaseLayout() {
                         <CoursePaymentCard
                             data={isSubscription ? { ...data, sale_price: activePlan?.price ?? "0" } : data}
                             vat={vat}
-                            isLoading={payingViaEsewa || isKhaltiLoading}
+                            discountAmount={totalDiscount}
+                            isLoading={payingViaEsewa || isKhaltiLoading || applyingPoints}
                         />
                         <div className="mt-4 lg:mt-6 lg:hidden">
                             <PurchaseGuideLines />
