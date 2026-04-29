@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Tab, Tabs } from "@mui/material";
+import { Box, Skeleton, Tab, Tabs } from "@mui/material";
 import { useState } from "react";
 import { useGetPointsConfigQuery, useGetUserReferralStatsQuery } from "../../../services/referralApi";
 import PageHeader from "../../organism/PageHeader";
@@ -33,21 +33,29 @@ export default function ReferralPage() {
             </Tabs>
 
             {tab === 0 && (
-                statsLoading ? (
-                    <Box display="flex" justifyContent="center" py={8}>
-                        <CircularProgress size={28} />
-                    </Box>
-                ) : (
-                    <>
-                        {stats && <MyReferralCode referralCode={stats.referral_code} />}
-                        <ReferralStatsCards
-                            stats={stats}
-                            isLoading={statsLoading}
-                            conversionRate={conversionRate}
-                        />
-                        <MyReferralsTable />
-                    </>
-                )
+                <>
+                    {statsLoading ? (
+                        <Box sx={{ border: "1px solid", borderColor: "divider", borderRadius: 2, p: 3, mb: 4 }}>
+                            <Skeleton width={160} height={24} sx={{ mb: 1 }} />
+                            <Skeleton width="70%" height={18} sx={{ mb: 2.5 }} />
+                            <Skeleton width={120} height={36} sx={{ mb: 2 }} />
+                            <Skeleton width="100%" height={42} sx={{ mb: 2.5 }} />
+                            <Box display="flex" gap={1}>
+                                <Skeleton width={100} height={34} />
+                                <Skeleton width={80} height={34} />
+                                <Skeleton width={100} height={34} />
+                            </Box>
+                        </Box>
+                    ) : (
+                        <MyReferralCode referralCode={stats?.referral_code ?? ""} />
+                    )}
+                    <ReferralStatsCards
+                        stats={stats}
+                        isLoading={statsLoading}
+                        conversionRate={conversionRate}
+                    />
+                    <MyReferralsTable />
+                </>
             )}
 
             {tab === 1 && <PointsHistoryTab />}
