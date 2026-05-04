@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { authApi } from '../services/authApi';
+import { referralApi } from '../services/referralApi';
 import { categoryApi } from '../services/categoryApi';
 import { commentApi } from '../services/commentApi';
 import { contentApi } from '../services/contentApi';
@@ -47,6 +48,7 @@ export const store = configureStore({
         [discussionApi.reducerPath]: discussionApi.reducer,
         [commentApi.reducerPath]: commentApi.reducer,
         [controlsApi.reducerPath]: controlsApi.reducer,
+        [referralApi.reducerPath]: referralApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(authApi.middleware)
@@ -66,6 +68,7 @@ export const store = configureStore({
             .concat(discussionApi.middleware)
             .concat(commentApi.middleware)
             .concat(controlsApi.middleware)
+            .concat(referralApi.middleware)
 })
 
 export type RootState = ReturnType<typeof store.getState>

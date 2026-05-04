@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 export default function PurchaseFailure() {
     const navigate = useNavigate();
-    const { id } = useParams();
+    const { id, type } = useParams();
 
     return (
         <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
@@ -16,15 +16,15 @@ export default function PurchaseFailure() {
             <div className="flex gap-4 mt-4">
                 <Button
                     variant="contained"
-                    onClick={() => navigate(`/courses/${id}/purchase`)}
+                    onClick={() => navigate(`/${type}/${id}/purchase`)}
                 >
                     Try Again
                 </Button>
                 <Button
                     variant="outlined"
-                    onClick={() => navigate(`/courses/${id}`)}
+                    onClick={() => navigate(`/${type}/${id}`)}
                 >
-                    Back to Course
+                    Go Back
                 </Button>
             </div>
         </div>

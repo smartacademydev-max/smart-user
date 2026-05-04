@@ -73,6 +73,7 @@ import ForgotPasswordPage from "../components/pages/auth/forgotPassword";
 import ForgotPasswordVerify from "../components/pages/auth/forgotPassword/verify";
 import ForgotPasswordReset from "../components/pages/auth/forgotPassword/reset";
 import SetPasswordPage from "../components/pages/auth/setPassword";
+import ReferralPage from "../components/pages/Referral";
 
 const router = createBrowserRouter([
   {
@@ -309,6 +310,10 @@ const router = createBrowserRouter([
               { path: PATH.DISCUSSION.DETAIL.ROOT(), element: <DiscussionDetail /> },
               { path: PATH.DISCUSSION.EDIT.ROOT(), element: <DiscussionForm /> },
             ],
+          },
+          {
+            path: PATH.REFERRAL.ROOT,
+            element: <ReferralPage />,
           },
           {
             element: (

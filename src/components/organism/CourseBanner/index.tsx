@@ -121,12 +121,13 @@ export default function CourseBanner({ data, havePurchased }: { data?: CoursePro
                                     <Typography variant="caption">{startDate.split(",")[0]}</Typography>
                                     <Typography variant="subtitle1" >-</Typography>
                                 </div> : ""}
-                                {course?.user?.has_taken_freetrial ? <Button variant="contained" className="black__btn mt-4!" fullWidth onClick={() => dispatch(
-                                    setPurchase({
-                                        courseId: Number(course?.id),
-                                        open: true
-                                    })
-                                )}>{t("messages.purchase_now")}</Button> : ""}
+                                {course?.user?.has_taken_freetrial && !havePurchased
+                                    ? <Button variant="contained" className="black__btn mt-4!" fullWidth onClick={() => dispatch(
+                                        setPurchase({
+                                            courseId: Number(course?.id),
+                                            open: true
+                                        })
+                                    )}>{t("messages.purchase_now")}</Button> : ""}
                             </div>
                         </Box> : <BannerCourseTypeModule
                             courseType={course?.course_type}

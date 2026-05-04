@@ -150,20 +150,22 @@ export const courseApi = createApi({
                 { type: "Media" as const, id: "LIST" },
             ],
         }),
-        purchaseCourseWithEsewa: builder.mutation<GlobalResponse & { data: EsewaPaymentPayload }, { id: number, moduleType: PurchaseModuleTypes; subscriptionId?: number }>({
-            query: ({ id, moduleType, subscriptionId }) => ({
+        purchaseCourseWithEsewa: builder.mutation<GlobalResponse & { data: EsewaPaymentPayload }, { id: number, moduleType: PurchaseModuleTypes; subscriptionId?: number; coupon_code?: string; use_points?: boolean; points_amount?: number }>({
+            query: ({ id, moduleType, subscriptionId, coupon_code, use_points, points_amount }) => ({
                 url: `/payment/esewa`,
                 method: "POST",
                 body: {
                     module_type: moduleType,
                     module_id: id,
                     ...(subscriptionId && { subscription_id: subscriptionId }),
+                    ...(coupon_code && { coupon_code }),
+                    ...(use_points && { use_points, points_amount }),
                 },
             }),
             invalidatesTags: (_result, _error, { id }) => [{ type: "Course" as const, id }],
         }),
-        purchaseWithKhalti: builder.mutation<GlobalResponse & { data: { payment_url: string; pidx: string; order_id: string } }, { id: number, type: string, amount: number, moduleType: PurchaseModuleTypes; subscriptionId?: number }>({
-            query: ({ id, type, amount, moduleType, subscriptionId }) => ({
+        purchaseWithKhalti: builder.mutation<GlobalResponse & { data: { payment_url: string; pidx: string; order_id: string } }, { id: number, type: string, amount: number, moduleType: PurchaseModuleTypes; subscriptionId?: number; coupon_code?: string; use_points?: boolean; points_amount?: number }>({
+            query: ({ id, type, amount, moduleType, subscriptionId, coupon_code, use_points, points_amount }) => ({
                 url: `/payment/khalti`,
                 method: "POST",
                 body: {
@@ -172,6 +174,8 @@ export const courseApi = createApi({
                     module_id: id,
                     module_type: moduleType,
                     ...(subscriptionId && { subscription_id: subscriptionId }),
+                    ...(coupon_code && { coupon_code }),
+                    ...(use_points && { use_points, points_amount }),
                 }
             }),
             invalidatesTags: (_result, _error, { id }) => [

@@ -14,7 +14,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { AudioSquare, Book, Bookmark, Document, Element4, I24Support, Notepad2, Notification, Paperclip, PenAdd, SearchNormal, VideoOctagon, VideoPlay } from "iconsax-reactjs";
+import { AudioSquare, Book, Bookmark, Document, Element4, Gift, I24Support, Notepad2, Notification, Paperclip, PenAdd, SearchNormal, VideoOctagon, VideoPlay } from "iconsax-reactjs";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -374,6 +374,20 @@ export default function PrimaryMenu({ isCollapsed = false }: PrimaryMenuProps) {
         {/* ── OTHERS ── */}
         <SectionLabel label={t("messages.others")} />
         <List sx={{ px: isCollapsed ? 0 : undefined }}>
+          {wrap(t("menus.referral"),
+            <ListItem disablePadding className="menu__item">
+              <ListItemButton
+                onClick={() => navigate(PATH.REFERRAL.ROOT)}
+                className={isActive(PATH.REFERRAL.ROOT) ? "active" : ""}
+                sx={{ justifyContent: isCollapsed ? "center" : undefined }}
+              >
+                <ListItemIcon sx={{ minWidth: isCollapsed ? "unset" : undefined, justifyContent: "center" }}>
+                  <Gift size={20} />
+                </ListItemIcon>
+                {!isCollapsed && <ListItemText primary={t("menus.referral")} />}
+              </ListItemButton>
+            </ListItem>
+          )}
           {wrap(t("menus.support"),
             <ListItem disablePadding className="menu__item">
               <ListItemButton
@@ -399,7 +413,7 @@ export default function PrimaryMenu({ isCollapsed = false }: PrimaryMenuProps) {
       {/* ── User Profile Section ── */}
       <Box
         ref={profileRef}
-        onClick={(e) => setProfileAnchor(e.currentTarget)}
+        onClick={(e:any) => setProfileAnchor(e.currentTarget)}
         sx={{
           borderTop: "1px solid rgba(255,255,255,0.07)",
           padding: isCollapsed ? "10px 8px" : "10px 14px",

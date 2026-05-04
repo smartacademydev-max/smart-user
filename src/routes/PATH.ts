@@ -221,6 +221,9 @@ export const PATH = {
             ROOT: (id?: number) => id ? `/discussions/${id}/edit` : "/discussions/:id/edit",
         },
     },
+    REFERRAL: {
+        ROOT: "/referrals",
+    },
     TICKET: {
         ROOT: "/tickets",
         ALL_TICKETS: {

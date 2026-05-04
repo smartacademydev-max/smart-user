@@ -192,7 +192,8 @@
             "all_tickets": "All Tickets",
             "chats": "Chats",
             "ticket_types": "Ticket Types"
-        }
+        },
+        "referral": "Referrals & Points"
     },
     "actions": {
         "create": "Create",

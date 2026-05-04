@@ -12,7 +12,7 @@ import type { CourseExpiry, CourseSubscription, CourseTypeProps } from '../../..
 
 interface Props {
     courseType?: CourseTypeProps;
-courseExpiry?: CourseExpiry;
+    courseExpiry?: CourseExpiry;
     courseSubscription?: CourseSubscription[];
     purchaseStatus?: {
         has_taken_freetrial: false,
@@ -112,7 +112,7 @@ export default function BannerCourseTypeModule({ courseType, courseExpiry, cours
                         open: true
                     })
                 )}>{t("messages.purchase_now")}</Button>}
-                {canTakeFreeTrial ? <Button variant="contained" fullWidth className={`white__btn ${!purchaseStatus?.is_free_trial_valid && purchaseStatus?.has_taken_freetrial ? "opacity-60 pointer-events-none" : ""}`} disabled={!purchaseStatus?.is_free_trial_valid && purchaseStatus?.has_taken_freetrial}
+                {canTakeFreeTrial && courseType !== "subscription" ? <Button variant="contained" fullWidth className={`white__btn ${!purchaseStatus?.is_free_trial_valid && purchaseStatus?.has_taken_freetrial ? "opacity-60 pointer-events-none" : ""}`} disabled={!purchaseStatus?.is_free_trial_valid && purchaseStatus?.has_taken_freetrial}
                     onClick={async () => {
                         try {
                             const response = await purchaseCourse({

@@ -1,16 +1,35 @@
 
-import { Phone } from '@mui/icons-material';
-import { Button, Checkbox, Divider, FormControlLabel, Typography } from '@mui/material';
+import { LocalOffer, Phone, Toll } from '@mui/icons-material';
+import {
+    Box,
+    Button,
+    Checkbox,
+    Chip,
+    CircularProgress,
+    Divider,
+    FormControlLabel,
+    InputAdornment,
+    MenuItem,
+    OutlinedInput,
+    Select,
+    Typography,
+} from '@mui/material';
 import { useFormik } from 'formik';
 import { ArrowLeft } from 'iconsax-reactjs';
 import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { usePaymentGateways } from "../../../hooks/usePaymentGateways";
 import { useGetCourseByIdQuery, usePurchaseCourseWithEsewaMutation, usePurchaseWithKhaltiMutation } from "../../../services/courseApi";
+import {
+    useGetPointsBalanceQuery,
+    useGetPointsConfigQuery,
+    useValidateCouponMutation,
+} from '../../../services/referralApi';
 import { useGetBundleByOverviewQuery, useGetTestOverviewQuery } from '../../../services/testApi';
 import { showToast } from '../../../slice/toastSlice';
 import { useAppDispatch } from '../../../store/hook';
 import type { PaymentMethods, PurchaseFormValues, PurchaseModuleTypes } from "../../../types/purchase";
+import type { CouponValidateResponse } from '../../../types/referral';
 import Quote from '../../molecules/Quote';
 import PageHeader from '../../organism/PageHeader';
 import CoursePaymentCard from './CoursePaymentCard';
@@ -21,6 +40,9 @@ import PurchasePaymentOption from './PurchasePaymentOption';
 export const ESEWA_CONFIG = {
     PAYMENT_URL: import.meta.env.VITE_ESEWA_PAYMENT_URL,
 } as const;
+
+// Redeemable points tiers — user picks one
+const POINTS_TIERS = [100, 500, 1000];
 
 
 function submitEsewaForm(action: string, params: Record<string, any>) {
@@ -65,6 +87,19 @@ export default function PurchaseLayout() {
     const [payViaEsewa, { isLoading: payingViaEsewa }] = usePurchaseCourseWithEsewaMutation();
     const [payViaKhalti, { isLoading: isKhaltiLoading }] = usePurchaseWithKhaltiMutation();
 
+    // ── Discount state ────────────────────────────────────────────────────────
+    const [discountMode, setDiscountMode] = useState<"points" | "coupon">("coupon");
+    const [couponInput, setCouponInput] = useState("");
+    const [couponResult, setCouponResult] = useState<CouponValidateResponse["data"] | null>(null);
+    const [selectedPointsTier, setSelectedPointsTier] = useState<number | null>(null);
+
+    const { data: balanceData } = useGetPointsBalanceQuery();
+    const { data: configData } = useGetPointsConfigQuery();
+    const [validateCoupon, { isLoading: validatingCoupon }] = useValidateCouponMutation();
+
+    const pointsBalance = balanceData?.data?.balance ?? 0;
+    const conversionRate = configData?.data?.conversion_rate ?? 100;
+
     const subscriptionPlans = subscriptionCourse?.data?.subscriptions || [];
     const activePlan = subscriptionPlans.find(p => p.id === selectedSubscriptionId);
 
@@ -73,7 +108,7 @@ export default function PurchaseLayout() {
 
     if (isSubscription) {
         data = subscriptionCourse?.data;
-        price = Number(activePlan?.price) || 0;
+        price = Number(activePlan?.sale_price) || Number(activePlan?.price) || 0;
     } else {
         switch (type) {
             case "course":
@@ -92,10 +127,145 @@ export default function PurchaseLayout() {
                 data = null;
         }
     }
-    // const vat = price * 0.13;
     const vat = 0;
 
+    const selectedPointsDiscountRs = selectedPointsTier ? Math.floor(selectedPointsTier / conversionRate) : 0;
+    const pointsDiscount = discountMode === "points" ? selectedPointsDiscountRs : 0;
+    const couponDiscount = discountMode === "coupon" && couponResult ? couponResult.discount_amount : 0;
+    const totalDiscount = pointsDiscount + couponDiscount;
+    const finalPrice = Math.max(0, price + vat - totalDiscount);
 
+    const handleDiscountModeChange = (val: "points" | "coupon") => {
+        setDiscountMode(val);
+        if (val !== "points") setSelectedPointsTier(null);
+        if (val !== "coupon") { setCouponInput(""); setCouponResult(null); }
+    };
+
+    const discountSection = (
+        <Box>
+            <Typography variant="body2" fontWeight={600} mb={1}>
+                Apply Discount
+            </Typography>
+
+            <Select
+                size="small"
+                fullWidth
+                value={discountMode}
+                onChange={(e) => handleDiscountModeChange(e.target.value as "points" | "coupon")}
+                sx={{ mb: 1.5 }}
+            >
+                <MenuItem value="coupon">
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+                        <LocalOffer sx={{ fontSize: 16 }} />
+                        Coupon Code
+                    </Box>
+                </MenuItem>
+                <MenuItem value="points" disabled={pointsBalance === 0}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+                        <Toll sx={{ fontSize: 16 }} />
+                        Points{pointsBalance > 0
+                            ? ` (${pointsBalance} pts available)`
+                            : " (no balance)"}
+                    </Box>
+                </MenuItem>
+            </Select>
+
+            {discountMode === "coupon" && (
+                <Box>
+                    <Box display="flex" gap={1}>
+                        <OutlinedInput
+                            size="small"
+                            placeholder="Enter coupon code"
+                            value={couponInput}
+                            onChange={(e) => {
+                                setCouponInput(e.target.value.toUpperCase());
+                                setCouponResult(null);
+                            }}
+                            startAdornment={
+                                <InputAdornment position="start">
+                                    <LocalOffer fontSize="small" />
+                                </InputAdornment>
+                            }
+                            sx={{ flex: 1 }}
+                        />
+                        <Button
+                            variant="outlined"
+                            size="small"
+                            disabled={!couponInput || validatingCoupon}
+                            onClick={async () => {
+                                try {
+                                    const res = await validateCoupon({
+                                        code: couponInput,
+                                        order_amount: price + vat,
+                                    }).unwrap();
+                                    setCouponResult(res.data);
+                                    dispatch(showToast({ message: "Coupon applied!", severity: "success" }));
+                                } catch (e: any) {
+                                    setCouponResult(null);
+                                    dispatch(showToast({
+                                        message: e?.data?.message || "Invalid coupon code.",
+                                        severity: "error",
+                                    }));
+                                }
+                            }}
+                        >
+                            {validatingCoupon ? <CircularProgress size={16} /> : "Apply"}
+                        </Button>
+                    </Box>
+                    {couponResult && (
+                        <Typography variant="body2" color="success.main" fontWeight={600} mt={1}>
+                            − Rs. {couponResult.discount_amount} discount applied
+                        </Typography>
+                    )}
+                </Box>
+            )}
+
+            {discountMode === "points" && (
+                <Box>
+                    <Typography variant="caption" color="text.secondary" display="block" mb={1}>
+                        Select redemption amount ({pointsBalance} pts available):
+                    </Typography>
+                    <Box display="flex" gap={1} flexWrap="wrap">
+                        {POINTS_TIERS.map((tier) => {
+                            const discountRs = Math.floor(tier / conversionRate);
+                            const canAfford = pointsBalance >= tier;
+                            const wouldExceedPrice = discountRs > price + vat;
+                            const disabled = !canAfford || wouldExceedPrice;
+                            const selected = selectedPointsTier === tier;
+                            return (
+                                <Chip
+                                    key={tier}
+                                    label={`${tier} pts → Rs. ${discountRs}`}
+                                    onClick={() => !disabled && setSelectedPointsTier(selected ? null : tier)}
+                                    variant={selected ? "filled" : "outlined"}
+                                    color={selected ? "primary" : "default"}
+                                    disabled={disabled}
+                                    size="small"
+                                />
+                            );
+                        })}
+                    </Box>
+                    {selectedPointsTier !== null && (
+                        <Box display="flex" alignItems="center" gap={1} mt={1}>
+                            <Typography variant="body2" color="success.main" fontWeight={600}>
+                                − Rs. {Math.floor(selectedPointsTier / conversionRate)} applied
+                            </Typography>
+                            <Button
+                                size="small"
+                                color="error"
+                                variant="text"
+                                onClick={() => setSelectedPointsTier(null)}
+                                sx={{ minWidth: 0, p: 0 }}
+                            >
+                                Remove
+                            </Button>
+                        </Box>
+                    )}
+                </Box>
+            )}
+        </Box>
+    );
+    // ─────────────────────────────────────────────────────────────────────────
 
     const formik = useFormik<PurchaseFormValues>({
         initialValues: {
@@ -105,13 +275,19 @@ export default function PurchaseLayout() {
         enableReinitialize: true,
         onSubmit: async (values) => {
             try {
+                const usePointsFlag = discountMode === "points" && selectedPointsTier !== null;
+                const couponCode = discountMode === "coupon" && couponResult ? couponResult.code : undefined;
+
                 if (values.paymentOption === "esewa") {
                     const coursePurchaseData = await payViaEsewa({
                         id: isSubscription ? Number(courseId) : Number(id),
                         moduleType: isSubscription ? "course" : type as PurchaseModuleTypes,
                         subscriptionId: isSubscription ? selectedSubscriptionId : undefined,
+                        coupon_code: couponCode,
+                        use_points: usePointsFlag || undefined,
+                        points_amount: usePointsFlag ? selectedPointsTier! : undefined,
                     }).unwrap();
-                    debugger;
+
                     if (coursePurchaseData) {
                         const paymentData = coursePurchaseData?.data;
 
@@ -135,15 +311,16 @@ export default function PurchaseLayout() {
                         id: isSubscription ? Number(courseId) : Number(id),
                         type: values.paymentOption,
                         moduleType: isSubscription ? "course" : type as PurchaseModuleTypes,
-                        amount: vat + price,
+                        amount: finalPrice,
                         subscriptionId: isSubscription ? selectedSubscriptionId : undefined,
+                        coupon_code: couponCode,
+                        use_points: usePointsFlag || undefined,
+                        points_amount: usePointsFlag ? selectedPointsTier! : undefined,
                     }).unwrap();
-                    debugger;
                     const paymentUrl = response?.data?.payment_url;
                     if (paymentUrl) {
                         window.location.replace(paymentUrl);
-                    }
-                    else {
+                    } else {
                         dispatch(showToast({
                             message: "Unable to proceed for payment. Try Again Later.",
                             severity: "error"
@@ -190,7 +367,7 @@ export default function PurchaseLayout() {
                                                     <Checkbox
                                                         checked={plan.id === selectedSubscriptionId}
                                                         onChange={() => setSelectedSubscriptionId(plan.id)}
-                                                        sx={(theme) => ({
+                                                        sx={(theme: any) => ({
                                                             color: theme.palette.gray.gray2,
                                                             "&.Mui-checked": { color: theme.palette.primary.main }
                                                         })}
@@ -210,6 +387,7 @@ export default function PurchaseLayout() {
                             selected={formik.values.paymentOption}
                             onSelect={(value) => formik.setFieldValue("paymentOption", value)}
                         />
+
                         <div className="mt-6 hidden lg:block">
                             <PurchaseGuideLines />
                             <div className="mt-4 lg:mt-6">
@@ -220,9 +398,12 @@ export default function PurchaseLayout() {
 
                     <div className="col-span-1">
                         <CoursePaymentCard
-                            data={isSubscription ? { ...data, sale_price: activePlan?.price ?? "0" } : data}
+                            data={isSubscription ? { ...data, marked_price: activePlan?.marked_price ?? data?.marked_price, sale_price: activePlan?.sale_price ?? activePlan?.price ?? "0" } : data}
                             vat={vat}
+                            discountAmount={totalDiscount}
                             isLoading={payingViaEsewa || isKhaltiLoading}
+                            discountSection={discountSection}
+                            // subscriptionPlan={isSubscription ? activePlan : undefined}
                         />
                         <div className="mt-4 lg:mt-6 lg:hidden">
                             <PurchaseGuideLines />
