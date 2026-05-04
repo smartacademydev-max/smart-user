@@ -83,6 +83,19 @@ export default function PurchaseSuccess() {
                     throw new Error("Invalid payment response");
                 }
 
+                // Discount params embedded by backend in the success_url
+                const usePoints = searchParams.get('use_points') === 'true';
+                const pointsAmount = searchParams.get('points_amount');
+                const couponCode = searchParams.get('coupon_code');
+
+                if (usePoints && pointsAmount) {
+                    backendPayload.use_points = true;
+                    backendPayload.points_amount = Number(pointsAmount);
+                }
+                if (couponCode) {
+                    backendPayload.coupon_code = couponCode;
+                }
+
                 const response = await verifyPaymentAPI({
                     body: backendPayload,
                     id: Number(id),

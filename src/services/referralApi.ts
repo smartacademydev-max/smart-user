@@ -1,14 +1,13 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import type { QueryParams } from "../types";
 import type {
-    ApplyPointsResponse,
     CouponValidateResponse,
     PointsBalanceResponse,
     PointsConfigResponse,
     PointsTransactionListResponse,
     PointsTransactionType,
     ReferralListResponse,
-    UserReferralStatsResponse,
+    UserReferralStatsResponse
 } from "../types/referral";
 import type { GlobalResponse } from "../types/user";
 import { buildQueryParams } from "../utils/buildQueryParams";
@@ -66,13 +65,13 @@ export const referralApi = createApi({
             providesTags: [{ type: "UserPointsBalance", id: "SELF" }],
         }),
 
-        applyPoints: builder.mutation<ApplyPointsResponse, { points: number }>({
-            query: (body) => ({ url: "/user/checkout/apply-points", method: "POST", body }),
-            invalidatesTags: [
-                { type: "UserPointsBalance", id: "SELF" },
-                { type: "UserReferralStats", id: "SELF" },
-            ],
-        }),
+        // applyPoints: builder.mutation<ApplyPointsResponse, { points: number }>({
+        //     query: (body) => ({ url: "/user/checkout/apply-points", method: "POST", body }),
+        //     invalidatesTags: [
+        //         { type: "UserPointsBalance", id: "SELF" },
+        //         { type: "UserReferralStats", id: "SELF" },
+        //     ],
+        // }),
 
         restorePoints: builder.mutation<GlobalResponse, void>({
             query: () => ({ url: "/user/checkout/restore-points", method: "POST" }),
@@ -94,7 +93,7 @@ export const {
     useGetUserPointsTransactionsQuery,
     useGetPointsConfigQuery,
     useGetPointsBalanceQuery,
-    useApplyPointsMutation,
+    // useApplyPointsMutation,
     useRestorePointsMutation,
     useValidateCouponMutation,
 } = referralApi;
