@@ -1,6 +1,16 @@
-import { Box, Button, Divider, Typography, useTheme } from "@mui/material";
+import { Box, Button, Chip, Divider, Typography, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "../../../utils/dateFormat";
+
+interface SubscriptionPlan {
+    id: number;
+    name: string;
+    price: string;
+    sale_price?: string;
+    marked_price?: string;
+    number: number;
+    billing_cycle: string;
+}
 
 interface Props {
     vat: number;
@@ -8,9 +18,10 @@ interface Props {
     data?: any;
     discountAmount?: number;
     discountSection?: React.ReactNode;
+    subscriptionPlan?: SubscriptionPlan;
 }
 
-export default function CoursePaymentCard({ vat, isLoading, data, discountAmount = 0, discountSection }: Props) {
+export default function CoursePaymentCard({ vat, isLoading, data, discountAmount = 0, discountSection, subscriptionPlan }: Props) {
     const theme = useTheme();
     const { t } = useTranslation();
     return (
@@ -41,13 +52,28 @@ export default function CoursePaymentCard({ vat, isLoading, data, discountAmount
                     </Box> : ""}
                     <div className="content">
                         <Typography variant="h5" fontWeight={600} className="line-clamp-2 mb-1">{data?.name}</Typography>
-                        <div className="flex items-center">
-                            {data?.set_count ? <>
-                                <Typography variant="caption" >{data?.set_count} Tests</Typography>
-                                <Divider orientation="vertical" className="mx-2! lg:mx-2! h-3.5!" />
-                            </> : ""}
-                            <Typography variant="caption" color="text.dark">{t("messages.published_date")}: {formatDate(data?.created_at || "")}</Typography>
-                        </div>
+                        {subscriptionPlan ? (
+                            <Box display="flex" alignItems="center" gap={1} mt={0.5}>
+                                <Chip
+                                    label={subscriptionPlan.name}
+                                    size="small"
+                                    color="primary"
+                                    variant="outlined"
+                                    sx={{ textTransform: "capitalize", height: 20, fontSize: 11 }}
+                                />
+                                <Typography variant="caption" color="text.secondary">
+                                    {subscriptionPlan.number} {subscriptionPlan.billing_cycle}
+                                </Typography>
+                            </Box>
+                        ) : (
+                            <div className="flex items-center">
+                                {data?.set_count ? <>
+                                    <Typography variant="caption">{data?.set_count} Tests</Typography>
+                                    <Divider orientation="vertical" className="mx-2! lg:mx-2! h-3.5!" />
+                                </> : ""}
+                                <Typography variant="caption" color="text.dark">{t("messages.published_date")}: {formatDate(data?.created_at || "")}</Typography>
+                            </div>
+                        )}
                     </div>
                 </div>
                 <div className="pricing__wrapper">
@@ -74,9 +100,11 @@ export default function CoursePaymentCard({ vat, isLoading, data, discountAmount
 
             <div className="flex flex-col gap-2.5">
                 <div className="grid grid-cols-2">
-                    <Typography variant="subtitle1" color="text.middle">Model Price:</Typography>
+                    <Typography variant="subtitle1" color="text.middle">
+                        {subscriptionPlan ? "Subscription Price:" : "Model Price:"}
+                    </Typography>
                     <Typography variant="subtitle1" color="text.dark" fontWeight={600} className="text-end font-medium">
-                        {t("messages.npr")} {data?.sale_price.toLocaleString()}
+                        {t("messages.npr")} {data?.sale_price?.toLocaleString()}
                     </Typography>
                 </div>
 
@@ -126,13 +154,6 @@ export default function CoursePaymentCard({ vat, isLoading, data, discountAmount
             >
                 {isLoading ? "Proceeding Payment" : "Pay Now"}
             </Button>
-            {/* <Button
-                className="primary__btn mt-2.5!"
-                variant="contained"
-                fullWidth
-            >
-                Generate QR
-            </Button> */}
         </Box>
     );
 }
