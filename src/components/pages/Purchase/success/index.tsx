@@ -247,8 +247,48 @@ export default function PurchaseSuccess() {
                             <div className="max-w-fit ml-auto">
                                 <StatusPill status={recipt?.status || "success"} variant={getTransactionStatus(recipt?.status || "success")} />
                             </div>
-
                         </div>
+
+                        {recipt?.original_amount != null && (
+                            <>
+                                <Divider />
+                                <div className="grid grid-cols-2">
+                                    <Typography variant="subtitle1" color="text.middle">Base Price</Typography>
+                                    <Typography variant="subtitle1" color="text.dark" fontWeight={600} className="text-end font-medium">
+                                        NRs. {recipt.original_amount}
+                                    </Typography>
+                                </div>
+                            </>
+                        )}
+
+                        {recipt?.use_points && recipt.points_amount != null && recipt.points_amount > 0 && (
+                            <>
+                                <Divider />
+                                <div className="grid grid-cols-2">
+                                    <Typography variant="subtitle1" color="success.main">
+                                        Points Redeemed
+                                    </Typography>
+                                    <Typography variant="subtitle1" color="success.main" fontWeight={600} className="text-end">
+                                        − {recipt.points_amount} pts
+                                    </Typography>
+                                </div>
+                            </>
+                        )}
+
+                        {recipt?.coupon_code && recipt.coupon_discount != null && recipt.coupon_discount > 0 && (
+                            <>
+                                <Divider />
+                                <div className="grid grid-cols-2">
+                                    <Typography variant="subtitle1" color="success.main">
+                                        Coupon ({recipt.coupon_code})
+                                    </Typography>
+                                    <Typography variant="subtitle1" color="success.main" fontWeight={600} className="text-end">
+                                        − NRs. {recipt.coupon_discount}
+                                    </Typography>
+                                </div>
+                            </>
+                        )}
+
                         <Divider
                             className=" mb-.5!"
                             sx={{
@@ -257,9 +297,9 @@ export default function PurchaseSuccess() {
                             }}
                         />
                         <div className="grid grid-cols-2">
-                            <Typography variant="subtitle1" color="text.dark" fontWeight={600}>Amount</Typography>
+                            <Typography variant="subtitle1" color="text.dark" fontWeight={600}>Amount Paid</Typography>
                             <Typography variant="subtitle1" color="text.dark" fontWeight={600} className="text-end font-medium">
-                                {recipt?.amount}
+                                NRs. {recipt?.amount}
                             </Typography>
                         </div>
 

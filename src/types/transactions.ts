@@ -22,6 +22,7 @@ export interface TransactionsResponse extends GlobalResponse {
 
 export interface ReciptProps {
     amount: number;
+    original_amount?: number;
     thumbnail_url: string;
     name: string;
     published_date: string;
@@ -30,5 +31,9 @@ export interface ReciptProps {
     payment_method: PaymentMethods;
     status: "success" | "failed" | "pending";
     download_url: string;
-    mega_categories: string[]
+    mega_categories: string[];
+    use_points?: boolean;
+    points_amount?: number;
+    coupon_code?: string;
+    coupon_discount?: number;
 }
