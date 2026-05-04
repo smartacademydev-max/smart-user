@@ -96,7 +96,7 @@ export default function PurchaseSuccess() {
                 if (couponCode) {
                     backendPayload.coupon_code = couponCode;
                 }
-                console.log("Verifying payment with payload:", backendPayload);
+                console.log("Verifying payment with payload:", { backendPayload, usePoints, pointsAmount, couponCode });
 
                 const response = await verifyPaymentAPI({
                     body: backendPayload,
