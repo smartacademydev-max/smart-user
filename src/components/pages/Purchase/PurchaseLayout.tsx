@@ -288,9 +288,6 @@ export default function PurchaseLayout() {
                         points_amount: usePointsFlag ? selectedPointsTier! : undefined,
                     }).unwrap();
 
-                    debugger;
-                    debugger;
-                    debugger;
                     if (coursePurchaseData) {
                         const paymentData = coursePurchaseData?.data;
 
