@@ -33,6 +33,7 @@ export default function PurchaseSuccess() {
                 let backendPayload: any = null;
 
                 const encodedData = searchParams.get('data');
+
                 if (encodedData) {
                     const decodedData = JSON.parse(atob(encodedData));
 
@@ -83,7 +84,6 @@ export default function PurchaseSuccess() {
                     throw new Error("Invalid payment response");
                 }
 
-                // Discount params embedded by backend in the success_url
                 const usePoints = searchParams.get('use_points') === 'true';
                 const pointsAmount = searchParams.get('points_amount');
                 const couponCode = searchParams.get('coupon_code');
@@ -95,6 +95,7 @@ export default function PurchaseSuccess() {
                 if (couponCode) {
                     backendPayload.coupon_code = couponCode;
                 }
+                console.log("Verifying payment with payload:", backendPayload);
 
                 const response = await verifyPaymentAPI({
                     body: backendPayload,
@@ -109,7 +110,7 @@ export default function PurchaseSuccess() {
                     message: response?.message || "Payment successful!",
                     severity: "success"
                 }));
-                navigate(`/${type}/${id}/purchase/success`, { replace: true });
+                // navigate(`/${type}/${id}/purchase/success`, { replace: true });
 
             } catch (error: any) {
                 dispatch(showToast({
