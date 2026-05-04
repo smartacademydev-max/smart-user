@@ -84,7 +84,8 @@ export default function PurchaseSuccess() {
                     throw new Error("Invalid payment response");
                 }
 
-                const usePoints = searchParams.get('use_points') === 'true';
+                const usePointsRaw = searchParams.get('use_points');
+                const usePoints = usePointsRaw === 'true' || usePointsRaw === '1';
                 const pointsAmount = searchParams.get('points_amount');
                 const couponCode = searchParams.get('coupon_code');
 
