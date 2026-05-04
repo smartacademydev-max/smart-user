@@ -10,6 +10,7 @@ import type {
     ReferralListResponse,
     UserReferralStatsResponse,
 } from "../types/referral";
+import type { GlobalResponse } from "../types/user";
 import { buildQueryParams } from "../utils/buildQueryParams";
 import { baseQuery } from "./baseQuery";
 
@@ -73,6 +74,14 @@ export const referralApi = createApi({
             ],
         }),
 
+        restorePoints: builder.mutation<GlobalResponse, void>({
+            query: () => ({ url: "/user/checkout/restore-points", method: "POST" }),
+            invalidatesTags: [
+                { type: "UserPointsBalance", id: "SELF" },
+                { type: "UserReferralStats", id: "SELF" },
+            ],
+        }),
+
         validateCoupon: builder.mutation<CouponValidateResponse, { code: string; order_amount: number }>({
             query: (body) => ({ url: "/coupon-codes/validate", method: "POST", body }),
         }),
@@ -86,5 +95,6 @@ export const {
     useGetPointsConfigQuery,
     useGetPointsBalanceQuery,
     useApplyPointsMutation,
+    useRestorePointsMutation,
     useValidateCouponMutation,
 } = referralApi;

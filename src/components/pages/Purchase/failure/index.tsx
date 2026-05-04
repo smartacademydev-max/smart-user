@@ -1,10 +1,22 @@
 import { Button } from '@mui/material';
 import { CloseCircle } from 'iconsax-reactjs';
+import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useRestorePointsMutation } from '../../../../services/referralApi';
+import { POINTS_SESSION_KEY } from '../PurchaseLayout';
 
 export default function PurchaseFailure() {
     const navigate = useNavigate();
     const { id } = useParams();
+    const [restorePoints] = useRestorePointsMutation();
+
+    useEffect(() => {
+        if (sessionStorage.getItem(POINTS_SESSION_KEY)) {
+            restorePoints().finally(() => {
+                sessionStorage.removeItem(POINTS_SESSION_KEY);
+            });
+        }
+    }, []);
 
     return (
         <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">

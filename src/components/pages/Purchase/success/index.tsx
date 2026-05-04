@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { PATH } from '../../../../routes/PATH';
 import { usePurchaseCourseMutation } from '../../../../services/courseApi';
+import { POINTS_SESSION_KEY } from '../PurchaseLayout';
 import { showToast } from '../../../../slice/toastSlice';
 import { useAppDispatch } from '../../../../store/hook';
 import type { PurchaseModuleTypes } from '../../../../types/purchase';
@@ -23,6 +24,11 @@ export default function PurchaseSuccess() {
     const [verified, setVerified] = useState(false);
     const [recipt, setRecipt] = useState<ReciptProps | null>(null);
     const [verifyPaymentAPI] = usePurchaseCourseMutation();
+
+    useEffect(() => {
+        // Points were used for a successful purchase — clear the restore flag
+        sessionStorage.removeItem(POINTS_SESSION_KEY);
+    }, []);
 
     useEffect(() => {
         if (hasVerified.current) return;

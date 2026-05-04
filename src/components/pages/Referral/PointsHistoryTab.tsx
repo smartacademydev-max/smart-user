@@ -1,23 +1,16 @@
-import {
-    Box,
-    Chip,
-    CircularProgress,
-    MenuItem,
-    Select,
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TablePagination,
-    TableRow,
-    Typography,
-} from "@mui/material";
-import { useState } from "react";
+import { Chip, MenuItem, Select, TablePagination, Typography } from "@mui/material";
+import type { ColumnDef } from "@tanstack/react-table";
+import { useMemo, useState } from "react";
 import { useGetUserPointsTransactionsQuery } from "../../../services/referralApi";
-import type { PointsTransactionType } from "../../../types/referral";
+import type { PointsTransaction, PointsTransactionType } from "../../../types/referral";
 import { formatDate } from "../../../utils/dateFormat";
+import CustomTable from "../../molecules/Table";
 
 const PAGE_SIZE = 10;
+
+function formatActionType(actionType: string): string {
+    return actionType.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
 
 export default function PointsHistoryTab() {
     const [page, setPage] = useState(0);
@@ -32,8 +25,72 @@ export default function PointsHistoryTab() {
     const rows = data?.data?.data ?? [];
     const total = data?.data?.pagination?.total ?? 0;
 
+    const columns = useMemo<ColumnDef<PointsTransaction>[]>(
+        () => [
+            {
+                accessorKey: "action_label",
+                header: "Action",
+                cell: ({ getValue, row }) => {
+                    const actionType = row.original.action_type;
+                    const label = actionType
+                        ? formatActionType(actionType)
+                        : (getValue() as string);
+                    return label;
+                },
+            },
+            {
+                accessorKey: "transaction_type",
+                header: "Type",
+                cell: ({ getValue }) => {
+                    const type = getValue() as PointsTransactionType;
+                    return (
+                        <Chip
+                            label={type}
+                            size="small"
+                            color={type === "earned" ? "success" : "error"}
+                            sx={{ textTransform: "capitalize" }}
+                        />
+                    );
+                },
+            },
+            {
+                accessorKey: "points",
+                header: "Points",
+                cell: ({ getValue, row }) => {
+                    const pts = getValue() as number;
+                    const type = row.original.transaction_type;
+                    return (
+                        <Typography
+                            variant="body2"
+                            fontWeight={600}
+                            color={type === "earned" ? "success.main" : "error.main"}
+                        >
+                            {type === "earned" ? "+" : "−"}
+                            {pts}
+                        </Typography>
+                    );
+                },
+            },
+            {
+                accessorKey: "balance_after",
+                header: "Balance After",
+                cell: ({ getValue }) => `${getValue() as number} pts`,
+            },
+            {
+                accessorKey: "created_at",
+                header: "Date",
+                cell: ({ getValue }) => (
+                    <Typography variant="body2" color="text.secondary">
+                        {formatDate(getValue() as string)}
+                    </Typography>
+                ),
+            },
+        ],
+        []
+    );
+
     return (
-        <Box>
+        <div>
             <div className="flex items-center justify-between mb-4">
                 <Typography variant="subtitle1" fontWeight={600}>
                     Points History
@@ -54,85 +111,32 @@ export default function PointsHistoryTab() {
                 </Select>
             </div>
 
-            {isFetching ? (
-                <Box display="flex" justifyContent="center" py={4}>
-                    <CircularProgress size={24} />
-                </Box>
-            ) : rows.length === 0 ? (
-                <Box
-                    sx={{
-                        border: "1px dashed",
-                        borderColor: "divider",
-                        borderRadius: 2,
-                        py: 6,
-                        textAlign: "center",
-                    }}
-                >
+            {!isFetching && rows.length === 0 ? (
+                <div className="border border-dashed rounded-lg py-12 text-center">
                     <Typography variant="body2" color="text.secondary">
                         No points transactions yet.
                     </Typography>
-                </Box>
+                </div>
             ) : (
                 <>
-                    <Box sx={{ overflowX: "auto" }}>
-                        <Table size="small">
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Action</TableCell>
-                                    <TableCell>Type</TableCell>
-                                    <TableCell align="right">Points</TableCell>
-                                    <TableCell align="right">Balance After</TableCell>
-                                    <TableCell align="right">Date</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {rows.map((row) => (
-                                    <TableRow key={row.id} hover>
-                                        <TableCell>
-                                            <Typography variant="body2">{row.action_label}</Typography>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Chip
-                                                label={row.transaction_type}
-                                                size="small"
-                                                color={row.transaction_type === "earned" ? "success" : "error"}
-                                                sx={{ textTransform: "capitalize" }}
-                                            />
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            <Typography
-                                                variant="body2"
-                                                fontWeight={600}
-                                                color={row.transaction_type === "earned" ? "success.main" : "error.main"}
-                                            >
-                                                {row.transaction_type === "earned" ? "+" : "−"}{row.points}
-                                            </Typography>
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            <Typography variant="body2" color="text.secondary">
-                                                {row.balance_after} pts
-                                            </Typography>
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            <Typography variant="body2" color="text.secondary">
-                                                {formatDate(row.created_at)}
-                                            </Typography>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </Box>
-                    <TablePagination
-                        component="div"
-                        count={total}
-                        page={page}
-                        rowsPerPage={PAGE_SIZE}
-                        onPageChange={(_e, newPage) => setPage(newPage)}
-                        rowsPerPageOptions={[PAGE_SIZE]}
+                    <CustomTable
+                        data={rows}
+                        columns={columns}
+                        loading={isFetching}
+                        skeletonRows={5}
                     />
+                    {total > PAGE_SIZE && (
+                        <TablePagination
+                            component="div"
+                            count={total}
+                            page={page}
+                            rowsPerPage={PAGE_SIZE}
+                            onPageChange={(_e, newPage) => setPage(newPage)}
+                            rowsPerPageOptions={[PAGE_SIZE]}
+                        />
+                    )}
                 </>
             )}
-        </Box>
+        </div>
     );
 }

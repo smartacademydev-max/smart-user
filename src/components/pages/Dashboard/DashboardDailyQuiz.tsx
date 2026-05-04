@@ -189,17 +189,37 @@ export default function DashboardDailyQuiz() {
     const [submitAnswer] = useSubmitDailyQuizAnswerMutation();
 
     const [localSelectedId, setLocalSelectedId] = useState<number | null>(null);
+    const [localAnswered, setLocalAnswered] = useState(false);
+    const [localIsCorrect, setLocalIsCorrect] = useState<boolean | null>(null);
+    const [submitting, setSubmitting] = useState(false);
 
     const quiz = data?.data?.quiz ?? null;
     const stats = data?.data?.stats ?? null;
 
-    const answered = stats?.answered_today ?? false;
+    const answered = stats?.answered_today || localAnswered;
     const selectedId = stats?.selected_option_id ?? localSelectedId;
 
+    // is_correct sourced directly from the submit response; fall back to GET option data
+    const isCorrectAnswer: boolean | null =
+        localIsCorrect !== null
+            ? localIsCorrect
+            : selectedId !== null
+            ? (quiz?.options.find((o) => o.id === selectedId)?.is_correct ?? null)
+            : null;
+
     const handleSelect = async (option: DailyQuizOption) => {
-        if (answered || !quiz) return;
+        if (answered || !quiz || submitting) return;
         setLocalSelectedId(option.id);
-        await submitAnswer({ quiz_id: quiz.id, option_id: option.id });
+        setSubmitting(true);
+        try {
+            const result = await submitAnswer({ quiz_id: quiz.id, option_id: option.id }).unwrap();
+            setLocalAnswered(true);
+            setLocalIsCorrect(result.data.is_correct);
+        } catch {
+            setLocalSelectedId(null);
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     if (isLoading) return <DailyQuizSkeleton />;
@@ -343,7 +363,7 @@ export default function DashboardDailyQuiz() {
                         <QuizOption
                             key={option.id}
                             option={option}
-                            answered={answered}
+                            answered={answered || submitting}
                             selectedId={selectedId}
                             onSelect={handleSelect}
                         />
@@ -361,13 +381,23 @@ export default function DashboardDailyQuiz() {
                     {answered ? (
                         <Typography
                             variant="caption"
-                            sx={{ color: "rgba(255,255,255,0.65)" }}
+                            fontWeight={600}
+                            sx={{
+                                color: isCorrectAnswer
+                                    ? theme.palette.success.light
+                                    : theme.palette.error.light,
+                            }}
                         >
-                            {selectedId !== null &&
-                                quiz.options.find((o) => o.id === selectedId)
-                                    ?.is_correct
+                            {isCorrectAnswer
                                 ? "🎉 Correct! Come back tomorrow."
-                                : "Nice try! Come back tomorrow for the next one."}
+                                : "✗ Incorrect. Come back tomorrow for the next one."}
+                        </Typography>
+                    ) : submitting ? (
+                        <Typography
+                            variant="caption"
+                            sx={{ color: "rgba(255,255,255,0.5)" }}
+                        >
+                            Submitting…
                         </Typography>
                     ) : (
                         <Box

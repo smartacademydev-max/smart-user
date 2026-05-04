@@ -7,9 +7,10 @@ interface Props {
     isLoading?: boolean;
     data?: any;
     discountAmount?: number;
+    discountSection?: React.ReactNode;
 }
 
-export default function CoursePaymentCard({ vat, isLoading, data, discountAmount = 0 }: Props) {
+export default function CoursePaymentCard({ vat, isLoading, data, discountAmount = 0, discountSection }: Props) {
     const theme = useTheme();
     const { t } = useTranslation();
     return (
@@ -110,6 +111,12 @@ export default function CoursePaymentCard({ vat, isLoading, data, discountAmount
                     </Typography>
                 </div>
             </div>
+
+            {discountSection && (
+                <Box mt={2}>
+                    {discountSection}
+                </Box>
+            )}
 
             <Button
                 className="primary__btn mt-2.5!"

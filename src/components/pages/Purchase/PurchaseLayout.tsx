@@ -8,9 +8,9 @@ import {
     Divider,
     FormControlLabel,
     InputAdornment,
+    MenuItem,
     OutlinedInput,
-    ToggleButton,
-    ToggleButtonGroup,
+    Select,
     Typography,
 } from '@mui/material';
 import { useFormik } from 'formik';
@@ -23,6 +23,7 @@ import {
     useApplyPointsMutation,
     useGetPointsBalanceQuery,
     useGetPointsConfigQuery,
+    useRestorePointsMutation,
     useValidateCouponMutation,
 } from '../../../services/referralApi';
 import { useGetBundleByOverviewQuery, useGetTestOverviewQuery } from '../../../services/testApi';
@@ -35,6 +36,8 @@ import PageHeader from '../../organism/PageHeader';
 import CoursePaymentCard from './CoursePaymentCard';
 import PurchaseGuideLines from './PurchaseGuideLines';
 import PurchasePaymentOption from './PurchasePaymentOption';
+
+export const POINTS_SESSION_KEY = "checkout_points_applied";
 
 // eSewa Configuration
 export const ESEWA_CONFIG = {
@@ -85,7 +88,7 @@ export default function PurchaseLayout() {
     const [payViaKhalti, { isLoading: isKhaltiLoading }] = usePurchaseWithKhaltiMutation();
 
     // ── Discount state ────────────────────────────────────────────────────────
-    const [discountMode, setDiscountMode] = useState<"none" | "points" | "coupon">("none");
+    const [discountMode, setDiscountMode] = useState<"points" | "coupon">("coupon");
     const [couponInput, setCouponInput] = useState("");
     const [couponResult, setCouponResult] = useState<CouponValidateResponse["data"] | null>(null);
     const [pointsApplied, setPointsApplied] = useState(false);
@@ -93,6 +96,7 @@ export default function PurchaseLayout() {
     const { data: balanceData } = useGetPointsBalanceQuery();
     const { data: configData } = useGetPointsConfigQuery();
     const [applyPoints, { isLoading: applyingPoints }] = useApplyPointsMutation();
+    const [restorePoints] = useRestorePointsMutation();
     const [validateCoupon, { isLoading: validatingCoupon }] = useValidateCouponMutation();
 
     const pointsBalance = balanceData?.data?.balance ?? 0;
@@ -135,7 +139,125 @@ export default function PurchaseLayout() {
     const totalDiscount = pointsDiscount + couponDiscount;
     const finalPrice = Math.max(0, price + vat - totalDiscount);
 
+    const handleDiscountModeChange = (val: "points" | "coupon") => {
+        setDiscountMode(val);
+        if (val !== "points") setPointsApplied(false);
+        if (val !== "coupon") { setCouponInput(""); setCouponResult(null); }
+    };
 
+    // ── Discount section (rendered inside the right-side payment card) ────────
+    const discountSection = (
+        <Box>
+            <Typography variant="body2" fontWeight={600} mb={1}>
+                Apply Discount
+            </Typography>
+
+            <Select
+                size="small"
+                fullWidth
+                value={discountMode}
+                onChange={(e) => handleDiscountModeChange(e.target.value as "points" | "coupon")}
+                sx={{ mb: 1.5 }}
+            >
+                <MenuItem value="coupon">
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+                        <LocalOffer sx={{ fontSize: 16 }} />
+                        Coupon Code
+                    </Box>
+                </MenuItem>
+                <MenuItem value="points" disabled={pointsBalance === 0}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+                        <Toll sx={{ fontSize: 16 }} />
+                        Points{pointsBalance > 0
+                            ? ` (${pointsBalance} pts ≈ Rs. ${Math.floor(pointsBalance / conversionRate)})`
+                            : " (no balance)"}
+                    </Box>
+                </MenuItem>
+            </Select>
+
+            {discountMode === "coupon" && (
+                <Box>
+                    <Box display="flex" gap={1}>
+                        <OutlinedInput
+                            size="small"
+                            placeholder="Enter coupon code"
+                            value={couponInput}
+                            onChange={(e) => {
+                                setCouponInput(e.target.value.toUpperCase());
+                                setCouponResult(null);
+                            }}
+                            startAdornment={
+                                <InputAdornment position="start">
+                                    <LocalOffer fontSize="small" />
+                                </InputAdornment>
+                            }
+                            sx={{ flex: 1 }}
+                        />
+                        <Button
+                            variant="outlined"
+                            size="small"
+                            disabled={!couponInput || validatingCoupon}
+                            onClick={async () => {
+                                try {
+                                    const res = await validateCoupon({
+                                        code: couponInput,
+                                        order_amount: price + vat,
+                                    }).unwrap();
+                                    setCouponResult(res.data);
+                                    dispatch(showToast({ message: "Coupon applied!", severity: "success" }));
+                                } catch (e: any) {
+                                    setCouponResult(null);
+                                    dispatch(showToast({
+                                        message: e?.data?.message || "Invalid coupon code.",
+                                        severity: "error",
+                                    }));
+                                }
+                            }}
+                        >
+                            {validatingCoupon ? <CircularProgress size={16} /> : "Apply"}
+                        </Button>
+                    </Box>
+                    {couponResult && (
+                        <Typography variant="body2" color="success.main" fontWeight={600} mt={1}>
+                            − Rs. {couponResult.discount_amount} discount applied
+                        </Typography>
+                    )}
+                </Box>
+            )}
+
+            {discountMode === "points" && (
+                <Box>
+                    {pointsApplied ? (
+                        <Box display="flex" alignItems="center" gap={1}>
+                            <Typography variant="body2" color="success.main" fontWeight={600}>
+                                − Rs. {maxPointsDiscountRs} applied
+                            </Typography>
+                            <Button
+                                size="small"
+                                color="error"
+                                variant="text"
+                                onClick={() => setPointsApplied(false)}
+                                sx={{ minWidth: 0 }}
+                            >
+                                Remove
+                            </Button>
+                        </Box>
+                    ) : (
+                        <Button
+                            size="small"
+                            variant="outlined"
+                            fullWidth
+                            onClick={() => setPointsApplied(true)}
+                            disabled={maxPointsDiscountRs === 0}
+                        >
+                            Apply {maxPointsDiscountRs > 0 ? `(−Rs. ${maxPointsDiscountRs})` : "(no balance)"}
+                        </Button>
+                    )}
+                </Box>
+            )}
+        </Box>
+    );
+    // ─────────────────────────────────────────────────────────────────────────
 
     const formik = useFormik<PurchaseFormValues>({
         initialValues: {
@@ -147,7 +269,15 @@ export default function PurchaseLayout() {
             try {
                 // Apply points on the server before initiating payment
                 if (discountMode === "points" && pointsApplied && maxPointsDiscountRs > 0) {
-                    await applyPoints({ points: maxPointsDiscountRs * conversionRate }).unwrap();
+                    // Frontend guard: never send more points than the user actually holds
+                    const pointsToDeduct = Math.min(
+                        maxPointsDiscountRs * conversionRate,
+                        pointsBalance,
+                    );
+                    if (pointsToDeduct <= 0) throw new Error("Invalid points amount.");
+                    await applyPoints({ points: pointsToDeduct }).unwrap();
+                    // Flag so failure page can restore if payment gateway fails
+                    sessionStorage.setItem(POINTS_SESSION_KEY, "1");
                 }
 
                 const couponCode = discountMode === "coupon" && couponResult ? couponResult.code : undefined;
@@ -159,7 +289,6 @@ export default function PurchaseLayout() {
                         subscriptionId: isSubscription ? selectedSubscriptionId : undefined,
                         coupon_code: couponCode,
                     }).unwrap();
-                    debugger;
                     if (coursePurchaseData) {
                         const paymentData = coursePurchaseData?.data;
 
@@ -187,12 +316,10 @@ export default function PurchaseLayout() {
                         subscriptionId: isSubscription ? selectedSubscriptionId : undefined,
                         coupon_code: couponCode,
                     }).unwrap();
-                    debugger;
                     const paymentUrl = response?.data?.payment_url;
                     if (paymentUrl) {
                         window.location.replace(paymentUrl);
-                    }
-                    else {
+                    } else {
                         dispatch(showToast({
                             message: "Unable to proceed for payment. Try Again Later.",
                             severity: "error"
@@ -202,6 +329,11 @@ export default function PurchaseLayout() {
 
             } catch (e: any) {
                 console.error("Payment Error:", e);
+                // Payment initiation failed after points were applied — restore them immediately
+                if (sessionStorage.getItem(POINTS_SESSION_KEY)) {
+                    try { await restorePoints().unwrap(); } catch {}
+                    sessionStorage.removeItem(POINTS_SESSION_KEY);
+                }
                 dispatch(showToast({
                     message: e?.data?.message || "Unable to proceed for payment. Try Again Later.",
                     severity: "error"
@@ -260,119 +392,6 @@ export default function PurchaseLayout() {
                             onSelect={(value) => formik.setFieldValue("paymentOption", value)}
                         />
 
-                        {/* ── Discount section ─────────────────────────────── */}
-                        <Box sx={{ border: "1px solid", borderColor: "divider", borderRadius: 2, p: 2.5, mt: 3 }}>
-                            <Typography variant="subtitle2" fontWeight={600} mb={1.5}>
-                                Apply Discount
-                            </Typography>
-
-                            <ToggleButtonGroup
-                                value={discountMode}
-                                exclusive
-                                size="small"
-                                onChange={(_e, val) => {
-                                    if (!val) return;
-                                    setDiscountMode(val);
-                                    // clear the other side
-                                    if (val !== "points") { setPointsApplied(false); }
-                                    if (val !== "coupon") { setCouponInput(""); setCouponResult(null); }
-                                }}
-                                sx={{ mb: 2 }}
-                            >
-                                <ToggleButton value="none">None</ToggleButton>
-                                <ToggleButton value="points" disabled={pointsBalance === 0}>
-                                    <Toll fontSize="small" sx={{ mr: 0.5 }} /> Points
-                                </ToggleButton>
-                                <ToggleButton value="coupon">
-                                    <LocalOffer fontSize="small" sx={{ mr: 0.5 }} /> Coupon
-                                </ToggleButton>
-                            </ToggleButtonGroup>
-
-                            {discountMode === "points" && (
-                                <Box>
-                                    <Typography variant="body2" color="text.secondary" mb={1}>
-                                        Balance: <strong>{pointsBalance} pts</strong>{" "}
-                                        ≈ Rs. {Math.floor(pointsBalance / conversionRate)}
-                                    </Typography>
-                                    {pointsApplied ? (
-                                        <Box display="flex" alignItems="center" gap={1}>
-                                            <Typography variant="body2" color="success.main" fontWeight={600}>
-                                                − Rs. {maxPointsDiscountRs} applied
-                                            </Typography>
-                                            <Button
-                                                size="small"
-                                                color="error"
-                                                variant="text"
-                                                onClick={() => setPointsApplied(false)}
-                                            >
-                                                Remove
-                                            </Button>
-                                        </Box>
-                                    ) : (
-                                        <Button
-                                            size="small"
-                                            variant="outlined"
-                                            onClick={() => setPointsApplied(true)}
-                                            disabled={maxPointsDiscountRs === 0}
-                                        >
-                                            Apply {maxPointsDiscountRs > 0 ? `(−Rs. ${maxPointsDiscountRs})` : "(no balance)"}
-                                        </Button>
-                                    )}
-                                </Box>
-                            )}
-
-                            {discountMode === "coupon" && (
-                                <Box>
-                                    <Box display="flex" gap={1} mb={1}>
-                                        <OutlinedInput
-                                            size="small"
-                                            placeholder="Enter coupon code"
-                                            value={couponInput}
-                                            onChange={(e) => {
-                                                setCouponInput(e.target.value.toUpperCase());
-                                                setCouponResult(null);
-                                            }}
-                                            startAdornment={
-                                                <InputAdornment position="start">
-                                                    <LocalOffer fontSize="small" />
-                                                </InputAdornment>
-                                            }
-                                            sx={{ flex: 1 }}
-                                        />
-                                        <Button
-                                            variant="outlined"
-                                            size="small"
-                                            disabled={!couponInput || validatingCoupon}
-                                            onClick={async () => {
-                                                try {
-                                                    const res = await validateCoupon({
-                                                        code: couponInput,
-                                                        order_amount: price + vat,
-                                                    }).unwrap();
-                                                    setCouponResult(res.data);
-                                                    dispatch(showToast({ message: "Coupon applied!", severity: "success" }));
-                                                } catch (e: any) {
-                                                    setCouponResult(null);
-                                                    dispatch(showToast({
-                                                        message: e?.data?.message || "Invalid coupon code.",
-                                                        severity: "error",
-                                                    }));
-                                                }
-                                            }}
-                                        >
-                                            {validatingCoupon ? <CircularProgress size={16} /> : "Apply"}
-                                        </Button>
-                                    </Box>
-                                    {couponResult && (
-                                        <Typography variant="body2" color="success.main" fontWeight={600}>
-                                            − Rs. {couponResult.discount_amount} discount applied
-                                        </Typography>
-                                    )}
-                                </Box>
-                            )}
-                        </Box>
-                        {/* ──────────────────────────────────────────────────── */}
-
                         <div className="mt-6 hidden lg:block">
                             <PurchaseGuideLines />
                             <div className="mt-4 lg:mt-6">
@@ -387,6 +406,7 @@ export default function PurchaseLayout() {
                             vat={vat}
                             discountAmount={totalDiscount}
                             isLoading={payingViaEsewa || isKhaltiLoading || applyingPoints}
+                            discountSection={discountSection}
                         />
                         <div className="mt-4 lg:mt-6 lg:hidden">
                             <PurchaseGuideLines />

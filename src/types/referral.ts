@@ -1,7 +1,7 @@
 import type { Pagination } from ".";
 import type { GlobalResponse } from "./user";
 
-export type ReferralStatus = "pending" | "registered" | "purchased";
+export type ReferralStatus = "pending" | "registered" | "purchased" | "course_purchased" | "test_purchased" | "bundle_purchased";
 export type PointsTransactionType = "earned" | "spent";
 export type CouponDiscountType = "percentage" | "fixed";
 
@@ -24,6 +24,7 @@ export interface ReferralEntry {
 export interface PointsTransaction {
     id: number;
     action_label: string;
+    action_type?: string;
     transaction_type: PointsTransactionType;
     points: number;
     balance_after: number;
