@@ -301,14 +301,48 @@ const commonThemeOptions: ThemeOptions = {
         },
         ".styled__list": {
           "ul": {
-            ">li": {
-              listStyleType: "disc"
-            }
-          }, "ol": {
-            ">li": {
-              listStyleType: "decimal"
-            }
-          }
+            paddingLeft: 0,
+            listStyle: "none",
+            margin: "0.75rem 0",
+            "& > li": {
+              ...theme.typography.subtitle1,
+              color: theme.palette.text.dark,
+              position: "relative",
+              paddingLeft: "1.75rem",
+              marginBottom: "0.4rem",
+              "&::before": {
+                content: '""',
+                position: "absolute",
+                left: 0,
+                top: "0.45em",
+                width: "14px",
+                height: "14px",
+                backgroundImage: `url("data:image/svg+xml,${encodeURIComponent(
+                  `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 2.5v9M2.5 7h9" stroke="${theme.palette.primary.main}" stroke-width="1.6" stroke-linecap="round"/></svg>`
+                )}")`,
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "center",
+              },
+              "& strong": {
+                color: theme.palette.text.dark,
+                fontWeight: 700,
+              },
+            },
+          },
+          "ol": {
+            paddingLeft: "1.5rem",
+            margin: "0.75rem 0",
+            "& > li": {
+              ...theme.typography.subtitle1,
+              color: theme.palette.text.dark,
+              listStyleType: "decimal",
+              marginBottom: "0.4rem",
+              "&::marker": {
+                color: theme.palette.primary.main,
+                fontWeight: 700,
+              },
+            },
+          },
         },
         ".status": {
           padding: "4px 8px",

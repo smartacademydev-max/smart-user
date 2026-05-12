@@ -19,3 +19,5 @@ export interface Pagination {
   current_page: number;
   total_pages: number;
 }
+
+export type { CanvasCourseStatus, CanvasContentType, CanvasCurriculumSection, CanvasCurriculumItem } from "./learningCanvas";

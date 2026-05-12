@@ -84,6 +84,10 @@ export interface CourseProps {
     can_take_free_trial: boolean;
     course_completion_status: "completed" | "ongoing" | "not_started";
 
+    /** 0..5 — populated by the backend once a rating system exists. Optional for now. */
+    rating?: number;
+    /** Human-readable count, e.g. "2.4k" or numeric — accepts both. */
+    reviews_count?: number | string;
 }
 
 export interface CourseList extends GlobalResponse {
@@ -138,12 +142,23 @@ export interface CurriculumMediaProps extends MediaProps {
 
 }
 
+// Test attached to a curriculum node (read-only payload from the API).
+export interface CurriculumTestProps {
+    id: number;
+    name: string;
+    test_type: string;
+    duration: DurationProps;
+    total_questions: number;
+}
+
 // Base props for all curriculum items
 export interface CurriculumCommonProps {
     id?: number;
     name: string;
     description: string;
     media: CurriculumMediaProps[];
+    /** Hydrated test for chapter / unit / lesson / child_lesson nodes. Subjects do not carry a test. */
+    test?: CurriculumTestProps | null;
 }
 
 // Hierarchy of curriculum items

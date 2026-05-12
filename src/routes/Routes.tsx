@@ -10,20 +10,38 @@ import SingleCourse from "../components/pages/CourseManagement/course/singleCour
 
 import AuthBridge from "../components/pages/auth/bridge";
 import ChoosePlatform from "../components/pages/auth/choosePlatform";
+import DeviceResetForm from "../components/pages/auth/deviceReset";
+import DeviceResetSuccess from "../components/pages/auth/deviceReset/success";
+import ForgotPasswordPage from "../components/pages/auth/forgotPassword";
+import ForgotPasswordReset from "../components/pages/auth/forgotPassword/reset";
+import ForgotPasswordVerify from "../components/pages/auth/forgotPassword/verify";
 import InterestRoot from "../components/pages/auth/interest";
 import IntroScreenRoot from "../components/pages/auth/introScreens";
 import SelectPreferedLanguage from "../components/pages/auth/selectPreferedLang";
+import SetPasswordPage from "../components/pages/auth/setPassword";
 import SavedCourse from "../components/pages/CourseManagement/course/savedCourse";
 import SingleLiveClassRoot from "../components/pages/CourseManagement/course/singleLiveClass";
 import LiveClassRoot from "../components/pages/CourseManagement/liveClasses";
 import AllLiveClass from "../components/pages/CourseManagement/liveClasses/allLiveClass";
 import MyCourseRoot from "../components/pages/CourseManagement/myCourse";
+import DiscussionManagementRoot from "../components/pages/DiscussionManagement";
+import AllDiscussions from "../components/pages/DiscussionManagement/allDiscussions";
+import DiscussionDetail from "../components/pages/DiscussionManagement/DiscussionDetail";
+import DiscussionForm from "../components/pages/DiscussionManagement/DiscussionForm";
 import GorkhapatraRoot from "../components/pages/Gorkhapatra";
 import AllGorkhapatras from "../components/pages/Gorkhapatra/AllGorkhapatra";
 import SingleGorkhapatraRoot from "../components/pages/Gorkhapatra/SingleGorkhapatra";
 import AuthLayout from "../components/pages/layout/AuthLayout";
 import NotFound from "../components/pages/layout/NotFound";
 import SingleFormAuthLayout from "../components/pages/layout/SingleFormAuthLayout";
+import LearningCanvasRoot from "../components/pages/LearningCanvas";
+import LearningCanvasAllCourses from "../components/pages/LearningCanvas/AllCourses";
+import AssignmentTaking from "../components/pages/LearningCanvas/AssignmentTaking";
+import CourseCompletion from "../components/pages/LearningCanvas/Completion";
+import ContentViewer from "../components/pages/LearningCanvas/ContentViewer";
+import LearningCanvasCourseOverview from "../components/pages/LearningCanvas/CourseOverview";
+import QuizTaking from "../components/pages/LearningCanvas/QuizTaking";
+import ReviewPage from "../components/pages/LearningCanvas/Review";
 import AudiosRoot from "../components/pages/MediaManagement/audios";
 import AllAudios from "../components/pages/MediaManagement/audios/allAudios";
 import NotesRoot from "../components/pages/MediaManagement/notes";
@@ -39,6 +57,7 @@ import PurchaseRoot from "../components/pages/Purchase";
 import PurchaseFailure from "../components/pages/Purchase/failure";
 import PurchaseLayout from "../components/pages/Purchase/PurchaseLayout";
 import PaymentSuccessPage from "../components/pages/Purchase/success";
+import ReferralPage from "../components/pages/Referral";
 import SettingRoot from "../components/pages/Settings";
 import LinkedDevices from "../components/pages/Settings/LinkedDevices";
 import ProfilePage from "../components/pages/Settings/ProfilePage";
@@ -57,23 +76,12 @@ import ReviewTestRoot from "../components/pages/TestManagement/reviewTest";
 import ReviewSubjectTestRoot from "../components/pages/TestManagement/reviewTest/subjective";
 import SingleSubjectiveTest from "../components/pages/TestManagement/singleSubjectiveTest";
 import SingleTestRoot from "../components/pages/TestManagement/singleTest";
-import { PATH } from "./PATH";
-import Private from "./Private";
-import RootLayout from "./RootLayout";
-import DiscussionManagementRoot from "../components/pages/DiscussionManagement";
-import AllDiscussions from "../components/pages/DiscussionManagement/allDiscussions";
-import DiscussionForm from "../components/pages/DiscussionManagement/DiscussionForm";
-import DiscussionDetail from "../components/pages/DiscussionManagement/DiscussionDetail";
 import TicketManagementRoot from "../components/pages/TicketManagement";
 import AllTickets from "../components/pages/TicketManagement/allTickets";
 import TicketChats from "../components/pages/TicketManagement/chats";
-import DeviceResetForm from "../components/pages/auth/deviceReset";
-import DeviceResetSuccess from "../components/pages/auth/deviceReset/success";
-import ForgotPasswordPage from "../components/pages/auth/forgotPassword";
-import ForgotPasswordVerify from "../components/pages/auth/forgotPassword/verify";
-import ForgotPasswordReset from "../components/pages/auth/forgotPassword/reset";
-import SetPasswordPage from "../components/pages/auth/setPassword";
-import ReferralPage from "../components/pages/Referral";
+import { PATH } from "./PATH";
+import Private from "./Private";
+import RootLayout from "./RootLayout";
 
 const router = createBrowserRouter([
   {
@@ -229,9 +237,11 @@ const router = createBrowserRouter([
             ],
           },
           {
-            path: PATH.MY_COURSE.ROOT,
-            element:
-              <MyCourseRoot />,
+            element: <CourseRoot />,
+            children: [
+              { path: PATH.MY_COURSE.ROOT, element: <MyCourseRoot /> },
+              { path: PATH.MY_COURSE.VIEW_COURSE.ROOT(), element: <SingleCourse /> },
+            ],
           },
           {
 
@@ -309,6 +319,19 @@ const router = createBrowserRouter([
               { path: PATH.DISCUSSION.CREATE.ROOT, element: <DiscussionForm /> },
               { path: PATH.DISCUSSION.DETAIL.ROOT(), element: <DiscussionDetail /> },
               { path: PATH.DISCUSSION.EDIT.ROOT(), element: <DiscussionForm /> },
+            ],
+          },
+          {
+            element: <LearningCanvasRoot />,
+            children: [
+              { path: PATH.LEARNING_CANVAS.ROOT, element: <LearningCanvasAllCourses /> },
+              { path: PATH.LEARNING_CANVAS.COURSE_OVERVIEW.ROOT(), element: <LearningCanvasCourseOverview /> },
+              { path: PATH.LEARNING_CANVAS.CONTENT_VIEWER.ROOT(), element: <ContentViewer /> },
+              { path: PATH.LEARNING_CANVAS.QUIZ.ROOT(), element: <QuizTaking /> },
+              { path: PATH.LEARNING_CANVAS.QUIZ.REVIEW.ROOT(), element: <ReviewPage /> },
+              { path: PATH.LEARNING_CANVAS.ASSIGNMENT.ROOT(), element: <AssignmentTaking /> },
+              { path: PATH.LEARNING_CANVAS.ASSIGNMENT.REVIEW.ROOT(), element: <ReviewPage /> },
+              { path: PATH.LEARNING_CANVAS.COMPLETION.ROOT(), element: <CourseCompletion /> },
             ],
           },
           {

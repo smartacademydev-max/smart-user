@@ -14,7 +14,7 @@ export default function SinlgeCourseOverview({ data }: Props) {
 
     return (
         <div className="pb-4">
-            {data?.about_this_course ? <div className="general-content">
+            {data?.about_this_course ? <div className="general__content__box styled__list">
                 {renderHtml(data?.about_this_course || "")}
             </div> : ""}
 

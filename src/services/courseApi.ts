@@ -1,6 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import type { CategoryFilterParams, QueryParams } from "../types";
 import type { CourseList, CourseProps, courseTabType, CurriculumList, PlaylistListing } from "../types/course";
+import type { CanvasContentsProgressResponse, CanvasCourseProgressResponse, CanvasCurriculumResponse, CourseCompletionResponse, MarkCanvasContentPayload, SaveCanvasProgressPayload } from "../types/learningCanvas";
 import type { LiveClassList, LiveClassProps } from "../types/liveClass";
 import type { MediaList } from "../types/media";
 import type { EsewaPaymentPayload, PurchaseModuleTypes, PurchaseProps } from "../types/purchase";
@@ -13,7 +14,7 @@ import { baseQuery } from "./baseQuery";
 export const courseApi = createApi({
     reducerPath: "courseApi",
     baseQuery,
-    tagTypes: ["Course", "Curriculum", "Media"],
+    tagTypes: ["Course", "Curriculum", "Media", "CanvasProgress"],
     endpoints: (builder) => ({
         getAllCourse: builder.query<CourseList, QueryParams & { categoryFilter?: CategoryFilterParams }>({
             query: ({ pageIndex, pageSize, search, categoryFilter }) => {
@@ -268,6 +269,84 @@ export const courseApi = createApi({
                 method: "GET",
             })
         }),
+
+        // ─── Learning Canvas (new endpoints) ────────────────────────
+
+        getCanvasCurriculum: builder.query<CanvasCurriculumResponse, { courseId: number }>({
+            query: ({ courseId }) => ({
+                url: `/course/${courseId}/canvas/curriculum`,
+                method: "GET",
+            }),
+            providesTags: (_r, _e, { courseId }) => [{ type: "Curriculum" as const, id: courseId }],
+        }),
+
+        getCanvasCourseProgress: builder.query<CanvasCourseProgressResponse, { courseId: number }>({
+            query: ({ courseId }) => ({
+                url: `/course/${courseId}/canvas/progress`,
+                method: "GET",
+            }),
+            providesTags: (_r, _e, { courseId }) => [{ type: "Course" as const, id: courseId }],
+        }),
+
+        markCanvasContentComplete: builder.mutation<GlobalResponse, { courseId: number; body: MarkCanvasContentPayload }>({
+            query: ({ courseId, body }) => ({
+                url: `/course/${courseId}/canvas/complete`,
+                method: "POST",
+                body,
+            }),
+            invalidatesTags: (_r, _e, { courseId }) => [
+                { type: "Curriculum" as const, id: courseId },
+                { type: "Course" as const, id: courseId },
+                { type: "CanvasProgress" as const, id: courseId },
+            ],
+        }),
+
+        // ─── Per-content progress (resume position + watched %) ─────────────
+        getCanvasContentsProgress: builder.query<CanvasContentsProgressResponse, { courseId: number }>({
+            query: ({ courseId }) => ({
+                url: `/course/${courseId}/canvas/contents-progress`,
+                method: "GET",
+            }),
+            providesTags: (_r, _e, { courseId }) => [{ type: "CanvasProgress" as const, id: courseId }],
+        }),
+
+        saveCanvasContentProgress: builder.mutation<GlobalResponse, { courseId: number; body: SaveCanvasProgressPayload }>({
+            query: ({ courseId, body }) => ({
+                url: `/course/${courseId}/canvas/progress`,
+                method: "POST",
+                body,
+            }),
+            // Optimistic patch — keep cached list in sync without refetching on every tick.
+            onQueryStarted: async ({ courseId, body }, { dispatch, queryFulfilled }) => {
+                const patch = dispatch(
+                    courseApi.util.updateQueryData("getCanvasContentsProgress", { courseId }, (draft) => {
+                        const list = draft?.data?.data;
+                        if (!Array.isArray(list)) return;
+                        const existing = list.find((p) => p.content_id === body.content_id);
+                        if (existing) {
+                            existing.position = body.position;
+                            existing.percent = body.percent;
+                        } else {
+                            list.push({
+                                content_id: body.content_id,
+                                content_type: body.content_type,
+                                position: body.position,
+                                percent: body.percent,
+                                completed: false,
+                            });
+                        }
+                    })
+                );
+                try { await queryFulfilled; } catch { patch.undo(); }
+            },
+        }),
+
+        getCourseCompletion: builder.query<CourseCompletionResponse, { courseId: number }>({
+            query: ({ courseId }) => ({
+                url: `/course/${courseId}/canvas/completion`,
+                method: "GET",
+            }),
+        }),
     }),
 });
 
@@ -292,5 +371,10 @@ export const {
     useTrackCourseProgressMutation,
     useGetAllUserTransacionsQuery,
     useDownloadAdmitCardQuery,
-    
+    useGetCanvasCurriculumQuery,
+    useGetCanvasCourseProgressQuery,
+    useMarkCanvasContentCompleteMutation,
+    useGetCourseCompletionQuery,
+    useGetCanvasContentsProgressQuery,
+    useSaveCanvasContentProgressMutation,
 } = courseApi;

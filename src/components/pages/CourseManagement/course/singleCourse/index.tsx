@@ -1,7 +1,7 @@
 import { CircularProgress } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { useGetCourseByIdQuery, useGetCourseCurriculumByIdQuery, useGetCourseLiveClassQuery, useGetCourseMediaPlaylistQuery, useGetCourseOverviewByIdQuery } from "../../../../../services/courseApi";
 import type { QueryParams } from "../../../../../types";
 import TabController from "../../../../molecules/TabController";
@@ -10,12 +10,16 @@ import PurchaseCourseDialog from "../../../../organism/Dialog/PurchaseCourseDial
 import CoursePlaylistListing from "./coursePlaylistListing";
 import SinlgeCourseCurriculum from "./curriculum";
 import SinlgeCourseLiveClass from "./liveClass";
+import MyCourseBanner from "./myCourseView/MyCourseBanner";
+import MyCourseSidebar from "./myCourseView/MyCourseSidebar";
 import SinlgeCourseOverview from "./overview";
 import SinlgeCourseTest from "./test";
 
 export default function SingleCourse() {
     const { id } = useParams();
     const { t } = useTranslation();
+    const location = useLocation();
+    const isMyCourseView = location.pathname.startsWith("/my-course/");
 
     const [activeTab, setActiveTab] = useState<string>("");
 
@@ -72,9 +76,8 @@ export default function SingleCourse() {
             </div>
         );
     }
-    return (
-        <div className="h-full overflow-auto pr-4">
-            <CourseBanner data={courseBasic?.data && courseBasic.data} isLoading={loadingBasic} havePurchased={havePurchased} />
+    const tabContent = (
+        <>
             <div className="my-8">
                 <TabController
                     options={availableTabs}
@@ -138,6 +141,34 @@ export default function SingleCourse() {
                     totalPages={liveClasses?.data?.pagination?.total_pages || 0}
                 />
             )}
+        </>
+    );
+
+    if (isMyCourseView) {
+        return (
+            <div className="h-full overflow-auto pr-4">
+                <div className="lg:grid lg:grid-cols-12 lg:gap-6">
+                    {/* Banner spans full width on row 1; its inner content is constrained to the left 2/3 */}
+                    <div className="lg:col-span-12">
+                        <MyCourseBanner data={courseBasic?.data} />
+                    </div>
+
+                    <div className="lg:col-span-7 2xl:col-span-8 ">
+                        {tabContent}
+                    </div>
+                    <aside className="relative z-10 mt-4 lg:-mt-70 lg:col-span-4 2xl:col-span-3">
+                        <MyCourseSidebar data={courseBasic?.data} />
+                    </aside>
+                </div>
+                <PurchaseCourseDialog type={courseBasic?.data?.course_type} />
+            </div>
+        );
+    }
+
+    return (
+        <div className="h-full overflow-auto pr-4">
+            <CourseBanner data={courseBasic?.data && courseBasic.data} isLoading={loadingBasic} havePurchased={havePurchased} />
+            {tabContent}
             <PurchaseCourseDialog type={courseBasic?.data?.course_type} />
         </div>
     );

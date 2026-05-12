@@ -2,6 +2,7 @@ import { Box, Collapse, useTheme } from '@mui/material';
 import { useState } from 'react';
 import type { ChapterProps, ChildLessonProps, CurriculumMediaProps, CurriculumProps, LessonProps, UnitProps } from '../../../../../../types/course';
 import CustomCollapseIcon from '../../../../../atom/CustomCollapseIcon';
+import CurriculumTestCard from '../../../../../organism/Cards/CurriculumTestCard';
 import MediaCard from '../../../../../organism/Cards/MediaCard';
 
 interface Props {
@@ -155,6 +156,11 @@ const MobileChildLesson = ({ childLesson, havePurchased, courseId }: {
                             ))}
                         </div>
                     ) : null}
+                    {childLesson?.test ? (
+                        <div className="mt-3">
+                            <CurriculumTestCard test={childLesson.test} havePurchased={havePurchased} courseId={courseId} />
+                        </div>
+                    ) : null}
                 </Box>
             </Collapse>
         </Box>
@@ -198,6 +204,12 @@ const MobileLesson = ({ lesson, havePurchased, courseId }: {
                             {lesson.media.map((item: CurriculumMediaProps) => (
                                 <MediaCard havePurchased={havePurchased} type={item.type} media={item} courseId={courseId} />
                             ))}
+                        </div>
+                    ) : null}
+
+                    {lesson?.test ? (
+                        <div className="mb-3">
+                            <CurriculumTestCard test={lesson.test} havePurchased={havePurchased} courseId={courseId} />
                         </div>
                     ) : null}
 
@@ -260,6 +272,12 @@ const MobileUnit = ({ unit, havePurchased, courseId }: {
                         </div>
                     ) : null}
 
+                    {unit?.test ? (
+                        <div className="mb-3">
+                            <CurriculumTestCard test={unit.test} havePurchased={havePurchased} courseId={courseId} />
+                        </div>
+                    ) : null}
+
                     {unit.lessons?.map((lesson: any) => (
                         <MobileLesson
                             key={lesson.id}
@@ -312,6 +330,12 @@ const MobileChapter = ({ chapter, havePurchased, courseId }: {
                             {chapter.media.map((item: CurriculumMediaProps) => (
                                 <MediaCard havePurchased={havePurchased} type={item.type} media={item} courseId={courseId} />
                             ))}
+                        </div>
+                    ) : null}
+
+                    {chapter?.test ? (
+                        <div className="mb-3">
+                            <CurriculumTestCard test={chapter.test} havePurchased={havePurchased} courseId={courseId} />
                         </div>
                     ) : null}
 

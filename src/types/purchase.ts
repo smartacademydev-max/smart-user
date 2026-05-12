@@ -19,12 +19,18 @@ export interface PurchaseFormValues {
 
 export interface PurchaseProps {
     payment_method: PaymentMethods;
-    transaction_amount: string;
+    transaction_amount: string | number;
     transaction_status: "success" | "failed" | "pending";
-    transaction_id: string;
-    reference_id: string;
+    transaction_id: string | null;
+    reference_id: string | null;
     is_trial: boolean;
-
+    course_type?: string;
+    subscription_id?: number | null;
+    purchase_order_id?: string | null;
+    purchase_order_name?: string | null;
+    use_points?: boolean;
+    points_amount?: number;
+    coupon_code?: string;
 }
 
 export interface EsewaPaymentPayload {

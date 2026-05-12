@@ -15,7 +15,7 @@ export interface AnalyticsList {
 export interface DailyQuizOption {
     id: number;
     option: string;
-    is_correct: boolean;
+    correct_answer: boolean;
 }
 
 export interface DailyQuizQuestion {

@@ -5,6 +5,7 @@ import { useParams } from 'react-router-dom';
 import { useGetCourseCurriculumByIdQuery } from '../../../../../../services/courseApi';
 import type { CurriculumMediaProps, CurriculumProps } from '../../../../../../types/course';
 import CustomCollapseIcon from '../../../../../atom/CustomCollapseIcon';
+import CurriculumTestCard from '../../../../../organism/Cards/CurriculumTestCard';
 import MediaCard from '../../../../../organism/Cards/MediaCard';
 import MobileCurriculum from './MobileCurriculum';
 
@@ -230,6 +231,11 @@ const ChildLesson = ({ childLesson, isOpen, onToggle, havePurchased, courseId }:
                             ))}
                         </div>
                     ) : null}
+                    {childLesson?.test ? (
+                        <div className="mt-4 md:grid md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 gap-4">
+                            <CurriculumTestCard test={childLesson.test} havePurchased={havePurchased} courseId={courseId} />
+                        </div>
+                    ) : null}
                 </Box>
             </Collapse>
         </Box>
@@ -279,6 +285,12 @@ const LessonItem = ({ lesson, isOpen, openChildLessonIds, onToggle, onChildLesso
                                     <MediaCard havePurchased={havePurchased} type={item.type} media={item} courseId={courseId} />
                                 </div>
                             ))}
+                        </div>
+                    ) : null}
+
+                    {lesson?.test ? (
+                        <div className="mb-4 md:grid md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 gap-4">
+                            <CurriculumTestCard test={lesson.test} havePurchased={havePurchased} courseId={courseId} />
                         </div>
                     ) : null}
 
@@ -350,6 +362,12 @@ const UnitItem = ({ unit, isOpen, openLessonIds, openChildLessonIds, onUnitToggl
                         </div>
                     ) : null}
 
+                    {unit?.test ? (
+                        <div className="mb-4 md:grid md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 gap-4">
+                            <CurriculumTestCard test={unit.test} havePurchased={havePurchased} courseId={courseId} />
+                        </div>
+                    ) : null}
+
                     {unit.lessons?.map((lesson: any) => (
                         <LessonItem
                             key={lesson.id}
@@ -411,6 +429,12 @@ const ChapterContent = ({
                             <MediaCard havePurchased={havePurchased} type={item.type} media={item} courseId={courseId} />
                         </div>
                     ))}
+                </div>
+            ) : null}
+
+            {activeChapter?.test ? (
+                <div className="mb-4 md:grid md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 gap-4">
+                    <CurriculumTestCard test={activeChapter.test} havePurchased={havePurchased} courseId={courseId} />
                 </div>
             ) : null}
 

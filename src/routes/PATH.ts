@@ -170,7 +170,10 @@ export const PATH = {
         ROOT: "/notes"
     },
     MY_COURSE: {
-        ROOT: "/my-course"
+        ROOT: "/my-course",
+        VIEW_COURSE: {
+            ROOT: (id?: number) => (id ? `/my-course/${id}` : "/my-course/:id"),
+        },
     },
     GORKHAPATRA: {
         ROOT: "/gorkhapatra",
@@ -219,6 +222,47 @@ export const PATH = {
         },
         EDIT: {
             ROOT: (id?: number) => id ? `/discussions/${id}/edit` : "/discussions/:id/edit",
+        },
+    },
+    LEARNING_CANVAS: {
+        ROOT: "/learning-canvas",
+        COURSE_OVERVIEW: {
+            ROOT: (courseId?: number) =>
+                courseId ? `/learning-canvas/${courseId}` : "/learning-canvas/:courseId",
+        },
+        CONTENT_VIEWER: {
+            ROOT: (courseId?: number, contentId?: number) =>
+                courseId && contentId
+                    ? `/learning-canvas/${courseId}/content/${contentId}`
+                    : "/learning-canvas/:courseId/content/:contentId",
+        },
+        QUIZ: {
+            ROOT: (courseId?: number, quizId?: number) =>
+                courseId && quizId
+                    ? `/learning-canvas/${courseId}/quiz/${quizId}`
+                    : "/learning-canvas/:courseId/quiz/:quizId",
+            REVIEW: {
+                ROOT: (courseId?: number, quizId?: number) =>
+                    courseId && quizId
+                        ? `/learning-canvas/${courseId}/quiz/${quizId}/review`
+                        : "/learning-canvas/:courseId/quiz/:quizId/review",
+            },
+        },
+        ASSIGNMENT: {
+            ROOT: (courseId?: number, assignmentId?: number) =>
+                courseId && assignmentId
+                    ? `/learning-canvas/${courseId}/assignment/${assignmentId}`
+                    : "/learning-canvas/:courseId/assignment/:assignmentId",
+            REVIEW: {
+                ROOT: (courseId?: number, assignmentId?: number) =>
+                    courseId && assignmentId
+                        ? `/learning-canvas/${courseId}/assignment/${assignmentId}/review`
+                        : "/learning-canvas/:courseId/assignment/:assignmentId/review",
+            },
+        },
+        COMPLETION: {
+            ROOT: (courseId?: number) =>
+                courseId ? `/learning-canvas/${courseId}/completed` : "/learning-canvas/:courseId/completed",
         },
     },
     REFERRAL: {

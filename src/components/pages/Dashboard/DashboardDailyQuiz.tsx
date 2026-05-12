@@ -38,7 +38,7 @@ function QuizOption({
 
     if (answered) {
         cursor = "default";
-        if (option.is_correct) {
+        if (option.correct_answer) {
             bg = theme.palette.success.light;
             border = `1.5px solid ${theme.palette.success.main}`;
             color = theme.palette.success.main;
@@ -199,12 +199,12 @@ export default function DashboardDailyQuiz() {
     const answered = stats?.answered_today || localAnswered;
     const selectedId = stats?.selected_option_id ?? localSelectedId;
 
-    // is_correct sourced directly from the submit response; fall back to GET option data
+    // correct_answer sourced directly from the submit response; fall back to GET option data
     const isCorrectAnswer: boolean | null =
         localIsCorrect !== null
             ? localIsCorrect
             : selectedId !== null
-            ? (quiz?.options.find((o) => o.id === selectedId)?.is_correct ?? null)
+            ? (quiz?.options.find((o) => o.id === selectedId)?.correct_answer ?? null)
             : null;
 
     const handleSelect = async (option: DailyQuizOption) => {
