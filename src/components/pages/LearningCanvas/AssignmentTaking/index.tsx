@@ -1,17 +1,19 @@
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography, useTheme } from "@mui/material";
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
+type AnswerType = "text" | "file" | "both";
+type MockQuestion = { id: number; question: string; points: number; answer_type: AnswerType };
 
 // Static mock data — will be dynamic once backend has assignment-specific endpoints
-const MOCK_QUESTIONS = [
-    { id: 1, question: "Analyze a real-world engineering problem and propose a structured solution using core engineering principles learned in this module.", points: 25, answer_type: "both" as const },
-    { id: 2, question: "Analyze a real-world engineering problem and propose a structured solution using core engineering principles learned in this module.", points: 25, answer_type: "file" as const },
-    { id: 3, question: "Analyze a real-world engineering problem and propose a structured solution using core engineering principles learned in this module.", points: 25, answer_type: "both" as const },
-    { id: 4, question: "Analyze a real-world engineering problem and propose a structured solution using core engineering principles learned in this module.", points: 25, answer_type: "both" as const },
+const MOCK_QUESTIONS: MockQuestion[] = [
+    { id: 1, question: "Analyze a real-world engineering problem and propose a structured solution using core engineering principles learned in this module.", points: 25, answer_type: "both" },
+    { id: 2, question: "Analyze a real-world engineering problem and propose a structured solution using core engineering principles learned in this module.", points: 25, answer_type: "file" },
+    { id: 3, question: "Analyze a real-world engineering problem and propose a structured solution using core engineering principles learned in this module.", points: 25, answer_type: "both" },
+    { id: 4, question: "Analyze a real-world engineering problem and propose a structured solution using core engineering principles learned in this module.", points: 25, answer_type: "both" },
 ];
 
 export default function AssignmentTaking() {
-    const { courseId, assignmentId } = useParams();
     const navigate = useNavigate();
     const theme = useTheme();
 

@@ -19,7 +19,6 @@ export default function ReviewPage() {
 
     const totalQuestions = report?.total_questions ?? 0;
     const correctCount = report?.correct_answers?.length ?? 0;
-    const incorrectCount = report?.incorrect_answers?.length ?? 0;
     const grade = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
 
     const allQuestions = [
