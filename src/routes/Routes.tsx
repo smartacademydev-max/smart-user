@@ -324,7 +324,7 @@ const router = createBrowserRouter([
           {
             element: <LearningCanvasRoot />,
             children: [
-              { path: PATH.LEARNING_CANVAS.ROOT, element: <LearningCanvasAllCourses /> },
+              // { path: PATH.LEARNING_CANVAS.ROOT, element: <LearningCanvasAllCourses /> },
               { path: PATH.LEARNING_CANVAS.COURSE_OVERVIEW.ROOT(), element: <LearningCanvasCourseOverview /> },
               { path: PATH.LEARNING_CANVAS.CONTENT_VIEWER.ROOT(), element: <ContentViewer /> },
               { path: PATH.LEARNING_CANVAS.QUIZ.ROOT(), element: <QuizTaking /> },

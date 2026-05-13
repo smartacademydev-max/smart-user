@@ -324,7 +324,7 @@ export default function ContentViewer() {
             {/* Header */}
             <Box sx={{ px: { xs: 2, md: 3 }, py: 1.5, borderBottom: `1px solid ${theme.palette.divider}` }}>
                 <Box
-                    onClick={() => navigate(PATH.LEARNING_CANVAS.ROOT)}
+                    onClick={() => navigate(PATH.MY_COURSE.ROOT)}
                     sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1, cursor: "pointer", width: "fit-content" }}
                 >
                     <ArrowLeft2 size={14} color={theme.palette.text.secondary} />

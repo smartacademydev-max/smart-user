@@ -109,7 +109,7 @@ export default function CourseCompletion() {
                     </Button>
                     <Button
                         variant="contained"
-                        onClick={() => navigate(PATH.LEARNING_CANVAS.ROOT)}
+                        onClick={() => navigate(PATH.MY_COURSE.ROOT)}
                         sx={{
                             flex: 1, maxWidth: 220, textTransform: "none", borderRadius: 2, py: 1.2,
                             bgcolor: "#1A2B57", "&:hover": { bgcolor: "#0f1d3d" },

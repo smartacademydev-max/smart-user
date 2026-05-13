@@ -225,7 +225,6 @@ export const PATH = {
         },
     },
     LEARNING_CANVAS: {
-        ROOT: "/learning-canvas",
         COURSE_OVERVIEW: {
             ROOT: (courseId?: number) =>
                 courseId ? `/learning-canvas/${courseId}` : "/learning-canvas/:courseId",
