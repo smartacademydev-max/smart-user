@@ -23,6 +23,7 @@ import SavedCourse from "../components/pages/CourseManagement/course/savedCourse
 import SingleLiveClassRoot from "../components/pages/CourseManagement/course/singleLiveClass";
 import LiveClassRoot from "../components/pages/CourseManagement/liveClasses";
 import AllLiveClass from "../components/pages/CourseManagement/liveClasses/allLiveClass";
+import LiveClassesByCourseLanding from "../components/pages/CourseManagement/liveClasses/LiveClassesByCourseLanding";
 import MyCourseRoot from "../components/pages/CourseManagement/myCourse";
 import DiscussionManagementRoot from "../components/pages/DiscussionManagement";
 import AllDiscussions from "../components/pages/DiscussionManagement/allDiscussions";
@@ -44,11 +45,14 @@ import QuizTaking from "../components/pages/LearningCanvas/QuizTaking";
 import ReviewPage from "../components/pages/LearningCanvas/Review";
 import AudiosRoot from "../components/pages/MediaManagement/audios";
 import AllAudios from "../components/pages/MediaManagement/audios/allAudios";
+import AudiosByCourseLanding from "../components/pages/MediaManagement/audios/AudiosByCourseLanding";
 import NotesRoot from "../components/pages/MediaManagement/notes";
 import AllNotes from "../components/pages/MediaManagement/notes/allNotes";
+import NotesByCourseLanding from "../components/pages/MediaManagement/notes/NotesByCourseLanding";
 import VideosRoot from "../components/pages/MediaManagement/videos";
 import CoursePlaylist from "../components/pages/MediaManagement/videos/allPlaylist";
 import SinglePlaylist from "../components/pages/MediaManagement/videos/allPlaylist/singlePlaylist";
+import VideosByCourseLanding from "../components/pages/MediaManagement/videos/VideosByCourseLanding";
 import AllNotices from "../components/pages/NoticeBoard/allNotices";
 import NoticeRoot from "../components/pages/NoticeBoard/index.";
 import SingleNoticeRoot from "../components/pages/NoticeBoard/singleNotice";
@@ -64,6 +68,7 @@ import ProfilePage from "../components/pages/Settings/ProfilePage";
 import SupportRoot from "../components/pages/Support";
 import TestManagementRoot from "../components/pages/TestManagement";
 import AllTestRoot from "../components/pages/TestManagement/allTest";
+import TestsByCourseLanding from "../components/pages/TestManagement/TestsByCourseLanding";
 import ExploreTestRoot from "../components/pages/TestManagement/exploreTest";
 import ExploreBundle from "../components/pages/TestManagement/exploreTest/bundles/ExploreBundle";
 import SingleBundle from "../components/pages/TestManagement/exploreTest/bundles/singleBundle";
@@ -204,7 +209,8 @@ const router = createBrowserRouter([
             element:
               <TestManagementRoot />,
             children: [
-              { path: PATH.TEST.MY_TEST.ROOT, element: <AllTestRoot /> },
+              { path: PATH.TEST.MY_TEST.ROOT, element: <TestsByCourseLanding /> },
+              { path: PATH.TEST.MY_TEST.BY_COURSE.ROOT(), element: <AllTestRoot /> },
               { path: PATH.TEST.MY_INDIVIDUAl_TEST.ROOT, element: <MyIndividualTest /> },
               { path: PATH.TEST.MY_BUNDLES.ROOT, element: <MyBundles /> },
               { path: PATH.TEST.VIEW_TEST.ROOT({}), element: <SingleTestRoot /> },
@@ -247,17 +253,18 @@ const router = createBrowserRouter([
 
             element:
               <LiveClassRoot />,
-            children: [{
-              path: PATH.LIVE_CLASSES.ROOT,
-              element: <AllLiveClass />
-            }]
+            children: [
+              { path: PATH.LIVE_CLASSES.ROOT, element: <LiveClassesByCourseLanding /> },
+              { path: PATH.LIVE_CLASSES.BY_COURSE.ROOT(), element: <AllLiveClass /> }
+            ]
           },
           {
 
             element:
               <NotesRoot />,
             children: [
-              { path: PATH.NOTES.ROOT, element: <AllNotes /> }
+              { path: PATH.NOTES.ROOT, element: <NotesByCourseLanding /> },
+              { path: PATH.NOTES.BY_COURSE.ROOT(), element: <AllNotes /> }
             ]
           },
           {
@@ -272,7 +279,8 @@ const router = createBrowserRouter([
             element:
               <VideosRoot />,
             children: [
-              { path: PATH.VIDEOS.ROOT, element: <CoursePlaylist /> },
+              { path: PATH.VIDEOS.ROOT, element: <VideosByCourseLanding /> },
+              { path: PATH.VIDEOS.BY_COURSE.ROOT(), element: <CoursePlaylist /> },
               { path: PATH.VIDEOS.VIEW_PLAYLIST.ROOT(), element: <SinglePlaylist /> }
             ]
           },
@@ -296,7 +304,8 @@ const router = createBrowserRouter([
             element:
               <AudiosRoot />,
             children: [
-              { path: PATH.AUDIOS.ROOT, element: <AllAudios /> }
+              { path: PATH.AUDIOS.ROOT, element: <AudiosByCourseLanding /> },
+              { path: PATH.AUDIOS.BY_COURSE.ROOT(), element: <AllAudios /> }
             ]
           },
           {

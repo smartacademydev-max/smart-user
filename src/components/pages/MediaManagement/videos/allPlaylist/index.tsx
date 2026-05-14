@@ -1,10 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowLeft2, SearchNormal1 } from "iconsax-reactjs";
+import { IconButton, InputAdornment, TextField } from "@mui/material";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { PATH } from "../../../../../routes/PATH";
 import { useGetCourseMediaPlaylistQuery, useGetUserPurchasedCourseQuery } from "../../../../../services/courseApi";
 import type { QueryParams } from "../../../../../types";
 import { EmptyList } from "../../../../molecules/EmptyList";
 import PlaylistCard from "../../../../organism/Cards/PlaylistCard";
-import TableFilter from "../../../../organism/TableFilter";
 
 const VideoSkeleton = () => (
     <div className="col-span-1 animate-pulse">
@@ -16,117 +18,77 @@ const VideoSkeleton = () => (
     </div>
 );
 
-const CourseFilterSkeleton = () => (
-    <div className="animate-pulse space-y-4">
-        <div className="h-12 bg-gray-200 rounded-lg"></div>
-        <div className="h-10 bg-gray-200 rounded w-1/2"></div>
-    </div>
-);
-
 export default function CoursePlaylist() {
-    const [qp] = useState<QueryParams>({
-        pageIndex: 1,
-        pageSize: 10,
-        search: '',
-    });
+    const navigate = useNavigate();
+    const { courseId: courseIdParam } = useParams<{ courseId: string }>();
+    const courseId = courseIdParam ? Number(courseIdParam) : null;
 
-    const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
-    const [qpVideos, setQpVideos] = useState<QueryParams>({
-        pageIndex: 1,
-        pageSize: 15,
-    });
+    const [qpVideos, setQpVideos] = useState<QueryParams>({ pageIndex: 1, pageSize: 15 });
     const [search, setSearch] = useState<string>("");
 
-    const initialCourseSet = useRef(false);
-
-    const { data: myCourse, isLoading } = useGetUserPurchasedCourseQuery(qp);
-
-    const myCourses = useMemo(() =>
-        myCourse?.data?.data || [],
-        [myCourse?.data?.data]
+    const { data: myCourse } = useGetUserPurchasedCourseQuery({ pageIndex: 1, pageSize: 50 });
+    const selectedCourse = useMemo(
+        () => (myCourse?.data?.data || []).find((c) => c.id === courseId),
+        [myCourse?.data?.data, courseId]
     );
-
-    useEffect(() => {
-        if (myCourses.length > 0 && !selectedCourseId && !initialCourseSet.current) {
-            setSelectedCourseId(myCourses[0].id || null);
-            initialCourseSet.current = true;
-        }
-    }, [myCourses.length, selectedCourseId]);
 
     const { data: playlist, isLoading: loadingPlaylist } = useGetCourseMediaPlaylistQuery(
-        { id: selectedCourseId!, type: "videos", qp: qpVideos },
-        { skip: !selectedCourseId }
+        { id: courseId!, type: "videos", qp: qpVideos },
+        { skip: !courseId }
     );
-
-    const selectedCourse = useMemo(
-        () => myCourses.find(course => course.id === selectedCourseId),
-        [myCourses, selectedCourseId]
-    );
-
-
-    useEffect(() => {
-        setQpVideos(prev => ({ ...prev, pageIndex: 1 }));
-    }, [selectedCourseId]);
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            setQpVideos(prev => ({ ...prev, search, pageIndex: 1 }));
+            setQpVideos((prev) => ({ ...prev, search, pageIndex: 1 }));
         }, 500);
-
         return () => clearTimeout(timer);
     }, [search]);
 
-
-    if (isLoading || loadingPlaylist) {
-        return (
-            <div className="all__video__listing">
-                <div className="mb-6">
-                    <CourseFilterSkeleton />
-                </div>
-                <div className="flex flex-col gap-4 md:grid grid-cols-2 xl:grid-cols-3 lg:gap-6">
-                    {[...Array(6)].map((_, idx) => (
-                        <VideoSkeleton key={idx} />
-                    ))}
-                </div>
-            </div>
-        );
-    }
-
-    if (!myCourses.length) {
-        return (
-            <EmptyList
-                title="You Haven't Purchased any course"
-                description="Please purchase a course to view the videos."
-                cta={{
-                    label: "Explore Course",
-                    url: PATH.COURSE_MANAGEMENT.COURSES.ROOT
-                }}
-            />
-        );
+    if (!courseId) {
+        navigate(PATH.VIDEOS.ROOT, { replace: true });
+        return null;
     }
 
     return (
         <div className="all__video__listing h-full flex flex-col overflow-hidden">
-            <div className="mb-6">
-                <TableFilter
-                    search={search || ""}
-                    setSearch={(search) => setSearch(search)}
-                    onFilter={() => { }}
-                    myCourses={myCourses}
-                    selectedCourseId={selectedCourseId}
-                    setSelectedCourseId={setSelectedCourseId}
-                />
+            <div className="flex items-center gap-3 mb-4">
+                <Link to={PATH.VIDEOS.ROOT} className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900">
+                    <IconButton size="small"><ArrowLeft2 size={18} /></IconButton>
+                    <span>All Videos</span>
+                </Link>
             </div>
 
             {selectedCourse && (
-                <div className="mb-6 pb-4 border-b border-gray-200">
-                    <h2 className="text-2xl font-bold text-gray-800">
-                        {selectedCourse.name}
-                    </h2>
-                </div>)}
+                <div className="mb-4 pb-3 border-b border-gray-200">
+                    <h2 className="text-2xl font-bold text-gray-800">{selectedCourse.name}</h2>
+                </div>
+            )}
+
+            <div className="mb-4">
+                <TextField
+                    fullWidth
+                    size="small"
+                    placeholder="Search videos"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchNormal1 size={18} />
+                            </InputAdornment>
+                        ),
+                    }}
+                />
+            </div>
 
             <div className="h-full overflow-auto">
-                {playlist && playlist?.data?.data?.length > 0 ? (
+                {loadingPlaylist ? (
+                    <div className="flex flex-col gap-4 md:grid md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-5 lg:gap-6">
+                        {[...Array(6)].map((_, idx) => (
+                            <VideoSkeleton key={idx} />
+                        ))}
+                    </div>
+                ) : playlist && playlist?.data?.data?.length > 0 ? (
                     <div className="flex flex-col gap-4 md:grid md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-5">
                         {playlist?.data?.data?.map((item) => (
                             <PlaylistCard data={item} key={item.chapter_id} courseId={selectedCourse?.id} />
@@ -135,10 +97,10 @@ export default function CoursePlaylist() {
                 ) : (
                     <EmptyList
                         title="No Videos Found"
-                        description="There are no videos available for the selected course."
+                        description="There are no videos available for this course."
                     />
                 )}
             </div>
-        </div >
+        </div>
     );
 }

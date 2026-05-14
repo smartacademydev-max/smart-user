@@ -102,6 +102,9 @@ export const PATH = {
     },
     LIVE_CLASSES: {
         ROOT: "/live-classes",
+        BY_COURSE: {
+            ROOT: (courseId?: number) => (courseId ? `/live-classes/course/${courseId}` : "/live-classes/course/:courseId"),
+        },
         VIEW_LIVE_CLASS: {
             ROOT: (id?: number) => (id ? `/live-classes/${id}` : "/live-classes/:id"),
         },
@@ -149,6 +152,9 @@ export const PATH = {
         },
         MY_TEST: {
             ROOT: "/test/my-tests",
+            BY_COURSE: {
+                ROOT: (courseId?: number) => (courseId ? `/test/my-tests/course/${courseId}` : "/test/my-tests/course/:courseId"),
+            },
         },
         MY_INDIVIDUAl_TEST: {
             ROOT: "/test/my-individual-test"
@@ -159,15 +165,24 @@ export const PATH = {
     },
     VIDEOS: {
         ROOT: "/videos",
+        BY_COURSE: {
+            ROOT: (courseId?: number) => (courseId ? `/videos/course/${courseId}` : "/videos/course/:courseId"),
+        },
         VIEW_PLAYLIST: {
             ROOT: (playlistId?: number, id?: number) => id && playlistId ? `/videos/playlist/${playlistId}/course/${id}` : "/videos/playlist/:playlistId/course/:id"
         }
     },
     AUDIOS: {
-        ROOT: "/audios"
+        ROOT: "/audios",
+        BY_COURSE: {
+            ROOT: (courseId?: number) => (courseId ? `/audios/course/${courseId}` : "/audios/course/:courseId"),
+        },
     },
     NOTES: {
-        ROOT: "/notes"
+        ROOT: "/notes",
+        BY_COURSE: {
+            ROOT: (courseId?: number) => (courseId ? `/notes/course/${courseId}` : "/notes/course/:courseId"),
+        },
     },
     MY_COURSE: {
         ROOT: "/my-course",
