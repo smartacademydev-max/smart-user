@@ -282,6 +282,9 @@ export const PATH = {
     REFERRAL: {
         ROOT: "/referrals",
     },
+    TRACK: {
+        ROOT: (code?: string) => code ? `/track/${code}` : "/track/:code",
+    },
     TICKET: {
         ROOT: "/tickets",
         ALL_TICKETS: {

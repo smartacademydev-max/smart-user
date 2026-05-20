@@ -24,6 +24,14 @@ export function captureAttribution(searchParams: URLSearchParams): void {
     } catch {}
 }
 
+export function setAttribution(type: AttributionType, code: string): void {
+    if (!code) return;
+    const entry: Attribution = { type, code, captured_at: Date.now() };
+    try {
+        localStorage.setItem(ATTRIBUTION_KEY, JSON.stringify(entry));
+    } catch {}
+}
+
 export function getAttribution(): Attribution | null {
     try {
         const raw = localStorage.getItem(ATTRIBUTION_KEY);

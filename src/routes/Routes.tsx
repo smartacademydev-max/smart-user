@@ -84,6 +84,7 @@ import SingleTestRoot from "../components/pages/TestManagement/singleTest";
 import TicketManagementRoot from "../components/pages/TicketManagement";
 import AllTickets from "../components/pages/TicketManagement/allTickets";
 import TicketChats from "../components/pages/TicketManagement/chats";
+import TrackRedirect from "../components/pages/Track";
 import { PATH } from "./PATH";
 import Private from "./Private";
 import RootLayout from "./RootLayout";
@@ -373,6 +374,10 @@ const router = createBrowserRouter([
     path: PATH.PRIVACY_POLICY.ROOT,
     element:
       <PrivacyPolicyRoot />
+  },
+  {
+    path: PATH.TRACK.ROOT(),
+    element: <TrackRedirect />,
   },
   {
     path: "*",

@@ -2,7 +2,7 @@ import { Box, Typography } from '@mui/material';
 import {
     Notification
 } from 'iconsax-reactjs';
-import { useReadNotificationMutation } from '../../../services/notificationApi';
+import { useReadNotificationMutation, useTrackNotificationClickMutation } from '../../../services/notificationApi';
 import { showToast } from '../../../slice/toastSlice';
 import { useAppDispatch } from '../../../store/hook';
 import type { NotificationProps } from '../../../types/notification';
@@ -47,6 +47,7 @@ const formatTimeAgo = (date: string | number | Date) => {
 export default function NotificationCard({ data }: Props) {
     const dispatch = useAppDispatch();
     const [readNotification] = useReadNotificationMutation();
+    const [trackClick] = useTrackNotificationClickMutation();
 
     return (
         <Box className="notification__item  flex flex-wrap gap-3 py-1.5 px-0 lg:px-4 lg:py-3.5 2xl:py-6 2xl:px-6 cursor-pointer last:border-b-0!"
@@ -55,6 +56,8 @@ export default function NotificationCard({ data }: Props) {
                 borderBottom: (theme) => `1px solid ${theme.palette.separator.darker}`,
             }}
             onClick={async () => {
+                const via = data?.external_link ? "external_link" : "card";
+                trackClick({ id: Number(data.id), via }).unwrap().catch(() => { });
                 try {
                     await readNotification({ id: Number(data.id) }).unwrap();
                     if (data?.external_link) {

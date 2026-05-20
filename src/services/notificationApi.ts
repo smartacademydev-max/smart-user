@@ -49,6 +49,16 @@ export const notificationApi = createApi({
             }),
             providesTags: [{ type: "Notifications", id: "LIST" }],
         }),
+        trackNotificationClick: builder.mutation<
+            GlobalResponse,
+            { id: number; via?: "card" | "external_link" | "deeplink" }
+        >({
+            query: ({ id, via }) => ({
+                url: `/notification/${id}/click`,
+                method: "POST",
+                body: via ? { via } : undefined,
+            }),
+        }),
     }),
 });
 
@@ -56,5 +66,6 @@ export const {
     useGetAllNotificationsQuery,
     useReadNotificationMutation,
     useGetNotificationByIdQuery,
-    useGetRelatedNotificationQuery
+    useGetRelatedNotificationQuery,
+    useTrackNotificationClickMutation,
 } = notificationApi;

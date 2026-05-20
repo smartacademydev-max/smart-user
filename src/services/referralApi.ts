@@ -84,6 +84,10 @@ export const referralApi = createApi({
         validateCoupon: builder.mutation<CouponValidateResponse, { code: string; order_amount: number }>({
             query: (body) => ({ url: "/coupon-codes/validate", method: "POST", body }),
         }),
+
+        trackMarketingClick: builder.mutation<GlobalResponse, { code: string }>({
+            query: ({ code }) => ({ url: `/marketing-links/track/${code}`, method: "POST" }),
+        }),
     }),
 });
 
@@ -96,4 +100,5 @@ export const {
     // useApplyPointsMutation,
     useRestorePointsMutation,
     useValidateCouponMutation,
+    useTrackMarketingClickMutation,
 } = referralApi;
