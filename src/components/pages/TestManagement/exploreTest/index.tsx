@@ -21,7 +21,7 @@ export default function ExploreTestRoot() {
                             { label: "All", value: PATH.TEST.EXPLORE_TEST.ROOT },
                             { label: "Individual Test", value: PATH.TEST.EXPLORE_TEST.INDIVIDUAl_TEST.ROOT },
                             { label: "Bundle Test", value: PATH.TEST.EXPLORE_TEST.BUNDLE_TEST.ROOT },
-                            { label: "OMR", value: PATH.TEST.EXPLORE_TEST.OMR.ROOT },
+                            // { label: "OMR", value: PATH.TEST.EXPLORE_TEST.OMR.ROOT },
                         ]}
                     />
 

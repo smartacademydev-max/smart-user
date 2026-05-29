@@ -8,7 +8,7 @@ interface Props {
     loading?: boolean;
 
 }
-export default function TestSubmissionDialog({ open, onSubmit, type, loading }: Props) {
+export default function TestSubmissionDialog({ open, handleClose, onSubmit, type, loading }: Props) {
     return (
         <Dialog open={open} >
             <DialogContent>
@@ -25,18 +25,23 @@ export default function TestSubmissionDialog({ open, onSubmit, type, loading }: 
 
                     <div className="content flex flex-col gap-2">
                         <Typography variant='h4' fontWeight={600}>
-                            {type === "timer" ? "Already Submitted Test" : "Already Submitted Test"}
+                            {type === "timer" ? "Time's Up!" : "Submit Test?"}
                         </Typography>
 
                         <Typography variant='subtitle1' color='text.middle'>
                             {type === "timer"
-                                ? "Your test has already been submitted automatically."
-                                : "You have already submitted this test. You can now view your result."
+                                ? "Your time has expired. Please submit your test."
+                                : "Are you sure you want to submit? You won't be able to change your answers."
                             }
                         </Typography>
                     </div>
                     <div className="footer__action flex justify-between items-center gap-4">
-                        <Button fullWidth variant="contained" color='primary' onClick={onSubmit}>{loading ? "Submitting Test" : "View Summary"}</Button>
+                        {type === "submit" && (
+                            <Button fullWidth variant="outlined" color='primary' onClick={handleClose}>View Summary</Button>
+                        )}
+                        <Button fullWidth variant="contained" color='primary' onClick={onSubmit} disabled={loading}>
+                            {loading ? "Submitting..." : "Submit"}
+                        </Button>
                     </div>
                 </div>
             </DialogContent>

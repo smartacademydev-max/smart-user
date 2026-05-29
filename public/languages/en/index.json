@@ -62,7 +62,7 @@
         "subjects": "Subjects",
         "browse_this_course": " Browse this Course",
         "continue": "Continue",
-        "gorkhapatra": "Gorkhapatra",
+        "gorkhapatra": "Articles",
         "news_updates": "News & Updates",
         "view_details": "View Details",
         "views": "Views",
@@ -146,8 +146,8 @@
         },
         "empty_states": {
             "gorkhapatra": {
-                "title": "No Gorkhapatra Found",
-                "description": "No Gorkhapatra available yet. Click the button below to create a new Gorkhapatra."
+                "title": "No Articles Found",
+                "description": "No Articles available yet. Click the button below to create a new Article."
             },
             "notification": {
                 "title": "No Notice Found",

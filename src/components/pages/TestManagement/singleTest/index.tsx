@@ -195,7 +195,10 @@ export default function SingleTestRoot() {
         );
 
         return () => clearInterval(id);
-    }, [timeLeft, timerPaused]);
+        // timeLeft intentionally excluded — functional update keeps the callback fresh.
+        // timeLeft !== undefined triggers this once when the timer is first initialized.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [timerPaused, timeLeft !== undefined]);
 
 
     useEffect(() => {
@@ -302,7 +305,6 @@ export default function SingleTestRoot() {
     const isLast = currentIndex === questions.length - 1;
 
 
-    console.log("expired", isExpired)
 
     if (!isReady) {
         return (

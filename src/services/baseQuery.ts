@@ -106,8 +106,9 @@ export const baseQuery: BaseQueryFn<
 
 
 			const state = api.getState() as RootState;
+			const isAuthenticated = !!state.auth?.token;
 
-			if (!state.session?.showSessionExpiredPopup) {
+			if (isAuthenticated && !state.session?.showSessionExpiredPopup) {
 				api.dispatch(
 					showSessionExpired(
 						"Your session has expired due to a login from another device. Please verify it's you to continue."

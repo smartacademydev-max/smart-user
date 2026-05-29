@@ -129,11 +129,17 @@ export default function VerifyOTP() {
                     navigate(PATH.AUTH.INTEREST.ROOT);
                 }
             } catch (e: any) {
+                const d = e?.data?.data;
+                const hasDeviceInfo =
+                    d != null &&
+                    !Array.isArray(d) &&
+                    d.device_location != null &&
+                    d.has_pending_request != null;
                 setNewDeviceDialog({
-                    open: e?.data?.data?.user_id ? true : false,
-                    deviceLocation: e?.data?.data?.device_location,
-                    hasPendingRequest: e?.data?.data?.has_pending_request,
-                    userId: e?.data?.data?.user_id,
+                    open: hasDeviceInfo,
+                    deviceLocation: d?.device_location,
+                    hasPendingRequest: d?.has_pending_request,
+                    userId: d?.user_id,
                 });
                 dispatch(showToast({
                     message: e?.data?.message || "Invalid OTP. Please try again.",

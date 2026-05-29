@@ -87,7 +87,7 @@ export default function QuestionView({ currentQuestion, setAttendedQuestion, att
                                 >
                                     <FormControlLabel
                                         value={option.id}
-                                        className={`${currentQuestion?.has_image_in_option ? "flex-col! items-start! p-2" : "items-center!"} w-full `}
+                                        className={`items-center! ${currentQuestion?.has_image_in_option ? "flex-col! items-start! p-2" : "items-center!"} w-full `}
                                         control={<Radio color="primary" />}
                                         label={
                                             <div className="general__content__box option_image">
