@@ -12,7 +12,7 @@ type StatusVariantKey = "error" | "info" | "success";
 const statusVariantMap: Record<string, StatusVariantKey> = {
     ended: "error",
     upcoming: "info",
-    ongoing: "error",
+    ongoing: "success",
 };
 
 export default function LiveClassCard({ data, courseId }: { data: LiveClassProps; courseId?: number; }) {
@@ -47,7 +47,7 @@ export default function LiveClassCard({ data, courseId }: { data: LiveClassProps
                 className="test__card rounded-md p-4 w-full"
                 sx={{
                     border: `1px solid ${theme.palette.separator.dark}`,
-                    borderTop: `4px solid ${theme.palette[variant].main}`,
+                    borderTop: `4px solid ${theme.palette.primary.main}`,
                 }}
             >
                 {/* Top row: category badge + status pill */}
@@ -81,7 +81,7 @@ export default function LiveClassCard({ data, courseId }: { data: LiveClassProps
                             {data?.teachers?.map((teacher) => teacher.name).join(", ")}
                         </Typography>
                     </div>
-                    <StatusPillWithBorder showIcon variant={variant} status={data?.status} />
+                    <StatusPillWithBorder  variant={variant} status={data?.status} />
                 </div>
 
                 {/* Meta row */}

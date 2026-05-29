@@ -7,10 +7,13 @@ import type { QueryParams } from "../../../../types";
 import type { CourseProps } from "../../../../types/course";
 import { EmptyList } from "../../../molecules/EmptyList";
 import TablePagination from "../../../molecules/Pagination";
+import TabController from "../../../molecules/TabController";
 import LiveClassCard from "../../../organism/Cards/LiveClassCard";
 import CourseSectionShell from "../../../organism/LandingByCourse/CourseSectionShell";
 import ViewAllTile from "../../../organism/LandingByCourse/ViewAllTile";
 import PageHeader from "../../../organism/PageHeader";
+
+type LiveClassType = "ongoing" | "upcoming";
 
 const PREVIEW_PAGE_SIZE = 4;
 const MAX_VISIBLE = 4;
@@ -26,12 +29,12 @@ function LiveClassPreviewSkeleton() {
     );
 }
 
-function LiveClassesSection({ course }: { course: CourseProps }) {
+function LiveClassesSection({ course, type }: { course: CourseProps; type: LiveClassType }) {
     const { data, isLoading } = useGetAllLiveClassesQuery({
         id: course.id!,
         pageIndex: 1,
         pageSize: PREVIEW_PAGE_SIZE,
-        type: "upcoming",
+        type,
     });
     const items = data?.data?.data ?? [];
     const total = data?.data?.pagination?.total ?? items.length;
@@ -49,9 +52,11 @@ function LiveClassesSection({ course }: { course: CourseProps }) {
             {isLoading ? (
                 <LiveClassPreviewSkeleton />
             ) : items.length === 0 ? (
-                <div className="text-sm text-gray-500 italic py-4">No upcoming live classes for this course.</div>
+                <div className="text-sm text-gray-500 italic py-4">
+                    No {type} live classes for this course.
+                </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 md:gap-4">
                     {visibleItems.map((item) => (
                         <LiveClassCard key={item.id} data={item} courseId={Number(item.course_id)} />
                     ))}
@@ -66,6 +71,7 @@ function LiveClassesSection({ course }: { course: CourseProps }) {
 
 export default function LiveClassesByCourseLanding() {
     const { t } = useTranslation();
+    const [activeTab, setActiveTab] = useState<LiveClassType>("ongoing");
     const [qp, setQp] = useState<QueryParams>({ pageIndex: 1, pageSize: COURSES_PER_PAGE });
     const { data, isLoading } = useGetUserPurchasedCourseQuery(qp);
     const courses = data?.data?.data || [];
@@ -73,9 +79,24 @@ export default function LiveClassesByCourseLanding() {
 
     return (
         <>
-            <PageHeader breadcrumb={[{ title: t("menus.liveClasses") }]} />
+            <div className="page__header">
+                <PageHeader breadcrumb={[{ title: t("menus.liveClasses") }]} />
+
+                <TabController
+                    options={[
+                        { value: "ongoing", label: "Ongoing" },
+                        { value: "upcoming", label: "Upcoming" },
+                    ]}
+                    currentActive={activeTab}
+                    setActiveTab={(v) => {
+                        setActiveTab(v as LiveClassType);
+                        setQp((prev) => ({ ...prev, pageIndex: 1 }));
+                    }}
+                />
+            </div>
+
             {isLoading ? (
-                <div className="flex flex-col gap-8">
+                <div className="flex flex-col gap-8 mt-6">
                     {Array.from({ length: 2 }).map((_, i) => (
                         <div key={i}>
                             <div className="h-6 w-48 bg-gray-100 rounded animate-pulse mb-3" />
@@ -91,9 +112,9 @@ export default function LiveClassesByCourseLanding() {
                 />
             ) : (
                 <>
-                    <div className="flex flex-col">
+                    <div className="flex flex-col mt-4 h-full overflow-auto">
                         {courses.map((course) => (
-                            <LiveClassesSection key={course.id} course={course} />
+                            <LiveClassesSection key={`${course.id}-${activeTab}`} course={course} type={activeTab} />
                         ))}
                     </div>
                     <TablePagination qp={qp} setQp={setQp} totalPages={totalPages} />
