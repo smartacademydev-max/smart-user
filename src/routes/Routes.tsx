@@ -25,6 +25,20 @@ import LiveClassRoot from "../components/pages/CourseManagement/liveClasses";
 import AllLiveClass from "../components/pages/CourseManagement/liveClasses/allLiveClass";
 import LiveClassesByCourseLanding from "../components/pages/CourseManagement/liveClasses/LiveClassesByCourseLanding";
 import MyCourseRoot from "../components/pages/CourseManagement/myCourse";
+import MyPackageRoot from "../components/pages/MyPackage";
+import MyPackageCourse from "../components/pages/MyPackage/MyPackageCourse";
+import MyPackageNotes from "../components/pages/MyPackage/MyPackageNotes";
+import MyPackageVideo from "../components/pages/MyPackage/MyPackageVideo";
+import MyPackageAudio from "../components/pages/MyPackage/MyPackageAudio";
+import MyPackageTest from "../components/pages/MyPackage/MyPackageTest";
+import MyPackageLiveClass from "../components/pages/MyPackage/MyPackageLiveClass";
+import ExplorePackageRoot from "../components/pages/ExplorePackage";
+import ExplorePackageCourse from "../components/pages/ExplorePackage/ExplorePackageCourse";
+import ExplorePackageNotes from "../components/pages/ExplorePackage/ExplorePackageNotes";
+import ExplorePackageVideo from "../components/pages/ExplorePackage/ExplorePackageVideo";
+import ExplorePackageAudio from "../components/pages/ExplorePackage/ExplorePackageAudio";
+import ExplorePackageTest from "../components/pages/ExplorePackage/ExplorePackageTest";
+import ExplorePackageLiveClass from "../components/pages/ExplorePackage/ExplorePackageLiveClass";
 import DiscussionManagementRoot from "../components/pages/DiscussionManagement";
 import AllDiscussions from "../components/pages/DiscussionManagement/allDiscussions";
 import DiscussionDetail from "../components/pages/DiscussionManagement/DiscussionDetail";
@@ -247,6 +261,28 @@ const router = createBrowserRouter([
             children: [
               { path: PATH.MY_COURSE.ROOT, element: <MyCourseRoot /> },
               { path: PATH.MY_COURSE.VIEW_COURSE.ROOT(), element: <SingleCourse /> },
+            ],
+          },
+          {
+            element: <MyPackageRoot />,
+            children: [
+              { path: PATH.MY_PACKAGE.COURSE.ROOT, element: <MyPackageCourse /> },
+              { path: PATH.MY_PACKAGE.NOTES.ROOT, element: <MyPackageNotes /> },
+              { path: PATH.MY_PACKAGE.VIDEO.ROOT, element: <MyPackageVideo /> },
+              { path: PATH.MY_PACKAGE.AUDIO.ROOT, element: <MyPackageAudio /> },
+              { path: PATH.MY_PACKAGE.TEST.ROOT, element: <MyPackageTest /> },
+              { path: PATH.MY_PACKAGE.LIVE_CLASS.ROOT, element: <MyPackageLiveClass /> },
+            ],
+          },
+          {
+            element: <ExplorePackageRoot />,
+            children: [
+              { path: PATH.EXPLORE_PACKAGE.COURSE.ROOT, element: <ExplorePackageCourse /> },
+              { path: PATH.EXPLORE_PACKAGE.NOTES.ROOT, element: <ExplorePackageNotes /> },
+              { path: PATH.EXPLORE_PACKAGE.VIDEO.ROOT, element: <ExplorePackageVideo /> },
+              { path: PATH.EXPLORE_PACKAGE.AUDIO.ROOT, element: <ExplorePackageAudio /> },
+              { path: PATH.EXPLORE_PACKAGE.TEST.ROOT, element: <ExplorePackageTest /> },
+              { path: PATH.EXPLORE_PACKAGE.LIVE_CLASS.ROOT, element: <ExplorePackageLiveClass /> },
             ],
           },
           {

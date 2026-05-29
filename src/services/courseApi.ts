@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import type { CategoryFilterParams, QueryParams } from "../types";
-import type { CourseList, CourseProps, courseTabType, CurriculumList, PlaylistListing } from "../types/course";
+import type { CourseList, CourseProps, courseTabType, CurriculumList, PackageType, PlaylistListing } from "../types/course";
 import type { CanvasContentsProgressResponse, CanvasCourseProgressResponse, CanvasCurriculumResponse, CourseCompletionResponse, MarkCanvasContentPayload, SaveCanvasProgressPayload } from "../types/learningCanvas";
 import type { LiveClassList, LiveClassProps } from "../types/liveClass";
 import type { MediaList } from "../types/media";
@@ -16,8 +16,8 @@ export const courseApi = createApi({
     baseQuery,
     tagTypes: ["Course", "Curriculum", "Media", "CanvasProgress"],
     endpoints: (builder) => ({
-        getAllCourse: builder.query<CourseList, QueryParams & { categoryFilter?: CategoryFilterParams }>({
-            query: ({ pageIndex, pageSize, search, categoryFilter }) => {
+        getAllCourse: builder.query<CourseList, QueryParams & { categoryFilter?: CategoryFilterParams; package_type?: PackageType }>({
+            query: ({ pageIndex, pageSize, search, categoryFilter, package_type }) => {
                 const queryString = buildQueryParams({
                     page: pageIndex,
                     page_size: pageSize,
@@ -26,6 +26,7 @@ export const courseApi = createApi({
                     categories: categoryFilter?.category,
                     sub_categories: categoryFilter?.sub_category,
                     positions: categoryFilter?.positions,
+                    package_type,
                 });
                 return {
                     url: `/course?${queryString}`,
@@ -184,13 +185,14 @@ export const courseApi = createApi({
                 { type: "Course" as const, id: "LIST" },
             ],
         }),
-        getUserPurchasedCourse: builder.query<CourseList, QueryParams & { type?: "trial" | "purchased" | "free" }>({
-            query: ({ pageIndex, pageSize, search, type }) => {
+        getUserPurchasedCourse: builder.query<CourseList, QueryParams & { type?: "trial" | "purchased" | "free"; package_type?: PackageType }>({
+            query: ({ pageIndex, pageSize, search, type, package_type }) => {
                 const queryString = buildQueryParams({
                     page: pageIndex,
                     page_size: pageSize,
                     search,
-                    type: type
+                    type: type,
+                    package_type,
                 });
                 return {
                     url: `/my-course?${queryString}`,

@@ -172,6 +172,8 @@
         "dashboard": "Dashboard",
         "myCourse": "My Course",
         "exploreCourse": "Explore Course",
+        "myPackage": "My Package",
+        "explorePackage": "Explore Package",
         "exploreTest": "Explore Test",
         "savedCourse": "Saved Course",
         "liveClasses": "Live Classes",

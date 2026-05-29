@@ -190,6 +190,24 @@ export const PATH = {
             ROOT: (id?: number) => (id ? `/my-course/${id}` : "/my-course/:id"),
         },
     },
+    MY_PACKAGE: {
+        ROOT: "/my-package",
+        COURSE: { ROOT: "/my-package/course" },
+        NOTES: { ROOT: "/my-package/notes" },
+        VIDEO: { ROOT: "/my-package/video" },
+        AUDIO: { ROOT: "/my-package/audio" },
+        TEST: { ROOT: "/my-package/test" },
+        LIVE_CLASS: { ROOT: "/my-package/live-class" },
+    },
+    EXPLORE_PACKAGE: {
+        ROOT: "/explore-package",
+        COURSE: { ROOT: "/explore-package/course" },
+        NOTES: { ROOT: "/explore-package/notes" },
+        VIDEO: { ROOT: "/explore-package/video" },
+        AUDIO: { ROOT: "/explore-package/audio" },
+        TEST: { ROOT: "/explore-package/test" },
+        LIVE_CLASS: { ROOT: "/explore-package/live-class" },
+    },
     GORKHAPATRA: {
         ROOT: "/gorkhapatra",
         VIEW_GORKHAPATRA: {

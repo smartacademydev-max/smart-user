@@ -35,11 +35,17 @@ export default function PrimaryMenu({ isCollapsed = false }: PrimaryMenuProps) {
   const user = useAppSelector((state) => state.auth.user);
 
   const [openTest, setOpenTest] = useState(false);
+  const [openMyPackage, setOpenMyPackage] = useState(false);
+  const [openExplorePackage, setOpenExplorePackage] = useState(false);
   const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (isCollapsed) setOpenTest(false);
+    if (isCollapsed) {
+      setOpenTest(false);
+      setOpenMyPackage(false);
+      setOpenExplorePackage(false);
+    }
   }, [isCollapsed]);
 
   const isActive = (path: string) =>
@@ -47,6 +53,12 @@ export default function PrimaryMenu({ isCollapsed = false }: PrimaryMenuProps) {
 
   const isTestManagementActive = () =>
     location.pathname.startsWith(PATH.TEST.ROOT);
+
+  const isMyPackageActive = () =>
+    location.pathname.startsWith(PATH.MY_PACKAGE.ROOT);
+
+  const isExplorePackageActive = () =>
+    location.pathname.startsWith(PATH.EXPLORE_PACKAGE.ROOT);
 
   const wrap = (label: string, children: React.ReactNode) =>
     isCollapsed ? (
@@ -120,32 +132,153 @@ export default function PrimaryMenu({ isCollapsed = false }: PrimaryMenuProps) {
               </ListItemButton>
             </ListItem>
           )}
-          {wrap(t("menus.myCourse"),
-            <ListItem disablePadding className="menu__item">
+          {/* My Package – collapsible */}
+          {wrap(t("menus.myPackage"),
+            <ListItem disablePadding className="menu__item" sx={{ flexDirection: "column", alignItems: "stretch" }}>
               <ListItemButton
-                onClick={() => navigate(PATH.MY_COURSE.ROOT)}
-                className={isActive(PATH.MY_COURSE.ROOT) ? "active" : ""}
+                onClick={() => !isCollapsed && setOpenMyPackage((prev) => !prev)}
+                className={isMyPackageActive() ? "active" : ""}
                 sx={{ justifyContent: isCollapsed ? "center" : undefined }}
               >
                 <ListItemIcon sx={{ minWidth: isCollapsed ? "unset" : undefined, justifyContent: "center" }}>
                   <Book size={20} />
                 </ListItemIcon>
-                {!isCollapsed && <ListItemText primary={t("menus.myCourse")} />}
+                {!isCollapsed && (
+                  <>
+                    <ListItemText primary={t("menus.myPackage")} />
+                    {openMyPackage ? <ExpandLess /> : <ExpandMore />}
+                  </>
+                )}
               </ListItemButton>
+              {!isCollapsed && (
+                <Collapse in={openMyPackage} timeout="auto" unmountOnExit>
+                  <List component="div" disablePadding sx={{ pl: 3 }}>
+                    <ListItem disablePadding className="menu__item">
+                      <ListItemButton
+                        onClick={() => navigate(PATH.MY_PACKAGE.COURSE.ROOT)}
+                        className={isActive(PATH.MY_PACKAGE.COURSE.ROOT) ? "active-nested" : ""}
+                      >
+                        <ListItemText primary={t("messages.course")} />
+                      </ListItemButton>
+                    </ListItem>
+                    <ListItem disablePadding className="menu__item">
+                      <ListItemButton
+                        onClick={() => navigate(PATH.MY_PACKAGE.NOTES.ROOT)}
+                        className={isActive(PATH.MY_PACKAGE.NOTES.ROOT) ? "active-nested" : ""}
+                      >
+                        <ListItemText primary={t("menus.notes")} />
+                      </ListItemButton>
+                    </ListItem>
+                    <ListItem disablePadding className="menu__item">
+                      <ListItemButton
+                        onClick={() => navigate(PATH.MY_PACKAGE.VIDEO.ROOT)}
+                        className={isActive(PATH.MY_PACKAGE.VIDEO.ROOT) ? "active-nested" : ""}
+                      >
+                        <ListItemText primary={t("menus.videos")} />
+                      </ListItemButton>
+                    </ListItem>
+                    <ListItem disablePadding className="menu__item">
+                      <ListItemButton
+                        onClick={() => navigate(PATH.MY_PACKAGE.AUDIO.ROOT)}
+                        className={isActive(PATH.MY_PACKAGE.AUDIO.ROOT) ? "active-nested" : ""}
+                      >
+                        <ListItemText primary={t("menus.audios")} />
+                      </ListItemButton>
+                    </ListItem>
+                    <ListItem disablePadding className="menu__item">
+                      <ListItemButton
+                        onClick={() => navigate(PATH.MY_PACKAGE.TEST.ROOT)}
+                        className={isActive(PATH.MY_PACKAGE.TEST.ROOT) ? "active-nested" : ""}
+                      >
+                        <ListItemText primary={t("menus.test")} />
+                      </ListItemButton>
+                    </ListItem>
+                    <ListItem disablePadding className="menu__item">
+                      <ListItemButton
+                        onClick={() => navigate(PATH.MY_PACKAGE.LIVE_CLASS.ROOT)}
+                        className={isActive(PATH.MY_PACKAGE.LIVE_CLASS.ROOT) ? "active-nested" : ""}
+                      >
+                        <ListItemText primary={t("menus.liveClasses")} />
+                      </ListItemButton>
+                    </ListItem>
+                  </List>
+                </Collapse>
+              )}
             </ListItem>
           )}
-          {wrap(t("menus.exploreCourse"),
-            <ListItem disablePadding className="menu__item">
+
+          {/* Explore Package – collapsible */}
+          {wrap(t("menus.explorePackage"),
+            <ListItem disablePadding className="menu__item" sx={{ flexDirection: "column", alignItems: "stretch" }}>
               <ListItemButton
-                onClick={() => navigate(PATH.COURSE_MANAGEMENT.COURSES.ROOT)}
-                className={isActive(PATH.COURSE_MANAGEMENT.COURSES.ROOT) && !isActive(PATH.COURSE_MANAGEMENT.COURSES.SAVED_COURSES.ROOT) ? "active" : ""}
+                onClick={() => !isCollapsed && setOpenExplorePackage((prev) => !prev)}
+                className={isExplorePackageActive() ? "active" : ""}
                 sx={{ justifyContent: isCollapsed ? "center" : undefined }}
               >
                 <ListItemIcon sx={{ minWidth: isCollapsed ? "unset" : undefined, justifyContent: "center" }}>
                   <SearchNormal size={20} />
                 </ListItemIcon>
-                {!isCollapsed && <ListItemText primary={t("menus.exploreCourse")} />}
+                {!isCollapsed && (
+                  <>
+                    <ListItemText primary={t("menus.explorePackage")} />
+                    {openExplorePackage ? <ExpandLess /> : <ExpandMore />}
+                  </>
+                )}
               </ListItemButton>
+              {!isCollapsed && (
+                <Collapse in={openExplorePackage} timeout="auto" unmountOnExit>
+                  <List component="div" disablePadding sx={{ pl: 3 }}>
+                    <ListItem disablePadding className="menu__item">
+                      <ListItemButton
+                        onClick={() => navigate(PATH.EXPLORE_PACKAGE.COURSE.ROOT)}
+                        className={isActive(PATH.EXPLORE_PACKAGE.COURSE.ROOT) ? "active-nested" : ""}
+                      >
+                        <ListItemText primary={t("messages.course")} />
+                      </ListItemButton>
+                    </ListItem>
+                    <ListItem disablePadding className="menu__item">
+                      <ListItemButton
+                        onClick={() => navigate(PATH.EXPLORE_PACKAGE.NOTES.ROOT)}
+                        className={isActive(PATH.EXPLORE_PACKAGE.NOTES.ROOT) ? "active-nested" : ""}
+                      >
+                        <ListItemText primary={t("menus.notes")} />
+                      </ListItemButton>
+                    </ListItem>
+                    <ListItem disablePadding className="menu__item">
+                      <ListItemButton
+                        onClick={() => navigate(PATH.EXPLORE_PACKAGE.VIDEO.ROOT)}
+                        className={isActive(PATH.EXPLORE_PACKAGE.VIDEO.ROOT) ? "active-nested" : ""}
+                      >
+                        <ListItemText primary={t("menus.videos")} />
+                      </ListItemButton>
+                    </ListItem>
+                    <ListItem disablePadding className="menu__item">
+                      <ListItemButton
+                        onClick={() => navigate(PATH.EXPLORE_PACKAGE.AUDIO.ROOT)}
+                        className={isActive(PATH.EXPLORE_PACKAGE.AUDIO.ROOT) ? "active-nested" : ""}
+                      >
+                        <ListItemText primary={t("menus.audios")} />
+                      </ListItemButton>
+                    </ListItem>
+                    <ListItem disablePadding className="menu__item">
+                      <ListItemButton
+                        onClick={() => navigate(PATH.EXPLORE_PACKAGE.TEST.ROOT)}
+                        className={isActive(PATH.EXPLORE_PACKAGE.TEST.ROOT) ? "active-nested" : ""}
+                      >
+                        <ListItemText primary={t("menus.test")} />
+                      </ListItemButton>
+                    </ListItem>
+                    <ListItem disablePadding className="menu__item">
+                      <ListItemButton
+                        onClick={() => navigate(PATH.EXPLORE_PACKAGE.LIVE_CLASS.ROOT)}
+                        className={isActive(PATH.EXPLORE_PACKAGE.LIVE_CLASS.ROOT) ? "active-nested" : ""}
+                      >
+                        <ListItemText primary={t("menus.liveClasses")} />
+                      </ListItemButton>
+                    </ListItem>
+                  </List>
+                </Collapse>
+              )}
             </ListItem>
           )}
           {wrap(t("menus.exploreTest"),

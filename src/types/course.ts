@@ -99,6 +99,8 @@ export interface CourseList extends GlobalResponse {
 
 export type courseTabType = "overview" | "curriculum" | "notes" | "test" | "audios" | "videos" | "live_classes";
 
+export type PackageType = "course" | "notes" | "video" | "audio" | "test" | "live_class";
+
 export const CourseTabs: { label: string; value: courseTabType }[] = [
     {
         label: "Overview",

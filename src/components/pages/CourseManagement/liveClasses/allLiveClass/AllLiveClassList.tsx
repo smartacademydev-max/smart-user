@@ -63,14 +63,16 @@ export default function AllLiveClassList() {
     }, [list, qp.pageIndex]);
 
     useEffect(() => {
-        setQp((prev) => ({ ...prev, pageIndex: 1 }));
-        setItems([]);
+        setQp((prev) => (prev.pageIndex === 1 ? prev : { ...prev, pageIndex: 1 }));
     }, [activeTab]);
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            setQp((prev) => ({ ...prev, pageIndex: 1, search }));
-            setItems([]);
+            setQp((prev) =>
+                prev.pageIndex === 1 && prev.search === search
+                    ? prev
+                    : { ...prev, pageIndex: 1, search }
+            );
         }, 500);
         return () => clearTimeout(timer);
     }, [search]);
