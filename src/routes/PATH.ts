@@ -43,6 +43,9 @@ export const PATH = {
             VERIFY: { ROOT: "/auth/forgot-password/verify" },
             RESET: { ROOT: "/auth/forgot-password/reset" },
         },
+        RESET_PASSWORD: {
+            ROOT: "/reset-password",
+        },
     },
     DASHBOARD: {
         ROOT: "/dashboard",

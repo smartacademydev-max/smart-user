@@ -15,6 +15,7 @@ import DeviceResetSuccess from "../components/pages/auth/deviceReset/success";
 import ForgotPasswordPage from "../components/pages/auth/forgotPassword";
 import ForgotPasswordReset from "../components/pages/auth/forgotPassword/reset";
 import ForgotPasswordVerify from "../components/pages/auth/forgotPassword/verify";
+import ResetPasswordWithToken from "../components/pages/auth/resetPassword";
 import InterestRoot from "../components/pages/auth/interest";
 import IntroScreenRoot from "../components/pages/auth/introScreens";
 import SelectPreferedLanguage from "../components/pages/auth/selectPreferedLang";
@@ -164,6 +165,14 @@ const router = createBrowserRouter([
         element: (
           <SingleFormAuthLayout>
             <ForgotPasswordReset />
+          </SingleFormAuthLayout>
+        ),
+      },
+      {
+        path: PATH.AUTH.RESET_PASSWORD.ROOT,
+        element: (
+          <SingleFormAuthLayout>
+            <ResetPasswordWithToken />
           </SingleFormAuthLayout>
         ),
       },

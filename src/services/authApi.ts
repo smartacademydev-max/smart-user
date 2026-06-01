@@ -79,6 +79,13 @@ export const authApi = createApi({
 				body,
 			}),
 		}),
+		resetPasswordWithToken: builder.mutation<GlobalResponse, { token: string; email: string; password: string; password_confirmation: string }>({
+			query: (body) => ({
+				url: "/auth/reset-password",
+				method: "POST",
+				body,
+			}),
+		}),
 	}),
 });
 
@@ -92,4 +99,5 @@ export const {
 	useLoginWithPasswordMutation,
 	useSetPasswordMutation,
 	useResetPasswordMutation,
+	useResetPasswordWithTokenMutation,
 } = authApi;
