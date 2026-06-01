@@ -281,6 +281,21 @@ export default function PrimaryMenu({ isCollapsed = false }: PrimaryMenuProps) {
               )}
             </ListItem>
           )}
+          {/* Free Materials – single link (Udaan-style) */}
+          {wrap(t("menus.freeMaterials"),
+            <ListItem disablePadding className="menu__item">
+              <ListItemButton
+                onClick={() => navigate(PATH.FREE_MATERIALS.ROOT)}
+                className={isActive(PATH.FREE_MATERIALS.ROOT) ? "active" : ""}
+                sx={{ justifyContent: isCollapsed ? "center" : undefined }}
+              >
+                <ListItemIcon sx={{ minWidth: isCollapsed ? "unset" : undefined, justifyContent: "center" }}>
+                  <Gift size={20} />
+                </ListItemIcon>
+                {!isCollapsed && <ListItemText primary={t("menus.freeMaterials")} />}
+              </ListItemButton>
+            </ListItem>
+          )}
           {wrap(t("menus.exploreTest"),
             <ListItem disablePadding className="menu__item">
               <ListItemButton

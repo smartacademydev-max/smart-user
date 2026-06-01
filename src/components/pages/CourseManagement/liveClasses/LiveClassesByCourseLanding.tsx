@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { PATH } from "../../../../routes/PATH";
-import { useGetUserPurchasedCourseQuery } from "../../../../services/courseApi";
+import { useGetCourseLiveClassQuery, useGetFreeMaterialsCourseQuery, useGetUserPurchasedCourseQuery } from "../../../../services/courseApi";
 import { useGetAllLiveClassesQuery } from "../../../../services/liveApi";
 import type { QueryParams } from "../../../../types";
 import type { CourseProps } from "../../../../types/course";
@@ -26,6 +26,46 @@ function LiveClassPreviewSkeleton() {
                 <div key={i} className="h-44 rounded-xl bg-gray-100 animate-pulse" />
             ))}
         </div>
+    );
+}
+
+function FreeLiveClassesSection({ type }: { type: LiveClassType }) {
+    const { data: freeCourseRes } = useGetFreeMaterialsCourseQuery();
+    const freeCourseId = freeCourseRes?.data?.id ?? null;
+
+    const { data, isLoading } = useGetCourseLiveClassQuery(
+        { id: freeCourseId!, pageIndex: 1, pageSize: PREVIEW_PAGE_SIZE, type },
+        { skip: !freeCourseId }
+    );
+    const items = data?.data?.data ?? [];
+    const total = data?.data?.pagination?.total ?? items.length;
+    const viewAllUrl = `${PATH.FREE_MATERIALS.ROOT}?category=live_classes`;
+    const visibleItems = total > MAX_VISIBLE ? items.slice(0, MAX_VISIBLE - 1) : items.slice(0, MAX_VISIBLE);
+    const extra = total - visibleItems.length;
+
+    if (!freeCourseId) return null;
+    if (!isLoading && items.length === 0) return null;
+
+    return (
+        <CourseSectionShell
+            courseName="Free Live Classes"
+            count={total}
+            viewAllUrl={viewAllUrl}
+            viewAllDisabled={!items.length}
+        >
+            {isLoading ? (
+                <LiveClassPreviewSkeleton />
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 md:gap-4">
+                    {visibleItems.map((item) => (
+                        <LiveClassCard key={item.id} data={item} courseId={freeCourseId} />
+                    ))}
+                    {extra > 0 && (
+                        <ViewAllTile extra={extra} url={viewAllUrl} label="live classes" variant="card" />
+                    )}
+                </div>
+            )}
+        </CourseSectionShell>
     );
 }
 
@@ -105,14 +145,18 @@ export default function LiveClassesByCourseLanding() {
                     ))}
                 </div>
             ) : !courses.length ? (
-                <EmptyList
-                    title="You Haven't Purchased any course"
-                    description="Please purchase a course to view the live class."
-                    cta={{ label: "Explore Course", url: PATH.COURSE_MANAGEMENT.COURSES.ROOT }}
-                />
+                <div className="flex flex-col mt-4 h-full overflow-auto">
+                    <FreeLiveClassesSection key={`free-${activeTab}`} type={activeTab} />
+                    <EmptyList
+                        title="You Haven't Purchased any course"
+                        description="Please purchase a course to view the live class."
+                        cta={{ label: "Explore Course", url: PATH.COURSE_MANAGEMENT.COURSES.ROOT }}
+                    />
+                </div>
             ) : (
                 <>
                     <div className="flex flex-col mt-4 h-full overflow-auto">
+                        <FreeLiveClassesSection key={`free-${activeTab}`} type={activeTab} />
                         {courses.map((course) => (
                             <LiveClassesSection key={`${course.id}-${activeTab}`} course={course} type={activeTab} />
                         ))}

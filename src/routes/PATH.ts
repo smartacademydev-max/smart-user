@@ -208,6 +208,9 @@ export const PATH = {
         TEST: { ROOT: "/explore-package/test" },
         LIVE_CLASS: { ROOT: "/explore-package/live-class" },
     },
+    FREE_MATERIALS: {
+        ROOT: "/free-materials",
+    },
     GORKHAPATRA: {
         ROOT: "/gorkhapatra",
         VIEW_GORKHAPATRA: {

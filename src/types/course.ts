@@ -10,7 +10,7 @@ export interface SelectionType {
     position_ids: number[];
 }
 
-export type CourseTypeProps = "free" | "expiry" | "subscription"
+export type CourseTypeProps = "free" | "expiry" | "subscription" | "open_access"
 export type DiscountTypeProps = "percentage" | "amount"
 export type BillingCycle = "days" | "months" | "years"
 export type CurriculumType = "subject" | "chapter" | "unit" | "lesson" | "child_lesson";

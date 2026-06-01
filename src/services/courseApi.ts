@@ -115,6 +115,13 @@ export const courseApi = createApi({
             }),
             providesTags: (_result, _error, { id }) => [{ type: "Media" as const, id }],
         }),
+        getFreeMaterialsCourse: builder.query<{ data: CourseProps }, void>({
+            query: () => ({
+                url: `/free-materials/course`,
+                method: "GET",
+            }),
+            providesTags: [{ type: "Course" as const, id: "FREE_MATERIALS" }],
+        }),
         getCourseTest: builder.query<TestList, QueryParams & { id: number }>({
             query: ({ id, pageIndex, pageSize, search }) => ({
                 url: `/course/${id}/test?${buildQueryParams({ page: pageIndex, page_size: pageSize, search })}`,
@@ -360,6 +367,7 @@ export const {
     useGetCourseMediaByTypeQuery,
     useGetCourseMediaPlaylistQuery,
     useGetSinglePlaylistQuery,
+    useGetFreeMaterialsCourseQuery,
     useGetCourseTestQuery,
     useGetCourseLiveClassQuery,
     usePurchaseCourseMutation,

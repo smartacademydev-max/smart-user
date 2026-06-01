@@ -39,6 +39,7 @@ import ExplorePackageVideo from "../components/pages/ExplorePackage/ExplorePacka
 import ExplorePackageAudio from "../components/pages/ExplorePackage/ExplorePackageAudio";
 import ExplorePackageTest from "../components/pages/ExplorePackage/ExplorePackageTest";
 import ExplorePackageLiveClass from "../components/pages/ExplorePackage/ExplorePackageLiveClass";
+import FreeMaterials from "../components/pages/FreeMaterials";
 import DiscussionManagementRoot from "../components/pages/DiscussionManagement";
 import AllDiscussions from "../components/pages/DiscussionManagement/allDiscussions";
 import DiscussionDetail from "../components/pages/DiscussionManagement/DiscussionDetail";
@@ -285,6 +286,7 @@ const router = createBrowserRouter([
               { path: PATH.EXPLORE_PACKAGE.LIVE_CLASS.ROOT, element: <ExplorePackageLiveClass /> },
             ],
           },
+          { path: PATH.FREE_MATERIALS.ROOT, element: <FreeMaterials /> },
           {
 
             element:
