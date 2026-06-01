@@ -449,10 +449,10 @@ function CategoryContent({
     setQp: (qp: QueryParams) => void;
     children: React.ReactNode;
 }) {
-    const gridClass =
-        grid === "live"
-            ? "grid grid-cols-1 sm:grid-cols-2 gap-3"
-            : "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3";
+    // const gridClass =
+    //     grid === "live"
+    //         ? "grid grid-cols-1 sm:grid-cols-2 gap-3"
+    //         : "";
 
     if (isEmpty) {
         return <EmptyList title={emptyTitle} description={emptyDescription} />;
@@ -460,7 +460,7 @@ function CategoryContent({
 
     return (
         <div>
-            <div className={gridClass}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3">
                 {isLoading
                     ? grid === "card"
                         ? <CardSkeletons count={3} />
