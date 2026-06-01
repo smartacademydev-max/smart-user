@@ -138,12 +138,14 @@ export const testApi = createApi({
                 method: "GET",
             }),
         }),
-        getAllIndividualTest: builder.query<TestList, QueryParams & { type?: string }>({
-            query: ({ pageIndex, pageSize, search, type }) => ({
+        getAllIndividualTest: builder.query<TestList, QueryParams & { type?: string; categoryFilter?: CategoryFilterParams }>({
+            query: ({ pageIndex, pageSize, search, type, categoryFilter }) => ({
                 url: `/test?${buildQueryParams({
                     page: pageIndex,
                     page_size: pageSize,
-                    search: search, type
+                    search: search,
+                    type,
+                    mega_categories: categoryFilter?.mega_category,
                 })}`
             }),
             providesTags: [{ type: "Test", id: "LIST" }]
