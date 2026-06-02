@@ -27,12 +27,12 @@ export default function TestCard({ test, havePurchased, status: testStatus }: { 
     >
       <div className="card__top">
         <div className="flex justify-between items-center mb-3">
-          <Typography variant="caption" fontWeight={500} sx={{
+          {test?.selections?.mega_category.length ? <Typography variant="caption" fontWeight={500} sx={{
             padding: "6px 10px",
             borderRadius: "8px",
             background: (theme) => theme.palette.primary.light,
             color: (theme) => theme.palette.primary.main,
-          }}>{test?.selections?.mega_category[0] || "Loksewa"}</Typography>
+          }}>{test?.selections?.mega_category[0]}</Typography> : ""}
           <StatusPillWithBorder showIcon={true} variant={variant} status={!test?.has_taken_test ? "Not Started" : !test?.is_graded ? "Awaiting" : "Completed"} />
         </div>
         <Typography variant="subtitle1" fontWeight={600} color="text.dark" className="mb-3!">
