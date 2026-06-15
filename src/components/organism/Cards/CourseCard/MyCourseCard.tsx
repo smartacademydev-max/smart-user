@@ -67,7 +67,7 @@ export default function MyCourseCard({ course }: { course: CourseProps }) {
 
                 {/* Status badge — top left */}
                 <Box sx={{ position: "absolute", top: 8, left: 8 }}>
-                    <CourseStatus status={course.course_type} />
+                    <CourseStatus status={course.course_type} label={course.course_type_label} />
                 </Box>
 
                 {/* Bookmark — top right */}

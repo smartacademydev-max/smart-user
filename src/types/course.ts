@@ -57,6 +57,7 @@ export interface CourseProps {
     about_this_course: string;
     teachers: Teacher[];
     course_type: CourseTypeProps
+    course_type_label?: string;
     course_expiry: CourseExpiry;
     free_type_description?: string;
     subjects?: number;

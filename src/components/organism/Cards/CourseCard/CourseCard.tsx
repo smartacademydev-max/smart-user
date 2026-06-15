@@ -76,7 +76,7 @@ export default function CourseCard({ course, havePurchased = false }: { course: 
                 </div>
             </Box>
             <div className="absolute! top-1.5 left-1.5">
-                <CourseStatus status={course.course_type} />
+                <CourseStatus status={course.course_type} label={course.course_type_label} />
             </div>
         </Box>
     )

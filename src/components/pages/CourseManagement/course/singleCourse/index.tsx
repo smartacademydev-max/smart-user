@@ -153,10 +153,10 @@ export default function SingleCourse() {
                         <MyCourseBanner data={courseBasic?.data} />
                     </div>
 
-                    <div className="lg:col-span-7 2xl:col-span-8 ">
+                    <div className="lg:col-span-8 xl:col-span-8 ">
                         {tabContent}
                     </div>
-                    <aside className="relative z-10 mt-4 lg:-mt-70 lg:col-span-4 2xl:col-span-3">
+                    <aside className="relative z-10 mt-4 lg:-mt-70 lg:col-span-4 2xl:col-span-3 lg:mr-4">
                         <MyCourseSidebar data={courseBasic?.data} />
                     </aside>
                 </div>
