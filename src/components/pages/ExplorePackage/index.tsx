@@ -1,5 +1,5 @@
-import { Outlet } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Outlet } from "react-router-dom";
 import PageHeader from "../../organism/PageHeader";
 
 export default function ExplorePackageRoot() {
@@ -9,9 +9,7 @@ export default function ExplorePackageRoot() {
             <PageHeader
                 breadcrumb={[{ title: t("menus.explorePackage") }]}
             />
-            <div className="flex-1 overflow-auto">
-                <Outlet />
-            </div>
+            <Outlet />
         </div>
     );
 }

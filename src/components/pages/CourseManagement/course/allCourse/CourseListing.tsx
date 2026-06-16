@@ -44,7 +44,7 @@ export default function CourseListing() {
 
 
     return (
-        <>
+        <div className="flex flex-col h-full overflow-hidden justify-between">
             <div className="h-full overflow-auto">
                 <Box className="flex flex-col justify-between gap-4 mb-4 lg:mb-8">
                     <TabController
@@ -112,6 +112,6 @@ export default function CourseListing() {
                     totalPages={pagination.total_pages}
                 />
             )}
-        </>
+        </div>
     )
 }
