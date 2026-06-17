@@ -216,7 +216,7 @@ export default function BannerCourseTypeModule({ courseType, courseExpiry, cours
                                                 {plan.marked_price && plan.marked_price !== plan.sale_price && (
                                                     <Typography
                                                         variant="caption"
-                                                        sx={{ color: "error.main", textDecoration: "line-through" }}
+                                                        sx={{ color: "white", opacity: 0.7, textDecoration: "line-through" }}
                                                     >
                                                         NRs. {plan.marked_price}
                                                     </Typography>
