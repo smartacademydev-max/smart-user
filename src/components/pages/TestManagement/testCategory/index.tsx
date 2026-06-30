@@ -5,6 +5,7 @@ import { useUseGetAllTestCategoryInACourseQuery } from "../../../../services/cou
 import TablePagination from "../../../molecules/Pagination";
 import TestCategoryCard from "../../../organism/Cards/TestCategoryCard";
 import PageHeader from "../../../organism/PageHeader";
+import TableFilter from "../../../organism/TableFilter";
 
 export default function TestCategoryInCourse() {
     const { courseId } = useParams();
@@ -23,8 +24,8 @@ export default function TestCategoryInCourse() {
         return () => clearTimeout(timer);
     }, [search]);
 
-    const { data, isLoading } = useUseGetAllTestCategoryInACourseQuery(
-        { id: Number(courseId), pageIndex: qp.pageIndex, pageSize: qp.pageSize },
+    const { data } = useUseGetAllTestCategoryInACourseQuery(
+        { id: Number(courseId), pageIndex: qp.pageIndex, pageSize: qp.pageSize, search: debouncedSearch },
         { skip: !courseId }
     );
     const items = data?.data?.data ?? [];
@@ -35,6 +36,11 @@ export default function TestCategoryInCourse() {
                 { title: "My Test", url: PATH.TEST.MY_TEST.ROOT },
                 { title: "Test Category" }
             ]} />
+
+            <TableFilter
+                search={search}
+                setSearch={setSearch}
+            />
 
             <div className="flex flex-col gap-4 sm:grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                 {items.map((test) => (
