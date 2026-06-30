@@ -8,12 +8,12 @@ import TabController from "../../../../molecules/TabController";
 import CourseBanner from "../../../../organism/CourseBanner";
 import PurchaseCourseDialog from "../../../../organism/Dialog/PurchaseCourseDialog";
 import CoursePlaylistListing from "./coursePlaylistListing";
-import SinlgeCourseCurriculum from "./curriculum";
-import SinlgeCourseLiveClass from "./liveClass";
+import SingleCourseCurriculum from "./curriculum";
+import SingleCourseLiveClass from "./liveClass";
 import MyCourseBanner from "./myCourseView/MyCourseBanner";
 import MyCourseSidebar from "./myCourseView/MyCourseSidebar";
-import SinlgeCourseOverview from "./overview";
-import SinlgeCourseTest from "./test";
+import SingleCourseOverview from "./overview";
+import SingleCourseTest from "./test";
 
 export default function SingleCourse() {
     const { id } = useParams();
@@ -54,14 +54,13 @@ export default function SingleCourse() {
         if (notesPlaylist?.data?.data?.length) tabs.push({ label: t("menus.notes"), value: "notes" });
         if (audiosPlaylist?.data?.data?.length) tabs.push({ label: t("menus.audios"), value: "audios" });
 
-        if (courseBasic?.data?.no_of_tests) tabs.push({ label: t("menus.test"), value: "tests" });
+        if (courseBasic?.data?.no_of_test_category) tabs.push({ label: t("menus.test"), value: "tests" });
 
         if (liveClasses?.data?.data?.length) tabs.push({ label: t("menus.liveClasses"), value: "live_classes" });
 
         return tabs;
     }, [hasOverview, hasCurriculum, videosPlaylist, notesPlaylist, audiosPlaylist, courseBasic, liveClasses, t]);
 
-    // Auto-select the first available tab; don't override a user-selected tab if it's still valid
     useEffect(() => {
         if (availableTabs.length > 0 && !availableTabs.find((tab) => tab.value === activeTab)) {
             setActiveTab(availableTabs[0].value);
@@ -87,10 +86,10 @@ export default function SingleCourse() {
             </div>
 
             {activeTab === "overview" && (
-                <SinlgeCourseOverview data={overviewData?.data && overviewData.data} isLoading={loadingOverview} />
+                <SingleCourseOverview data={overviewData?.data && overviewData.data} isLoading={loadingOverview} />
             )}
             {activeTab === "curriculum" && (
-                <SinlgeCourseCurriculum havePurchased={havePurchased} />
+                <SingleCourseCurriculum havePurchased={havePurchased} />
             )}
             {activeTab === "videos" && (
                 <CoursePlaylistListing
@@ -129,10 +128,10 @@ export default function SingleCourse() {
                 />
             )}
             {activeTab === "tests" && (
-                <SinlgeCourseTest havePurchased={havePurchased} />
+                <SingleCourseTest havePurchased={havePurchased} />
             )}
             {activeTab === "live_classes" && (
-                <SinlgeCourseLiveClass
+                <SingleCourseLiveClass
                     havePurchased={havePurchased}
                     data={liveClasses}
                     isLoading={loadingLiveClass}
@@ -148,7 +147,6 @@ export default function SingleCourse() {
         return (
             <div className="h-full overflow-auto pr-4">
                 <div className="lg:grid lg:grid-cols-12 lg:gap-6">
-                    {/* Banner spans full width on row 1; its inner content is constrained to the left 2/3 */}
                     <div className="lg:col-span-12">
                         <MyCourseBanner data={courseBasic?.data} />
                     </div>

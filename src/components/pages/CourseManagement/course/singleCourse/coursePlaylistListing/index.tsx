@@ -71,7 +71,6 @@ export default function CoursePlaylistListing({ courseId, type, havePurchased, d
     const mediaItems = playlistMedia?.data?.data || [];
     const mediaPagination = playlistMedia?.data?.pagination;
 
-    // Single playlist / media drill-down view
     if (selectedPlaylist) {
         return (
             <div className="pb-4">
@@ -128,7 +127,6 @@ export default function CoursePlaylistListing({ courseId, type, havePurchased, d
         );
     }
 
-    // Playlist chapter listing view
     return (
         <div className="pb-4">
             {isLoading ? (

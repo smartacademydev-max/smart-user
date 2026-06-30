@@ -77,6 +77,24 @@ export interface TestList {
     }
 }
 
+
+
+export interface TestCategory {
+    id?: number;
+    name: string;
+    slug: string;
+    image: File | null;
+    image_url: string | null;
+    description?: string;
+}
+
+export interface TestCategoryListing {
+    data: {
+        data: TestCategory[];
+        pagination: Pagination;
+    }
+}
+
 export interface SingleMcqResponse extends GlobalResponse {
     data: QuestionProps[];
     overview: TestProps & {

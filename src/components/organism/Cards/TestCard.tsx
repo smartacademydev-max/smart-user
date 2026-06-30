@@ -58,7 +58,7 @@ export default function TestCard({ test, havePurchased, status: testStatus }: { 
           </Typography>
           <Typography variant="caption" color="text.dark" className="flex items-center gap-1">
             <Box sx={{ color: (theme) => theme.palette.success.main }}><Clock variant="Bold" size={16} /></Box>
-            <strong>{test?.duration.hours}</strong> Hrs  <strong>: {test?.duration.minutes}</strong> Mins
+            <strong>{test?.duration?.hours}</strong> Hrs  <strong>: {test?.duration?.minutes}</strong> Mins
           </Typography>
         </Box>
         <Divider className="my-1.5!" />

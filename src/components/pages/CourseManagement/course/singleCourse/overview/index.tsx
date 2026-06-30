@@ -10,7 +10,7 @@ interface Props {
     }
     isLoading: boolean;
 }
-export default function SinlgeCourseOverview({ data }: Props) {
+export default function SingleCourseOverview({ data }: Props) {
 
     return (
         <div className="pb-4">

@@ -56,6 +56,9 @@ export const PATH = {
             ROOT: "/courses",
             VIEW_COURSE: {
                 ROOT: (id?: number) => (id ? `/courses/${id}` : "/courses/:id"),
+                TEST_CATEGORY: {
+                    ROOT: (id?: number, test_category_id?: number) => id && test_category_id ? `/courses/${id}/test/test-category/${test_category_id}` : "/courses/:id/test/test-category/:test_category_id",
+                }
             },
             JOIN_LIVE: {
                 ROOT: (courseId?: number, liveId?: number) => (courseId && liveId ? `/courses/${courseId}/live/${liveId}` : "/courses/:courseId/live/:liveId"),

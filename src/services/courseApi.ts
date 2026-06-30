@@ -5,7 +5,7 @@ import type { CanvasContentsProgressResponse, CanvasCourseProgressResponse, Canv
 import type { LiveClassList, LiveClassProps } from "../types/liveClass";
 import type { MediaList } from "../types/media";
 import type { EsewaPaymentPayload, PurchaseModuleTypes, PurchaseProps } from "../types/purchase";
-import type { TestList } from "../types/question";
+import type { TestCategoryListing, TestList } from "../types/question";
 import type { ReciptProps, TransactionsResponse } from "../types/transactions";
 import type { GlobalResponse } from "../types/user";
 import { buildQueryParams } from "../utils/buildQueryParams";
@@ -14,7 +14,7 @@ import { baseQuery } from "./baseQuery";
 export const courseApi = createApi({
     reducerPath: "courseApi",
     baseQuery,
-    tagTypes: ["Course", "Curriculum", "Media", "CanvasProgress"],
+    tagTypes: ["Course", "Curriculum", "Media", "CanvasProgress", "TestCategory", "Test"],
     endpoints: (builder) => ({
         getAllCourse: builder.query<CourseList, QueryParams & { categoryFilter?: CategoryFilterParams; package_type?: PackageType }>({
             query: ({ pageIndex, pageSize, search, categoryFilter, package_type }) => {
@@ -128,6 +128,37 @@ export const courseApi = createApi({
                 method: "GET",
             }),
             providesTags: (_result, _error, { id }) => [{ type: "Course" as const, id }],
+        }),
+        useGetAllTestCategoryInACourse: builder.query<TestCategoryListing, QueryParams & { id: number; }>({
+            query: ({ id, pageIndex, pageSize, search }) => ({
+                url: `course/${id}/test-category?${buildQueryParams({
+                    page: pageIndex,
+                    page_size: pageSize,
+                    search: search,
+                })}`,
+                method: "GET",
+            }),
+            providesTags: (result) =>
+                result?.data?.data
+                    ? [
+                        ...result.data.data.map((course) => ({ type: "TestCategory" as const, id: course.id })),
+                        { type: "TestCategory", id: "LIST" },
+                    ]
+                    : [{ type: "TestCategory", id: "LIST" }],
+        }),
+        getSelectedTestBasedOnTestCategoryAndCourseId: builder.query<TestList, QueryParams & { course_id: number; test_category_id: number, search?: string; }>({
+            query: ({ course_id, test_category_id, pageIndex, pageSize, search }) => ({
+                url: `course/${course_id}/test-category/${test_category_id}?${buildQueryParams({
+                    page: pageIndex,
+                    page_size: pageSize,
+                    search: search,
+                })}`,
+                method: "GET",
+            }),
+            providesTags: [
+                { type: "TestCategory", id: "LIST" },
+                { type: "Test", id: "LIST" },
+            ]
         }),
         getCourseLiveClass: builder.query<LiveClassList, QueryParams & { id: number, type?: "ongoing" | "upcoming" }>({
             query: ({ id, pageIndex, pageSize, search, type }) => ({
@@ -387,4 +418,6 @@ export const {
     useGetCourseCompletionQuery,
     useGetCanvasContentsProgressQuery,
     useSaveCanvasContentProgressMutation,
+    useGetSelectedTestBasedOnTestCategoryAndCourseIdQuery,
+    useUseGetAllTestCategoryInACourseQuery
 } = courseApi;
