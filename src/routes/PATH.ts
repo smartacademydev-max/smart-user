@@ -158,6 +158,12 @@ export const PATH = {
         },
         MY_TEST: {
             ROOT: "/test/my-tests",
+            TEST_CATEGORY: {
+                ROOT: (courseId?: number) => (courseId ? `/test/my-tests/course/${courseId}/test-category` : "/test/my-tests/course/:courseId/test-category"),
+                VIEW_TEST_CATEGORY: {
+                    ROOT: (courseId?: number, test_category_id?: number) => (courseId && test_category_id ? `/test/my-tests/course/${courseId}/test-category/${test_category_id}` : "/test/my-tests/course/:courseId/test-category/:test_category_id"),
+                }
+            },
             BY_COURSE: {
                 ROOT: (courseId?: number) => (courseId ? `/test/my-tests/course/${courseId}` : "/test/my-tests/course/:courseId"),
             },

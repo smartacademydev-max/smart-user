@@ -1,12 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { PATH } from "../../../routes/PATH";
-import { useGetUserPurchasedCourseQuery } from "../../../services/courseApi";
-import { useGetUserAllTestQuery } from "../../../services/testApi";
+import { useGetUserPurchasedCourseQuery, useUseGetAllTestCategoryInACourseQuery } from "../../../services/courseApi";
 import type { QueryParams } from "../../../types";
 import type { CourseProps } from "../../../types/course";
 import { EmptyList } from "../../molecules/EmptyList";
 import TablePagination from "../../molecules/Pagination";
-import TestCard from "../../organism/Cards/TestCard";
+import TestCategoryCard from "../../organism/Cards/TestCategoryCard";
 import CourseSectionShell from "../../organism/LandingByCourse/CourseSectionShell";
 import ViewAllTile from "../../organism/LandingByCourse/ViewAllTile";
 import TestCardSkeleton from "../../organism/Loading/LoadingTestCard";
@@ -27,14 +27,15 @@ function TestPreviewSkeleton() {
 }
 
 function TestsSection({ course }: { course: CourseProps }) {
-    const havePurchased = course.user?.has_purchased ?? false;
-    const { data, isLoading } = useGetUserAllTestQuery(
+    const navigate = useNavigate();
+    // const havePurchased = course.user?.has_purchased ?? false;
+    const { data, isLoading } = useUseGetAllTestCategoryInACourseQuery(
         { id: course.id!, pageIndex: 1, pageSize: PREVIEW_PAGE_SIZE },
         { skip: !course.id }
     );
     const items = data?.data?.data ?? [];
     const total = data?.data?.pagination?.total ?? items.length;
-    const viewAllUrl = PATH.TEST.MY_TEST.BY_COURSE.ROOT(course.id);
+    const viewAllUrl = PATH.TEST.MY_TEST.TEST_CATEGORY.ROOT(course.id);
     const visibleItems = total > MAX_VISIBLE ? items.slice(0, MAX_VISIBLE - 1) : items.slice(0, MAX_VISIBLE);
     const extra = total - visibleItems.length;
 
@@ -52,7 +53,7 @@ function TestsSection({ course }: { course: CourseProps }) {
             ) : (
                 <div className="flex flex-col gap-4 sm:grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                     {visibleItems.map((test) => (
-                        <TestCard key={test.id} test={test} havePurchased={havePurchased} />
+                        <TestCategoryCard key={test.id} data={test} onClick={() => { navigate(PATH.TEST.MY_TEST.TEST_CATEGORY.VIEW_TEST_CATEGORY.ROOT(Number(course.id), Number(test.id))) }} />
                     ))}
                     {extra > 0 && (
                         <ViewAllTile extra={extra} url={viewAllUrl} label="tests" variant="card" />

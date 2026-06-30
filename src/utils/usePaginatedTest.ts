@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import type { TestStatus } from "../components/pages/TestManagement/allTest/AllTestList";
+import { useGetSelectedTestBasedOnTestCategoryAndCourseIdQuery } from "../services/courseApi";
 import { useGetUserAllTestQuery, useGetUserPurchasedTestRelatedToBundleQuery } from "../services/testApi";
 import type { QueryParams } from "../types";
 import type { QuestionTypeProps, TestProps } from "../types/question";
 const PAGE_SIZE = 8;
 
 export function usePaginatedTests(
-    baseParams: QueryParams,
+    baseParams: QueryParams & { test_category_id?: number; course_id?: number },
     type: QuestionTypeProps,
     status: TestStatus,
     resetKey: unknown,
@@ -19,13 +20,41 @@ export function usePaginatedTests(
         setAccumulated([]);
     }, [resetKey]);
 
-    const { data, isLoading } = useGetUserAllTestQuery({
-        ...baseParams,
-        pageIndex,
-        pageSize: PAGE_SIZE,
-        type,
-        status,
-    });
+    const testCategoryId = baseParams.test_category_id;
+    const useCategoryEndpoint = !!testCategoryId;
+
+    const {
+        data: allTestData,
+        isLoading: isLoadingAllTest,
+    } = useGetUserAllTestQuery(
+        {
+            ...baseParams,
+            pageIndex,
+            pageSize: PAGE_SIZE,
+            type,
+            status,
+        },
+        { skip: useCategoryEndpoint }
+    );
+
+    const {
+        data: categoryData,
+        isLoading: isLoadingCategory,
+    } = useGetSelectedTestBasedOnTestCategoryAndCourseIdQuery(
+        {
+            ...baseParams,
+            pageIndex,
+            pageSize: PAGE_SIZE,
+            test_category_id: testCategoryId as number,
+            course_id: baseParams.course_id as number,
+            type,
+            status,
+        },
+        { skip: !useCategoryEndpoint || !baseParams.course_id }
+    );
+
+    const data = useCategoryEndpoint ? categoryData : allTestData;
+    const isLoading = useCategoryEndpoint ? isLoadingCategory : isLoadingAllTest;
 
     const page = data?.data?.data ?? [];
     const totalPages = data?.data?.pagination?.total_pages ?? 0;
@@ -49,6 +78,7 @@ export function usePaginatedTests(
 
     return { tests: accumulated, isLoading, hasMore, loadMore };
 }
+
 export function usePaginatedBunldeTests(
     baseParams: QueryParams,
     type: QuestionTypeProps,
@@ -71,7 +101,7 @@ export function usePaginatedBunldeTests(
         type,
         status,
         id
-    });
+    }, { skip: !id });
 
     const page = data?.data?.data ?? [];
     const totalPages = data?.data?.pagination?.total_pages ?? 0;
@@ -95,4 +125,3 @@ export function usePaginatedBunldeTests(
 
     return { tests: accumulated, isLoading, hasMore, loadMore };
 }
-

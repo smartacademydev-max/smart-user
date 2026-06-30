@@ -5,7 +5,7 @@ import type { CanvasContentsProgressResponse, CanvasCourseProgressResponse, Canv
 import type { LiveClassList, LiveClassProps } from "../types/liveClass";
 import type { MediaList } from "../types/media";
 import type { EsewaPaymentPayload, PurchaseModuleTypes, PurchaseProps } from "../types/purchase";
-import type { TestCategoryListing, TestList } from "../types/question";
+import type { QuestionTypeProps, TestCategoryListing, TestList } from "../types/question";
 import type { ReciptProps, TransactionsResponse } from "../types/transactions";
 import type { GlobalResponse } from "../types/user";
 import { buildQueryParams } from "../utils/buildQueryParams";
@@ -146,12 +146,14 @@ export const courseApi = createApi({
                     ]
                     : [{ type: "TestCategory", id: "LIST" }],
         }),
-        getSelectedTestBasedOnTestCategoryAndCourseId: builder.query<TestList, QueryParams & { course_id: number; test_category_id: number, search?: string; }>({
-            query: ({ course_id, test_category_id, pageIndex, pageSize, search }) => ({
+        getSelectedTestBasedOnTestCategoryAndCourseId: builder.query<TestList, QueryParams & { course_id: number; test_category_id: number, search?: string; status?: string, type?: QuestionTypeProps }>({
+            query: ({ course_id, test_category_id, pageIndex, pageSize, search, status, type }) => ({
                 url: `course/${course_id}/test-category/${test_category_id}?${buildQueryParams({
                     page: pageIndex,
                     page_size: pageSize,
                     search: search,
+                    status,
+                    type
                 })}`,
                 method: "GET",
             }),
