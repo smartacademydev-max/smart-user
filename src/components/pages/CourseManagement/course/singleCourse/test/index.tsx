@@ -7,6 +7,7 @@ import type { QueryParams } from "../../../../../../types";
 import type { TestCategory } from "../../../../../../types/question";
 import { EmptyList } from "../../../../../molecules/EmptyList";
 import TablePagination from "../../../../../molecules/Pagination";
+import SortByButton from "../../../../../molecules/SortByButton";
 import TestCard from "../../../../../organism/Cards/TestCard";
 import TestCategoryCard from "../../../../../organism/Cards/TestCategoryCard";
 import TestCardSkeleton from "../../../../../organism/Loading/LoadingTestCard";
@@ -28,6 +29,7 @@ export default function SingleCourseTest({ havePurchased }: Props) {
     const [selectedPlaylist, setSelectedPlaylist] = useState<TestCategory | null>(null);
     const [search, setSearch] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
+    const [alphabeticOrder, setAlphabeticOrder] = useState<"a-z" | "z-a">("a-z");
 
     useEffect(() => {
         const timer = setTimeout(() => setDebouncedSearch(search), 500);
@@ -48,6 +50,7 @@ export default function SingleCourseTest({ havePurchased }: Props) {
             search: debouncedSearch,
             course_id: Number(id),
             test_category_id: Number(selectedPlaylist?.id),
+            alphabetic_order: alphabeticOrder,
         },
         { skip: !id || !selectedPlaylist?.id }
     );
@@ -90,7 +93,15 @@ export default function SingleCourseTest({ havePurchased }: Props) {
                     </Button>
                 </div>
 
-                <TableFilter search={search} setSearch={setSearch} />
+                <div className="flex gap-2 items-center">
+                    <div className="flex-1">
+                        <TableFilter search={search} setSearch={setSearch} />
+                    </div>
+                    <SortByButton
+                        value={alphabeticOrder}
+                        onChange={(val) => { setAlphabeticOrder(val); setMediaQp({ pageIndex: 1, pageSize: 20 }); }}
+                    />
+                </div>
 
                 <div className="mt-6">
                     {loadingMedia ? (

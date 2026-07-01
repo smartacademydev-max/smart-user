@@ -7,7 +7,7 @@ import type { QuestionTypeProps, TestProps } from "../types/question";
 const PAGE_SIZE = 8;
 
 export function usePaginatedTests(
-    baseParams: QueryParams & { test_category_id?: number; course_id?: number },
+    baseParams: QueryParams & { test_category_id?: number; course_id?: number; alphabetic_order?: "a-z" | "z-a" },
     type: QuestionTypeProps,
     status: TestStatus,
     resetKey: unknown,

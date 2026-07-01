@@ -146,14 +146,15 @@ export const courseApi = createApi({
                     ]
                     : [{ type: "TestCategory", id: "LIST" }],
         }),
-        getSelectedTestBasedOnTestCategoryAndCourseId: builder.query<TestList, QueryParams & { course_id: number; test_category_id: number, search?: string; status?: string, type?: QuestionTypeProps }>({
-            query: ({ course_id, test_category_id, pageIndex, pageSize, search, status, type }) => ({
+        getSelectedTestBasedOnTestCategoryAndCourseId: builder.query<TestList, QueryParams & { course_id: number; test_category_id: number, search?: string; status?: string, type?: QuestionTypeProps, alphabetic_order?: "a-z" | "z-a" }>({
+            query: ({ course_id, test_category_id, pageIndex, pageSize, search, status, type, alphabetic_order }) => ({
                 url: `course/${course_id}/test-category/${test_category_id}?${buildQueryParams({
                     page: pageIndex,
                     page_size: pageSize,
                     search: search,
                     status,
-                    type
+                    type,
+                    alphabetic_order,
                 })}`,
                 method: "GET",
             }),

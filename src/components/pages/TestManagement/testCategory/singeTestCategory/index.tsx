@@ -7,6 +7,7 @@ import type { QueryParams } from "../../../../../types";
 import type { QuestionTypeProps } from "../../../../../types/question";
 import { usePaginatedTests } from "../../../../../utils/usePaginatedTest";
 import { EmptyList } from "../../../../molecules/EmptyList";
+import SortByButton from "../../../../molecules/SortByButton";
 import TabController from "../../../../molecules/TabController";
 import PageHeader from "../../../../organism/PageHeader";
 import TestSection from "../../../../organism/TestSection";
@@ -22,16 +23,18 @@ export default function SingleTestCategory() {
     const [rawSearch, setRawSearch] = useState("");
     const [search, setSearch] = useState("");
     const [activeTab, setActiveTab] = useState<QuestionTypeProps>("mcq");
+    const [alphabeticOrder, setAlphabeticOrder] = useState<"a-z" | "z-a">("a-z");
 
-    const resetKey = `${activeTab}__${courseId}__${search}`;
+    const resetKey = `${activeTab}__${courseId}__${search}__${alphabeticOrder}`;
 
-    const baseParams: QueryParams & { courseId?: number; test_category_id?: number; course_id?: number } = useMemo(() => ({
+    const baseParams: QueryParams & { courseId?: number; test_category_id?: number; course_id?: number; alphabetic_order?: "a-z" | "z-a" } = useMemo(() => ({
         pageIndex: 1,
         pageSize: 8,
         search,
+        alphabetic_order: alphabeticOrder,
         ...(courseId ? { id: courseId, course_id: Number(courseId) } : {}),
         ...(test_category_id ? { test_category_id: Number(test_category_id) } : {}),
-    }), [search, courseId, test_category_id]);
+    }), [search, courseId, test_category_id, alphabeticOrder]);
 
     const notStarted = usePaginatedTests(baseParams, activeTab, "not_started", resetKey);
     const completed = usePaginatedTests(baseParams, activeTab, "completed", resetKey);
@@ -77,20 +80,23 @@ export default function SingleTestCategory() {
                     />
                 </div>
 
-                <TextField
-                    fullWidth
-                    size="small"
-                    placeholder="Search tests"
-                    value={rawSearch}
-                    onChange={(e) => setRawSearch(e.target.value)}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <SearchNormal1 size={18} />
-                            </InputAdornment>
-                        ),
-                    }}
-                />
+                <div className="flex gap-2 items-center">
+                    <TextField
+                        fullWidth
+                        size="small"
+                        placeholder="Search tests"
+                        value={rawSearch}
+                        onChange={(e) => setRawSearch(e.target.value)}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <SearchNormal1 size={18} />
+                                </InputAdornment>
+                            ),
+                        }}
+                    />
+                    <SortByButton value={alphabeticOrder} onChange={setAlphabeticOrder} />
+                </div>
             </div>
 
             <div className="media__listing__wrapper h-full overflow-auto pr-2">

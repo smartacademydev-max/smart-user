@@ -9,8 +9,6 @@ import { formatDateTime } from "../../../utils/dateFormat";
 
 
 const TestActionButton = ({ test, havePurchased, id }: { test: TestProps, status?: any; havePurchased: boolean; id: number }) => {
-
-
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [timeLeft, setTimeLeft] = useState<number | null>(null);
@@ -22,7 +20,7 @@ const TestActionButton = ({ test, havePurchased, id }: { test: TestProps, status
         const now = Date.now();
         const diff = startTime - now;
 
-        // Only start countdown if less than 24 hours
+        
         if (diff > 0 && diff <= 24 * 60 * 60 * 1000) {
             setTimeLeft(diff);
 
