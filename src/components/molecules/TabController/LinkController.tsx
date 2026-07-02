@@ -5,14 +5,12 @@ import {
     Typography,
     useTheme,
 } from "@mui/material";
-import { useLocation, useNavigate } from "react-router-dom"; // For React Router
-import Slider from "react-slick";
-import "slick-carousel/slick/slick-theme.css";
-import "slick-carousel/slick/slick.css";
+import { useEffect, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface TabOption {
     label: string;
-    value: string; // value will now be route path
+    value: string;
 }
 
 interface LinkControllerProps {
@@ -22,64 +20,69 @@ interface LinkControllerProps {
 export default function LinkController({ options = [] }: LinkControllerProps) {
     const theme = useTheme();
     const navigate = useNavigate();
-    const location = useLocation(); // Gives current path
+    const location = useLocation();
+    const scrollRef = useRef<HTMLDivElement>(null);
 
-    const settings = {
-        dots: false,
-        arrows: false,
-        infinite: false,
-        speed: 500,
-        mobileFirst: true,
-        slidesToShow: 3,
-        slidesToScroll: 2,
-        focusOnSelect: true,
-        variableWidth: true,
-        responsive: [
-            { breakpoint: 768, settings: { slidesToShow: 4 } },
-            { breakpoint: 992, settings: { slidesToShow: 5 } },
-            { breakpoint: 1200, settings: { slidesToShow: 6, focusOnSelect: false } },
-            { breakpoint: 1440, settings: { slidesToShow: 7 } },
-        ],
-    };
+    // Scroll active tab to the start of the container on route change
+    useEffect(() => {
+        const container = scrollRef.current;
+        if (!container) return;
+        const active = container.querySelector<HTMLElement>("[data-active='true']");
+        if (!active) return;
+        const containerLeft = container.getBoundingClientRect().left;
+        const activeLeft = active.getBoundingClientRect().left;
+        container.scrollTo({
+            left: container.scrollLeft + activeLeft - containerLeft,
+            behavior: "smooth",
+        });
+    }, [location.pathname]);
+
+    const tabItem = (tab: TabOption, isActive: boolean) => (
+        <div className={
+            `px-6 py-2 rounded-md cursor-pointer flex items-center gap-1.5 ${isActive ? "active__tab__controller" : ""}`
+        }>
+            <Typography
+                variant="subtitle2"
+                color="text.middle"
+                className="text-nowrap"
+            >
+                {tab.label}
+            </Typography>
+        </div>
+    );
 
     return (
         <>
-            {/* Mobile Slider */}
+            {/* Mobile — native horizontal scroll with smooth active-to-start */}
             <Box
+                ref={scrollRef}
                 className="p-1! rounded-md"
                 sx={{
                     background: theme.palette.tab.background,
-                    display: { xs: "block", lg: "none" },
+                    display: { xs: "flex", lg: "none" },
+                    overflowX: "auto",
+                    flexWrap: "nowrap",
+                    "&::-webkit-scrollbar": { display: "none" },
+                    scrollbarWidth: "none",
+                    msOverflowStyle: "none",
                 }}
             >
-                <Slider {...settings}>
-                    {options.map((tab) => {
-                        const isActive = location.pathname === tab.value;
-
-                        return (
-                            <div
-                                key={tab.value}
-                                onClick={() => navigate(tab.value)}
-                                className={isActive ? "active__tab__controller" : ""}
-                            >
-                                <div className={
-                                    `px-6 py-2 rounded-md cursor-pointer flex  items-center gap-1.5 ${isActive ? "active__tab__controller" : ""}`
-                                }>
-                                    <Typography
-                                        variant="subtitle2"
-                                        color="text.middle"
-                                        className="text-nowrap text-center"
-                                    >
-                                        {tab.label}
-                                    </Typography>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </Slider>
+                {options.map((tab) => {
+                    const isActive = location.pathname === tab.value;
+                    return (
+                        <Box
+                            key={tab.value}
+                            data-active={isActive ? "true" : undefined}
+                            onClick={() => navigate(tab.value)}
+                            sx={{ flexShrink: 0 }}
+                        >
+                            {tabItem(tab, isActive)}
+                        </Box>
+                    );
+                })}
             </Box>
 
-            {/* Desktop Menu */}
+            {/* Desktop */}
             <List
                 sx={{
                     background: theme.palette.tab.background,
@@ -90,24 +93,12 @@ export default function LinkController({ options = [] }: LinkControllerProps) {
             >
                 {options.map((tab) => {
                     const isActive = location.pathname === tab.value;
-
                     return (
                         <ListItem
                             key={tab.value}
                             onClick={() => navigate(tab.value)}
-
                         >
-                            <div className={
-                                `px-6 py-2 rounded-md cursor-pointer flex  items-center gap-1.5 ${isActive ? "active__tab__controller" : ""}`
-                            }>
-                                <Typography
-                                    variant="subtitle2"
-                                    color="text.middle"
-                                    className=" text-nowrap"
-                                >
-                                    {tab.label}
-                                </Typography>
-                            </div>
+                            {tabItem(tab, isActive)}
                         </ListItem>
                     );
                 })}

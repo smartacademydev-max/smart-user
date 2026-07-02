@@ -50,7 +50,7 @@ function NotesSection({ course }: { course: CourseProps }) {
             ) : items.length === 0 ? (
                 <div className="text-sm text-gray-500 italic py-4">No notes yet for this course.</div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3 md:gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3 md:gap-4">
                     {visibleItems.map((item) => (
                         <PlaylistCard
                             key={item.chapter_id}

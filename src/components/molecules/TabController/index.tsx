@@ -5,9 +5,7 @@ import {
     Typography,
     useTheme
 } from "@mui/material";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick-theme.css";
-import "slick-carousel/slick/slick.css";
+import { useEffect, useRef } from "react";
 
 interface TabOption<T> {
     label: string;
@@ -20,7 +18,6 @@ interface TabControllerProps<T> {
     setActiveTab: (value: T) => void;
     currentActive: T;
     size?: "sm" | "md";
-
 }
 
 export default function TabController<T extends string | number>({
@@ -29,127 +26,94 @@ export default function TabController<T extends string | number>({
     options = [],
     size = "md"
 }: TabControllerProps<T>) {
-    const settings = {
-        dots: false,
-        arrows: false,
-        infinite: false,
-        speed: 500,
-        mobileFirst: true,
-        slidesToShow: 3,
-        slidesToScroll: 2,
-        focusOnSelect: true,
-        variableWidth: true,
-        responsive: [
-            {
-                breakpoint: 768,
-                settings: {
-                    slidesToShow: 4,
-                }
-            },
-            {
-                breakpoint: 992,
-                settings: {
-                    slidesToShow: 5,
-                }
-            },
-            {
-                breakpoint: 1200,
-                settings: {
-                    slidesToShow: 6,
-                    focusOnSelect: false,
-                }
-            },
-            {
-                breakpoint: 1440,
-                settings: {
-                    slidesToShow: 7,
-                }
-            }
-        ]
-    };
-
-
     const theme = useTheme();
+    const scrollRef = useRef<HTMLDivElement>(null);
 
+    // Scroll active tab to the start of the container whenever it changes
+    useEffect(() => {
+        const container = scrollRef.current;
+        if (!container) return;
+        const active = container.querySelector<HTMLElement>("[data-active='true']");
+        if (!active) return;
+        const containerLeft = container.getBoundingClientRect().left;
+        const activeLeft = active.getBoundingClientRect().left;
+        container.scrollTo({
+            left: container.scrollLeft + activeLeft - containerLeft,
+            behavior: "smooth",
+        });
+    }, [currentActive]);
 
-    console.log(options)
+    const tabItem = (tab: TabOption<T>, isActive: boolean) => (
+        <div className={
+            `${size === "sm" ? "px-2.5 py-1" : "px-6 py-2"} rounded-md cursor-pointer flex items-center gap-1.5 ${isActive ? "active__tab__controller" : ""}`
+        }>
+            <Typography
+                variant="subtitle2"
+                color="text.middle"
+                className="text-nowrap"
+            >
+                {tab.label}
+            </Typography>
+            {tab.count ? (
+                <Typography
+                    component="span"
+                    variant="caption"
+                    color="text.dark"
+                    className="w-4.5 h-4.5 rounded-full flex justify-center items-center"
+                    sx={{ background: (t) => t.palette.primary.contrastText }}
+                >
+                    {tab.count}
+                </Typography>
+            ) : null}
+        </div>
+    );
 
     return (
         <>
-            <Box className="p-1! rounded-md"
+            {/* Mobile — native horizontal scroll with smooth active-to-start */}
+            <Box
+                ref={scrollRef}
+                className="p-1! rounded-md"
                 sx={{
                     background: theme.palette.tab.background,
-                    display: { xs: "block", lg: "none" }
-                }}>
-                <Slider {...settings}>
-                    {options.map((tab) => (
-                        <div key={tab.value}
+                    display: { xs: "flex", lg: "none" },
+                    overflowX: "auto",
+                    flexWrap: "nowrap",
+                    "&::-webkit-scrollbar": { display: "none" },
+                    scrollbarWidth: "none",
+                    msOverflowStyle: "none",
+                }}
+            >
+                {options.map((tab) => {
+                    const isActive = currentActive === tab.value;
+                    return (
+                        <Box
+                            key={tab.value as string | number}
+                            data-active={isActive ? "true" : undefined}
                             onClick={() => setActiveTab(tab.value)}
+                            sx={{ flexShrink: 0 }}
                         >
-                            <div className={
-                                `${size === "sm" ? "px-2.5 py-1" : "px-6 py-2 "} rounded-md cursor-pointer flex  items-center gap-1.5 ${currentActive === tab.value ? "active__tab__controller" : ""}`
-                            }>
-                                <Typography
-                                    variant="subtitle2"
-                                    color="text.middle"
-                                    className=" text-nowrap"
-                                >
-                                    {tab.label}
-                                </Typography>
-                                {tab.count ? <Typography
-                                    component="span"
-                                    variant="caption"
-                                    color="text.dark"
-                                    className="w-4.5 h-4.5 rounded-full flex justify-center items-center"
-                                    sx={{
-                                        background: (theme) => theme.palette.primary.contrastText
-                                    }}
-                                >
-                                    {tab.count}
-                                </Typography> : ""}
-                            </div>
-                        </div>
-                    ))}
-                </Slider>
+                            {tabItem(tab, isActive)}
+                        </Box>
+                    );
+                })}
             </Box>
+
             {/* Desktop */}
             <List
                 sx={{
                     background: theme.palette.tab.background,
                     display: { xs: "none", lg: "flex" },
-                    overflow: "auto"
+                    overflow: "auto",
                 }}
                 className="p-1! rounded-md max-w-fit flex items-center"
             >
                 {options.map((tab) => (
                     <ListItem
-                        key={tab.value}
+                        key={tab.value as string | number}
                         onClick={() => setActiveTab(tab.value)}
-
                     >
-                        <div className={
-                            `${size === "sm" ? "px-2.5 py-1" : "px-6 py-2 "} rounded-md cursor-pointer flex  items-center gap-1.5 ${currentActive === tab.value ? "active__tab__controller" : ""}`
-                        }>
-                            <Typography
-                                variant="subtitle2"
-                                color="text.middle"
-                                className=" text-nowrap"
-                            >
-                                {tab.label}
-                            </Typography>
-                            {tab.count ? <Typography
-                                component="span"
-                                variant="caption"
-                                color="text.dark"
-                                className="w-4.5 h-4.5 rounded-full flex justify-center items-center"
-                                sx={{
-                                    background: (theme) => theme.palette.primary.contrastText
-                                }}
-                            >
-                                {tab.count}
-                            </Typography> : ""}
-                        </div>
-
+                        {tabItem(tab, currentActive === tab.value)}
                     </ListItem>
                 ))}
             </List>

@@ -204,8 +204,8 @@ export default function DashboardDailyQuiz() {
         localIsCorrect !== null
             ? localIsCorrect
             : selectedId !== null
-            ? (quiz?.options.find((o) => o.id === selectedId)?.correct_answer ?? null)
-            : null;
+                ? (quiz?.options.find((o) => o.id === selectedId)?.correct_answer ?? null)
+                : null;
 
     const handleSelect = async (option: DailyQuizOption) => {
         if (answered || !quiz || submitting) return;
@@ -265,12 +265,7 @@ export default function DashboardDailyQuiz() {
             </Box>
 
             <Box
-                sx={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(3, 1fr)",
-                    gap: "10px",
-                    mb: 1.5,
-                }}
+                className="flex flex-col gap-2 sm:grid grid-cols-2 lg:grid-cols-3"
             >
                 <StatCard
                     icon={<LocalFireDepartmentIcon fontSize="small" />}

@@ -34,7 +34,7 @@ export default function MyCourseRoot() {
                 }]}
             />
             <Box className="h-full overflow-auto">
-                <div className="mb-4 lg:mb-6 flex justify-between items-center
+                <div className="mb-4 lg:mb-6 flex justify-between items-center flex-wrap gap-1
                 ">
                     <TabController
                         options={[

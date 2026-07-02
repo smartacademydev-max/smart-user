@@ -1,6 +1,6 @@
 import { Box, Chip, Divider, InputAdornment, OutlinedInput, Skeleton, Typography, useTheme } from "@mui/material";
 import { AudioSquare, Document, Gift, Notepad2, SearchNormal, VideoOctagon, VideoPlay } from "iconsax-reactjs";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
     useGetCourseLiveClassQuery,
@@ -85,8 +85,7 @@ export default function FreeMaterials() {
     const theme = useTheme();
     const [searchParams, setSearchParams] = useSearchParams();
 
-    // Resolve the single open_access course id at runtime — backend returns it
-    // from `GET /free-materials/course` (filter by course_type === "open_access").
+
     const { data: freeCourseRes, isLoading: loadingFreeCourse } = useGetFreeMaterialsCourseQuery();
     const freeCourseId = freeCourseRes?.data?.id ?? null;
 
@@ -96,6 +95,7 @@ export default function FreeMaterials() {
 
     const [qp, setQp] = useState<QueryParams>({ pageIndex: 1, pageSize: 12, search: "" });
     const [searchInput, setSearchInput] = useState("");
+    const chipScrollRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -103,6 +103,19 @@ export default function FreeMaterials() {
         }, 400);
         return () => clearTimeout(timer);
     }, [searchInput]);
+
+    useEffect(() => {
+        const container = chipScrollRef.current;
+        if (!container) return;
+        const active = container.querySelector<HTMLElement>("[data-active='true']");
+        if (!active) return;
+        const containerLeft = container.getBoundingClientRect().left;
+        const activeLeft = active.getBoundingClientRect().left;
+        container.scrollTo({
+            left: container.scrollLeft + activeLeft - containerLeft,
+            behavior: "smooth",
+        });
+    }, [activeCategory]);
 
     const handleCategoryChange = (cat: Category) => {
         if (cat === "all") {
@@ -186,7 +199,7 @@ export default function FreeMaterials() {
                     <Gift size={24} color="#fff" variant="Bold" />
                 </Box>
                 <Box>
-                    <Typography variant="h2" fontWeight={700} color="text.dark">
+                    <Typography component="h2" fontWeight={600} color="text.dark" sx={{ typography: { xs: "h4", md: "h2" }, }}>
                         Free Learning Resources
                     </Typography>
                     <Typography variant="subtitle2" color="text.middle" fontWeight={400}>
@@ -197,35 +210,54 @@ export default function FreeMaterials() {
 
             <Divider sx={{ my: 2.5 }} />
 
-            {/* Filter chips + search */}
-            <Box className="flex flex-wrap gap-2 items-center mb-6">
-                <Chip
-                    label="All"
-                    onClick={() => handleCategoryChange("all")}
-                    variant={activeCategory === "all" ? "filled" : "outlined"}
-                    color={activeCategory === "all" ? "primary" : "default"}
-                    sx={{ fontWeight: activeCategory === "all" ? 600 : 400 }}
-                />
-                {chips.map((cat) => (
+            {/* Filter chips — horizontal scroll, active snaps to start */}
+            <Box
+                ref={chipScrollRef}
+                sx={{
+                    display: "flex",
+                    flexWrap: "nowrap",
+                    gap: 1,
+                    overflowX: "auto",
+                    mb: activeCategory !== "all" ? 1.5 : 3,
+                    "&::-webkit-scrollbar": { display: "none" },
+                    scrollbarWidth: "none",
+                    msOverflowStyle: "none",
+                }}
+            >
+                <Box data-active={activeCategory === "all" ? "true" : undefined} sx={{ flexShrink: 0 }}>
                     <Chip
-                        key={cat.value}
-                        label={
-                            <Box sx={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                                {cat.icon}
-                                <span>{cat.count !== undefined ? `${cat.label} (${cat.count})` : cat.label}</span>
-                            </Box>
-                        }
-                        onClick={() => handleCategoryChange(cat.value)}
-                        variant={activeCategory === cat.value ? "filled" : "outlined"}
-                        color={activeCategory === cat.value ? "primary" : "default"}
-                        sx={{ fontWeight: activeCategory === cat.value ? 600 : 400 }}
+                        label="All"
+                        onClick={() => handleCategoryChange("all")}
+                        variant={activeCategory === "all" ? "filled" : "outlined"}
+                        color={activeCategory === "all" ? "primary" : "default"}
+                        sx={{ fontWeight: activeCategory === "all" ? 600 : 400 }}
                     />
+                </Box>
+                {chips.map((cat) => (
+                    <Box key={cat.value} data-active={activeCategory === cat.value ? "true" : undefined} sx={{ flexShrink: 0 }}>
+                        <Chip
+                            label={
+                                <Box sx={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                                    {cat.icon}
+                                    <span>{cat.count !== undefined ? `${cat.label} (${cat.count})` : cat.label}</span>
+                                </Box>
+                            }
+                            onClick={() => handleCategoryChange(cat.value)}
+                            variant={activeCategory === cat.value ? "filled" : "outlined"}
+                            color={activeCategory === cat.value ? "primary" : "default"}
+                            sx={{ fontWeight: activeCategory === cat.value ? 600 : 400 }}
+                        />
+                    </Box>
                 ))}
+            </Box>
 
-                {activeCategory !== "all" && (
+            {/* Search — separate row, only when a category is active */}
+            {activeCategory !== "all" && (
+                <Box sx={{ mb: 3 }}>
                     <OutlinedInput
                         placeholder={`Search ${activeCategory.replace("_", " ")}…`}
                         size="small"
+                        fullWidth
                         startAdornment={
                             <InputAdornment position="start">
                                 <SearchNormal size={16} color={theme.palette.text.secondary} />
@@ -233,10 +265,10 @@ export default function FreeMaterials() {
                         }
                         value={searchInput}
                         onChange={(e) => setSearchInput(e.target.value)}
-                        sx={{ ml: "auto", maxWidth: 240 }}
+                        sx={{ maxWidth: 340 }}
                     />
-                )}
-            </Box>
+                </Box>
+            )}
 
             {/* ── ALL view ───────────────────────────────────────────── */}
             {activeCategory === "all" && (

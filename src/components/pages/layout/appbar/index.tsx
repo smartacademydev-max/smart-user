@@ -97,8 +97,14 @@ export default function CustomAppbar({
                         <div className="user_message">
                             <Typography
                                 className="w-full"
-                                variant="body1"
-                                sx={{ display: "flex", flexDirection: "column", lineHeight: 1.3, fontWeight: 700 }}
+                                // variant="body1"
+                                sx={{
+                                    display: "flex", flexDirection: "column", lineHeight: 1.3, fontWeight: 700,
+                                    fontSize: {
+                                        xs: "subtitle2",
+                                        md: "body1"
+                                    }
+                                }}
                             >
                                 <span>
                                     {t(getGreetingKey(user?.dob as string))},{" "}

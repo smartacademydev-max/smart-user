@@ -1,5 +1,5 @@
-import { Box, Divider, Skeleton, Stack, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { Box, Divider, Skeleton, Stack, Typography, useTheme } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { PATH } from "../../../../routes/PATH";
 import { useGetAllMegaCategoryQuery } from "../../../../services/categoryApi";
@@ -17,6 +17,8 @@ import DiscussionCard from "../../../organism/Cards/DiscussionCard";
 export default function AllDiscussions() {
 	const { t } = useTranslation();
 	const dispatch = useAppDispatch();
+	const theme = useTheme();
+	const categoryScrollRef = useRef<HTMLDivElement>(null);
 
 	const [search, setSearch] = useState("");
 	const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -29,6 +31,19 @@ export default function AllDiscussions() {
 		const timer = setTimeout(() => setDebouncedSearch(search), 1000);
 		return () => clearTimeout(timer);
 	}, [search]);
+
+	useEffect(() => {
+		const container = categoryScrollRef.current;
+		if (!container) return;
+		const active = container.querySelector<HTMLElement>("[data-active='true']");
+		if (!active) return;
+		const containerLeft = container.getBoundingClientRect().left;
+		const activeLeft = active.getBoundingClientRect().left;
+		container.scrollTo({
+			left: container.scrollLeft + activeLeft - containerLeft,
+			behavior: "smooth",
+		});
+	}, [megaCategoryId]);
 
 	const { data, isLoading } = useGetAllDiscussionsQuery({
 		...qp,
@@ -98,8 +113,49 @@ export default function AllDiscussions() {
 
 			<TableFilter search={search} setSearch={setSearch} />
 
+			{/* Mobile category slider */}
+			<Box
+				ref={categoryScrollRef}
+				className="p-1! rounded-md mt-2"
+				sx={{
+					background: theme.palette.tab.background,
+					display: { xs: "flex", md: "none" },
+					overflowX: "auto",
+					flexWrap: "nowrap",
+					"&::-webkit-scrollbar": { display: "none" },
+					scrollbarWidth: "none",
+					msOverflowStyle: "none",
+				}}
+			>
+				<Box
+					data-active={megaCategoryId === "" ? "true" : undefined}
+					onClick={() => selectCategory("")}
+					sx={{ flexShrink: 0 }}
+				>
+					<div className={`px-4 py-2 rounded-md cursor-pointer ${megaCategoryId === "" ? "active__tab__controller" : ""}`}>
+						<Typography variant="subtitle2" color="text.middle" className="text-nowrap">
+							{t("labels.all")}
+						</Typography>
+					</div>
+				</Box>
+				{categories.map((cat) => (
+					<Box
+						key={cat.id}
+						data-active={megaCategoryId === cat.id ? "true" : undefined}
+						onClick={() => selectCategory(cat.id as number)}
+						sx={{ flexShrink: 0 }}
+					>
+						<div className={`px-4 py-2 rounded-md cursor-pointer ${megaCategoryId === cat.id ? "active__tab__controller" : ""}`}>
+							<Typography variant="subtitle2" color="text.middle" className="text-nowrap">
+								{cat.name}
+							</Typography>
+						</div>
+					</Box>
+				))}
+			</Box>
+
 			<div className="grid grid-cols-12 gap-6 mt-2">
-				<Box className="col-span-12 md:col-span-3">
+				<Box className="col-span-12 md:col-span-3" sx={{ display: { xs: "none", md: "block" } }}>
 					<Box
 						sx={{
 							border: (theme) => `1px solid ${theme.palette.textField.border}`,

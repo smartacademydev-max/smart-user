@@ -1,4 +1,4 @@
-import { Box, MenuItem, Select, Skeleton, Typography, useTheme } from "@mui/material";
+import { Box, MenuItem, Select, Skeleton, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import { useGetStudyTimeQuery, useGetTestScoresQuery } from "../../../services/dashboardApi";
@@ -6,6 +6,7 @@ import type { ProgressRange } from "../../../types/dashboard";
 
 export default function DashboardProgressCharts() {
     const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
     const [range, setRange] = useState<ProgressRange>(30);
 
     const { data: studyRes, isLoading: studyLoading } = useGetStudyTimeQuery(range);
@@ -28,6 +29,8 @@ export default function DashboardProgressCharts() {
     const dividerColor = theme.palette.divider;
     const paperBg = theme.palette.background.paper;
     const fontFamily = theme.typography.fontFamily as string;
+    const mobileTickAmount = range === 90 ? 6 : range === 30 ? 7 : 7;
+
     const baseChartConfig = {
         chart: {
             toolbar: { show: false },
@@ -46,9 +49,13 @@ export default function DashboardProgressCharts() {
             categories: [] as string[], // overridden per chart
             labels: {
                 style: { fontSize: "10px", colors: textSecondary, fontFamily },
+                hideOverlappingLabels: true,
+                rotate: isMobile ? -30 : 0,
+                rotateAlways: false,
             },
             axisBorder: { show: false },
             axisTicks: { show: false },
+            tickAmount: isMobile ? mobileTickAmount : undefined,
         },
         tooltip: {
             theme: theme.palette.mode,
@@ -56,6 +63,19 @@ export default function DashboardProgressCharts() {
         },
         legend: { show: false },
         dataLabels: { enabled: false },
+        responsive: [
+            {
+                breakpoint: 380,
+                options: {
+                    xaxis: {
+                        labels: { style: { fontSize: "9px" } },
+                    },
+                    grid: {
+                        padding: { left: 2, right: 2 },
+                    },
+                },
+            },
+        ],
     };
 
     const studyOptions = {
@@ -129,8 +149,8 @@ export default function DashboardProgressCharts() {
 
     return (
         <Box>
-            {/* Section header — mirrors DashboardPurchasedCourseListing header */}
-            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1.5 }}>
+            {/* Section header */}
+            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 1, mb: 1.5 }}>
                 <Typography variant="subtitle1" fontWeight={700} sx={{ fontSize: "14.5px" }}>
                     Your Progress
                 </Typography>
@@ -185,7 +205,7 @@ export default function DashboardProgressCharts() {
                         options={studyOptions}
                         series={[{ name: "Study Time", data: studyChartData }]}
                         type="bar"
-                        height={160}
+                        height={isMobile ? 130 : 160}
                     />
 
                     <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1, mt: 1 }}>
@@ -245,7 +265,7 @@ export default function DashboardProgressCharts() {
                         options={scoreOptions}
                         series={[{ name: "Score", data: scoreChartData }]}
                         type="line"
-                        height={160}
+                        height={isMobile ? 130 : 160}
                     />
 
                     <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1, mt: 1 }}>

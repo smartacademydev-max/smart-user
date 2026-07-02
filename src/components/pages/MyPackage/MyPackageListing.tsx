@@ -1,7 +1,7 @@
 import { Box, OutlinedInput, Skeleton, useTheme } from "@mui/material";
 import { useState } from "react";
-import type { PackageType } from "../../../types/course";
 import { useGetUserPurchasedCourseQuery } from "../../../services/courseApi";
+import type { PackageType } from "../../../types/course";
 import { useDebounce } from "../../../utils/useDebounce";
 import { EmptyList } from "../../molecules/EmptyList";
 import TablePagination from "../../molecules/Pagination";
@@ -42,7 +42,7 @@ export default function MyPackageListing({ type }: Props) {
     return (
         <div className="flex flex-col justify-between h-full">
             <Box className="h-full overflow-auto">
-                <div className="mb-4 lg:mb-6 flex justify-between items-center">
+                <div className="mb-4 lg:mb-6 flex justify-between items-center flex-wrap gap-1">
                     <TabController
                         options={[
                             { value: "purchased", label: "Purchased" },
@@ -61,6 +61,12 @@ export default function MyPackageListing({ type }: Props) {
                         size="small"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
+                        sx={{
+                            width: {
+                                xs: "100%",
+                                sm: "auto"
+                            }
+                        }}
                     />
                 </div>
                 {!isLoading && !courses.length ? (

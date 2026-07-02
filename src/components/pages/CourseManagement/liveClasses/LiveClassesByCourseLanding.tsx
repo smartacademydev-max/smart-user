@@ -56,7 +56,7 @@ function FreeLiveClassesSection({ type }: { type: LiveClassType }) {
             {isLoading ? (
                 <LiveClassPreviewSkeleton />
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 md:gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 md:gap-4">
                     {visibleItems.map((item) => (
                         <LiveClassCard key={item.id} data={item} courseId={freeCourseId} />
                     ))}
@@ -96,7 +96,7 @@ function LiveClassesSection({ course, type }: { course: CourseProps; type: LiveC
                     No {type} live classes for this course.
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 md:gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 md:gap-4">
                     {visibleItems.map((item) => (
                         <LiveClassCard key={item.id} data={item} courseId={Number(item.course_id)} />
                     ))}
