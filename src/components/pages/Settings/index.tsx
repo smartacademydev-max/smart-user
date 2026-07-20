@@ -17,6 +17,10 @@ export default function SettingRoot() {
                   label: t("messages.linked_devices"),
                   url: PATH.SETTINGS.LINKED_DEVICES.ROOT
               },
+              {
+                  label: t("messages.transaction", "Transaction"),
+                  url: PATH.SETTINGS.TRANSACTIONS.ROOT
+              },
           ]
   return (
     <>

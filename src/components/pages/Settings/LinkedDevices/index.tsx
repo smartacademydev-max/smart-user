@@ -17,7 +17,7 @@ export default function LinkedDevices() {
     const dispatch = useAppDispatch();
     const [qp, setQp] = useState({
         pageIndex: 1,
-        pageSize: 10,
+        pageSize: 12,
     })
     const { data, isLoading } = useGetAllLinkedDevicesQuery(qp);
     const [logout, { isLoading: loggingOut }] =
@@ -132,29 +132,27 @@ export default function LinkedDevices() {
     );
 
     return (
-        <div className="linked__devices__page__root h-full">
-            <div className="top">
-                <Typography variant="h5" fontWeight={600}>
-                    {t("messages.linked_devices")}
-                </Typography>
-
-                <Divider className="mt-4! mb-6!" />
-            </div>
-
-            <div className="flex flex-col justify-between items-center">
-                <div className="w-full h-full overflow-auto">
-                    <CustomTable
-                        loading={isLoading}
-                        data={data?.data?.data || []}
-                        columns={columns}
-                    />
+        <div className="linked__devices__page__root h-full flex flex-col justify-start overflow-hidden">
+            <div className="flex-1 min-h-0 overflow-hidden">
+                <div className="top">
+                    <Typography variant="h5" fontWeight={600}>
+                        {t("messages.linked_devices")}
+                    </Typography>
+                    <Divider className="mt-4! mb-6!" />
                 </div>
-                <TablePagination
-                    qp={qp}
-                    setQp={setQp}
-                    totalPages={data?.data?.pagination?.total_pages || 0}
+
+                <CustomTable
+                    loading={isLoading}
+                    data={data?.data?.data || []}
+                    columns={columns}
                 />
             </div>
+
+            <TablePagination
+                qp={qp}
+                setQp={setQp}
+                totalPages={data?.data?.pagination?.total_pages || 0}
+            />
         </div>
     );
 }

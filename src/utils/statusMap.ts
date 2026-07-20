@@ -28,6 +28,12 @@ export const getTransactionStatus = statusMap<"failed" | "success" | "pending">(
     pending: "warning",
 });
 
+export const getInstallmentStatus = statusMap<"pending" | "paid" | "overdue">({
+    pending: "warning",
+    paid: "success",
+    overdue: "error",
+});
+
 export const getCourseStatus = (progress?: number): StatusVariant => {
     if (progress === 0) return "error";
     if (progress === 100) return "success";

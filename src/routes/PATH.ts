@@ -241,6 +241,9 @@ export const PATH = {
         },
         LINKED_DEVICES: {
             ROOT: "/linked-devices"
+        },
+        TRANSACTIONS: {
+            ROOT: "/transactions"
         }
     },
     SUPPORT: {

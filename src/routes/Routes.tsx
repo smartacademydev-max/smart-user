@@ -80,6 +80,7 @@ import ReferralPage from "../components/pages/Referral";
 import SettingRoot from "../components/pages/Settings";
 import LinkedDevices from "../components/pages/Settings/LinkedDevices";
 import ProfilePage from "../components/pages/Settings/ProfilePage";
+import SettingsTransactions from "../components/pages/Settings/Transactions";
 import SupportRoot from "../components/pages/Support";
 import TestManagementRoot from "../components/pages/TestManagement";
 import AllTestRoot from "../components/pages/TestManagement/allTest";
@@ -364,6 +365,7 @@ const router = createBrowserRouter([
             children: [
               { path: PATH.SETTINGS.PROFILE.ROOT, element: <ProfilePage /> },
               { path: PATH.SETTINGS.LINKED_DEVICES.ROOT, element: <LinkedDevices /> },
+              { path: PATH.SETTINGS.TRANSACTIONS.ROOT, element: <SettingsTransactions /> },
             ]
           },
           {
