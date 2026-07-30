@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import type { TestProps } from "../../../types/question";
 import { formatDateTime } from "../../../utils/dateFormat";
 import { getStatus } from "../../../utils/getStatus";
-import { getTestProgressStatus } from "../../../utils/statusMap";
+import { getTestProgressStatus, type StatusVariant } from "../../../utils/statusMap";
 import Donut from "../../atom/Donut";
 import StatusPillWithBorder from "../../atom/StatusPillWithBorder";
 import type { TestStatus } from "../../pages/TestManagement/allTest/AllTestList";
@@ -14,9 +14,24 @@ import TestActionButton from "./TestActionButton";
 
 export default function TestCard({ test, havePurchased, status: testStatus }: { test: TestProps; havePurchased: boolean; status?: TestStatus }) {
   const status = getStatus(test?.start_datetime, test?.end_datetime);
-  const { id } = useParams();
+  // `/courses/:id/...` exposes `id`, the my-tests routes expose `courseId`.
+  const { id, courseId } = useParams();
   const [omrOpen, setOmrOpen] = useState(false);
-  const variant = getTestProgressStatus(!test?.has_taken_test ? "not_started" : !test?.is_graded ? "awaiting_review" : "completed");
+
+  const resolvedCourseId = Number(test?.course_id ?? id ?? courseId) || undefined;
+
+  // The test window is over. A test taken before it closed still reads as
+  // Completed/Awaiting — only an unattempted one is surfaced as "Expired".
+  const isWindowClosed = !!test?.has_expired || testStatus === "expired";
+  const isExpired = isWindowClosed && !test?.has_taken_test;
+
+  const variant: StatusVariant = isExpired
+    ? "error"
+    : getTestProgressStatus(!test?.has_taken_test ? "not_started" : !test?.is_graded ? "awaiting_review" : "completed");
+  const statusLabel = isExpired
+    ? "Expired"
+    : !test?.has_taken_test ? "Not Started" : !test?.is_graded ? "Awaiting" : "Completed";
+
   return (
     <Box
       className="test__card rounded-md p-4 flex flex-col justify-between"
@@ -33,7 +48,7 @@ export default function TestCard({ test, havePurchased, status: testStatus }: { 
             background: (theme) => theme.palette.primary.light,
             color: (theme) => theme.palette.primary.main,
           }}>{test?.selections?.mega_category[0]}</Typography> : ""}
-          <StatusPillWithBorder showIcon={true} variant={variant} status={!test?.has_taken_test ? "Not Started" : !test?.is_graded ? "Awaiting" : "Completed"} />
+          <StatusPillWithBorder showIcon={true} variant={variant} status={statusLabel} />
         </div>
         <Typography variant="subtitle1" fontWeight={600} color="text.dark" className="mb-3!">
           {test?.name}
@@ -83,6 +98,20 @@ export default function TestCard({ test, havePurchased, status: testStatus }: { 
             fontSize: "10px !important",
           }}>Your submission is complete and pending review; you'll be notified once graded.</Typography>
         </Box> : ""}
+        {isExpired ? <Box sx={{
+          marginTop: "12px",
+          marginBottom: "16px",
+          padding: "6px 12px",
+          borderRadius: "8px",
+          bgcolor: "error.light"
+        }}>
+          <Typography color="error" sx={{
+            fontSize: "10px !important",
+          }}>
+            {test?.end_datetime ? `Closed on ${formatDateTime(test.end_datetime)}. ` : ""}
+            You can only view the questions — answers can no longer be submitted.
+          </Typography>
+        </Box> : ""}
       </div>
       <div className="bottom__wrapper mt-3">
         {havePurchased && test?.test_type === "omr" ? <div className="flex justify-end items-center gap-2 mt-5">
@@ -103,7 +132,8 @@ export default function TestCard({ test, havePurchased, status: testStatus }: { 
               test={test}
               status={status}
               havePurchased={havePurchased}
-              id={test?.course_id ? Number(test?.course_id) : Number(id)}
+              id={resolvedCourseId}
+              isExpired={isWindowClosed}
             />
             {testStatus === "completed" ? <div className="flex items-center gap-2">
               <Donut

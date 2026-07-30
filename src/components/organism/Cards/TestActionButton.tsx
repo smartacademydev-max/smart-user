@@ -8,7 +8,7 @@ import type { TestProps } from "../../../types/question";
 import { formatDateTime } from "../../../utils/dateFormat";
 
 
-const TestActionButton = ({ test, havePurchased, id }: { test: TestProps, status?: any; havePurchased: boolean; id: number }) => {
+const TestActionButton = ({ test, havePurchased, id, isExpired: isExpiredProp }: { test: TestProps, status?: any; havePurchased: boolean; id?: number; isExpired?: boolean }) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [timeLeft, setTimeLeft] = useState<number | null>(null);
@@ -112,8 +112,11 @@ const TestActionButton = ({ test, havePurchased, id }: { test: TestProps, status
     };
 
 
+    const isExpired = !!test.has_expired || !!isExpiredProp;
+
     if (test.has_taken_test) {
-        if (test.is_scheduled) {
+        // A closed test can't be retaken, only reviewed.
+        if (test.is_scheduled || isExpired) {
             return (
                 <Button variant="outlined" color="primary" onClick={handleViewResult}>
                     {test.is_graded ? "View Result" : "Result Pending"}
@@ -135,9 +138,9 @@ const TestActionButton = ({ test, havePurchased, id }: { test: TestProps, status
     }
 
 
-    if (test.has_expired && !test.has_taken_test) {
+    if (isExpired) {
         return (
-            <Button variant="contained" color="primary" onClick={() => id ? navigate(PATH.COURSE_MANAGEMENT.COURSES.VIEW_TEST.ROOT({
+            <Button variant="outlined" color="primary" onClick={() => id ? navigate(PATH.COURSE_MANAGEMENT.COURSES.VIEW_TEST.ROOT({
                 courseId: Number(id),
                 testId: Number(test?.id),
             })) : navigate(PATH.TEST.VIEW_TEST.ROOT({

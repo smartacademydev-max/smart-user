@@ -1,5 +1,5 @@
 import { Box, Button, Divider, Typography } from "@mui/material";
-import { ArrowLeft } from "iconsax-reactjs";
+import { ArrowLeft, Lock } from "iconsax-reactjs";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -17,6 +17,7 @@ import type {
     QuestionProps,
 } from "../../../../types/question";
 
+import { formatDateTime } from "../../../../utils/dateFormat";
 import { renderHtml } from "../../../../utils/renderHtml";
 
 import TestCancelDialog from "../../../organism/Dialog/TestCancelDialog";
@@ -72,8 +73,22 @@ export default function SingleTestRoot() {
         testId: string;
     }>();
 
-    const numericCourseId = Number(courseId);
+    // This screen is mounted on both `/courses/:courseId/test/:testId` and the
+    // standalone `/test/:testId`. Keep courseId undefined (not NaN) on the
+    // standalone route so path builders pick the right variant.
+    const numericCourseId = courseId ? Number(courseId) : undefined;
     const numericTestId = Number(testId);
+
+    const reviewPath = numericCourseId
+        ? PATH.COURSE_MANAGEMENT.COURSES.VIEW_TEST.REVIEW_TEST.ROOT({
+            courseId: numericCourseId,
+            testId: numericTestId,
+        })
+        : PATH.TEST.VIEW_TEST.REVIEW_TEST.ROOT({ testId: numericTestId });
+
+    const exitPath = numericCourseId
+        ? PATH.COURSE_MANAGEMENT.COURSES.VIEW_COURSE.ROOT(numericCourseId)
+        : PATH.TEST.MY_TEST.ROOT;
 
     const STORAGE_KEY = `mcq_test_progress_${courseId}_${testId}`;
     const RESULT_KEY = `mcq_test_result_${courseId}_${testId}`;
@@ -96,6 +111,9 @@ export default function SingleTestRoot() {
     const [result, setResult] = useState<McqSubmissionData | null>(null);
     const [resultOpen, setResultOpen] = useState(false);
     const [activeTab, setActiveTab] = useState("questions")
+    // Test window already closed when the page was opened -> questions are
+    // browsable but nothing can be answered or submitted.
+    const [viewOnly, setViewOnly] = useState(false);
 
     const initialTimeRef = useRef<number | null>(null);
     const fiveMinPlayedRef = useRef(false);
@@ -132,18 +150,14 @@ export default function SingleTestRoot() {
         const timeRemainingFromEnd = endTime ? Math.max(endTime - currentTime, 0) : null;
 
         if (timeRemainingFromEnd !== null && timeRemainingFromEnd <= 0) {
-            // dispatch(
-            //     showToast({
-            //         message: "This test has already ended.",
-            //         severity: "error",
-            //     })
-            // );
             localStorage.removeItem(STORAGE_KEY);
+            setViewOnly(true);
             setCurrentQuestion(data.data[0]);
             setTimeLeft(0);
-            // navigate(PATH.TEST.ROOT);
             return;
         }
+
+        setViewOnly(false);
 
         const actualTimeLeft = timeRemainingFromEnd !== null
             ? Math.min(data.overview.time, timeRemainingFromEnd)
@@ -230,11 +244,14 @@ export default function SingleTestRoot() {
     useEffect(() => {
         if (timeLeft === 0 && !timerPaused) {
             setTimerPaused(true);
-            if (!isExpired) {
+            // Only auto-submit a live attempt. A test opened after its window
+            // closed has nothing to submit.
+            if (!viewOnly) {
                 handleSubmit("timer");
             }
         }
-    }, [timeLeft, timerPaused]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [timeLeft, timerPaused, viewOnly]);
 
 
     const handleAnswer = (value: Answers) => {
@@ -297,10 +314,9 @@ export default function SingleTestRoot() {
     const isReady = !!data && !isLoading && !isFetching;
     const isMCQ = data?.overview?.test_type === "mcq";
     const questions = data?.data ?? [];
-    const endTime = data?.overview?.end_datetime
-        ? new Date(data.overview.end_datetime).getTime()
-        : null;
-    const isExpired = timeLeft === 0 || (endTime !== null && Date.now() >= endTime);
+    // Answering is locked either because the test window closed before the
+    // attempt started (viewOnly) or because the timer just ran out.
+    const isLocked = viewOnly || timeLeft === 0;
     const isFirst = currentIndex === 0;
     const isLast = currentIndex === questions.length - 1;
 
@@ -359,11 +375,40 @@ export default function SingleTestRoot() {
 
     return (
         <div className="single__test__wrapper overflow-auto">
-            <Button startIcon={<ArrowLeft />} onClick={() => setCancelModal(true)}>
+            <Button
+                startIcon={<ArrowLeft />}
+                onClick={() => (viewOnly ? navigate(exitPath) : setCancelModal(true))}
+            >
                 Back to Test
             </Button>
 
             <Divider className="my-4!" />
+
+            {viewOnly && (
+                <Box
+                    className="flex items-start gap-2 rounded-lg p-3 mb-6"
+                    sx={{
+                        bgcolor: "error.light",
+                        border: "1px solid",
+                        borderColor: "error.main",
+                        color: "error.main",
+                    }}
+                >
+                    <Lock variant="Bold" size={18} />
+                    <div>
+                        <Typography variant="subtitle2" fontWeight={600} color="error.main">
+                            This test has expired
+                            {data?.overview?.end_datetime
+                                ? ` on ${formatDateTime(data.overview.end_datetime)}`
+                                : ""}
+                        </Typography>
+                        <Typography variant="caption" color="error.main">
+                            You can read through the questions, but options are disabled and
+                            answers can no longer be submitted.
+                        </Typography>
+                    </div>
+                </Box>
+            )}
 
             <QuestionListView
                 timeLeft={timeLeft}
@@ -381,7 +426,7 @@ export default function SingleTestRoot() {
                 currentQuestion={currentQuestion}
                 attendedQuestion={attendedQuestion}
                 setAttendedQuestion={handleAnswer}
-                disabled={isExpired}
+                disabled={isLocked}
             />
 
             <div className="flex justify-between my-6">
@@ -400,16 +445,16 @@ export default function SingleTestRoot() {
                     variant="contained"
                     onClick={() =>
                         isLast
-                            ? !isExpired && setSubmitModal({ open: true, type: "submit" })
+                            ? !isLocked && setSubmitModal({ open: true, type: "submit" })
                             : (() => {
                                 const next = currentIndex + 1;
                                 setCurrentIndex(next);
                                 setCurrentQuestion(questions[next]);
                             })()
                     }
-                    disabled={isLast && isExpired}
+                    disabled={isLast && isLocked}
                 >
-                    {isLast ? "Submit" : "Next"}
+                    {isLast ? (viewOnly ? "Test Expired" : "Submit") : "Next"}
                 </Button>
             </div>
 
@@ -434,23 +479,12 @@ export default function SingleTestRoot() {
                 result={result}
                 onReview={() => {
                     localStorage.removeItem(RESULT_KEY);
-                    navigate(
-                        PATH.COURSE_MANAGEMENT.COURSES.VIEW_TEST.REVIEW_TEST.ROOT({
-                            courseId: numericCourseId,
-                            testId: numericTestId,
-                        })
-                    )
-                }
-                }
+                    navigate(reviewPath);
+                }}
                 onBack={() => {
                     localStorage.removeItem(RESULT_KEY);
-                    navigate(
-                        PATH.COURSE_MANAGEMENT.COURSES.VIEW_COURSE.ROOT(
-                            numericCourseId
-                        )
-                    )
-                }
-                }
+                    navigate(exitPath);
+                }}
             />
         </div>
     );
