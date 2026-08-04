@@ -37,7 +37,7 @@ export default function TestSubmissionDialog({ open, handleClose, onSubmit, type
                     </div>
                     <div className="footer__action flex justify-between items-center gap-4">
                         {type === "submit" && (
-                            <Button fullWidth variant="outlined" color='primary' onClick={handleClose}>View Summary</Button>
+                            <Button fullWidth variant="outlined" color='primary' onClick={handleClose}>Continue Test</Button>
                         )}
                         <Button fullWidth variant="contained" color='primary' onClick={onSubmit} disabled={loading}>
                             {loading ? "Submitting..." : "Submit"}
