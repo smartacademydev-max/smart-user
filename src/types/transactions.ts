@@ -63,6 +63,8 @@ export interface ReciptProps {
     name: string;
     published_date: string;
     transaction_id: string;
+    /** Invoice number for this purchase. Falls back to the transaction reference when absent. */
+    invoice_id?: string;
     created_at: string;
     payment_method: PaymentMethods;
     status: "success" | "failed" | "pending";

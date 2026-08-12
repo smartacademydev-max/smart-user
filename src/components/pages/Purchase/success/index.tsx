@@ -1,19 +1,28 @@
-import { Box, Button, CircularProgress, Divider, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Divider, Typography, useTheme } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useThemeSettings } from '../../../../hooks/useThemeSettings';
 import { PATH } from '../../../../routes/PATH';
 import { usePurchaseCourseMutation } from '../../../../services/courseApi';
+import { useGetAppSettingsQuery } from '../../../../services/settingApi';
 import { showToast } from '../../../../slice/toastSlice';
-import { useAppDispatch } from '../../../../store/hook';
+import { useAppDispatch, useAppSelector } from '../../../../store/hook';
 import type { PurchaseModuleTypes } from '../../../../types/purchase';
 import type { ReciptProps } from '../../../../types/transactions';
 import { formatDate, formatDateCustom } from '../../../../utils/dateFormat';
 import { getTransactionStatus } from '../../../../utils/statusMap';
 import StatusPill from '../../../atom/StatusPill';
 
+/** `9680` → `"9,680"`. Receipt amounts arrive as plain numbers. */
+const money = (value?: number | string | null) => {
+    const amount = Number(value);
+    return Number.isFinite(amount) ? amount.toLocaleString(undefined, { maximumFractionDigits: 2 }) : "0";
+};
+
 export default function PurchaseSuccess() {
     const navigate = useNavigate();
+    const theme = useTheme();
     const { t } = useTranslation();
     const hasVerified = useRef(false);
     const dispatch = useAppDispatch();
@@ -23,6 +32,15 @@ export default function PurchaseSuccess() {
     const [verified, setVerified] = useState(false);
     const [recipt, setRecipt] = useState<ReciptProps | null>(null);
     const [verifyPaymentAPI] = usePurchaseCourseMutation();
+
+    const isDark = theme.palette.mode === "dark";
+    const { companyName, brandName, tagline, logoUrl, logoDarkUrl } = useThemeSettings();
+    const { data: appSettings } = useGetAppSettingsQuery();
+    const buyer = useAppSelector((state) => state.auth.user);
+
+    const issuerName = companyName || brandName;
+    const issuerPhone = appSettings?.data?.phones?.[0]?.value ?? "";
+    const issuerEmail = appSettings?.data?.emails?.[0]?.value ?? "";
 
     useEffect(() => {
         if (hasVerified.current) return;
@@ -139,13 +157,19 @@ export default function PurchaseSuccess() {
         style.innerHTML = `
         @media print {
             body * { visibility: hidden !important; }
-            #receipt-print-area, #receipt-print-area * { visibility: visible !important; }
+            #receipt-print-area, #receipt-print-area * {
+                visibility: visible !important;
+                /* Keep the tinted course block and status pill from printing blank. */
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
             #receipt-print-area {
                 position: fixed !important;
                 top: 0 !important;
                 left: 0 !important;
                 width: 100% !important;
                 padding: 32px !important;
+                border: none !important;
                 box-shadow: none !important;
             }
         }
@@ -204,13 +228,80 @@ export default function PurchaseSuccess() {
                 <div className="text-center">
                     <Typography className="font-bold mb-2" variant='h5'>Payment Successful!</Typography>
                     <Typography variant='subtitle2' color='text.middle'>
-                        {`Your payment of NRs.${recipt?.amount} was successful. You can easily start the test.`}
+                        {`Your payment of NRs. ${money(recipt?.amount)} was successful. You can easily start the test.`}
                     </Typography>
                 </div>
 
-                <Box className="rounded-md py-6 px-4" id="receipt-print-area" sx={{
+                <Box className="rounded-md py-6 px-4 w-full" id="receipt-print-area" sx={{
                     border: (theme) => `1px solid ${theme.palette.separator.dark}`,
                 }} >
+                    {/* Issuer — who this receipt is from. Centered masthead. */}
+                    <div className="text-center flex flex-col items-center gap-1 mb-4">
+                        <img
+                            src={isDark ? logoDarkUrl : logoUrl}
+                            alt=""
+                            style={{ height: 36, objectFit: "contain" }}
+                        />
+                        {issuerName && (
+                            <Typography variant="h5" fontWeight={700} color="text.dark" className="uppercase tracking-wide">
+                                {issuerName}
+                            </Typography>
+                        )}
+                        {tagline && (
+                            <Typography variant="caption" color="text.middle">{tagline}</Typography>
+                        )}
+                        {(issuerPhone || issuerEmail) && (
+                            <Typography variant="caption" color="text.middle">
+                                {[issuerPhone, issuerEmail].filter(Boolean).join("  ·  ")}
+                            </Typography>
+                        )}
+                    </div>
+
+                    {/* Document title — a rule with the label sitting on it. */}
+                    <div className="flex items-center gap-3 mb-4">
+                        <Divider className="flex-1" />
+                        <Typography variant="caption" fontWeight={700} color="text.middle" className="uppercase tracking-[0.2em]">
+                            Payment Receipt
+                        </Typography>
+                        <Divider className="flex-1" />
+                    </div>
+
+                    <div className="flex flex-col gap-3 mb-4">
+                        <div className="grid grid-cols-2">
+                            <Typography variant="subtitle1" color="text.middle">
+                                {recipt?.invoice_id ? "Invoice No." : "Reference No."}
+                            </Typography>
+                            <Typography variant="subtitle1" color="text.dark" fontWeight={600} className="text-end break-all">
+                                {recipt?.invoice_id || recipt?.transaction_id || "—"}
+                            </Typography>
+                        </div>
+                        <Divider />
+                        <div className="grid grid-cols-2">
+                            <Typography variant="subtitle1" color="text.middle">Issued On</Typography>
+                            <Typography variant="subtitle1" color="text.dark" fontWeight={600} className="text-end">
+                                {formatDateCustom(recipt?.created_at || "", { shortMonth: true })}
+                            </Typography>
+                        </div>
+                        {buyer?.name && (
+                            <>
+                                <Divider />
+                                <div className="grid grid-cols-2">
+                                    <Typography variant="subtitle1" color="text.middle">Billed To</Typography>
+                                    <div className="text-end">
+                                        <Typography variant="subtitle1" color="text.dark" fontWeight={600} className="capitalize">
+                                            {buyer.name}
+                                        </Typography>
+                                        {(buyer.email || buyer.phone) && (
+                                            <Typography variant="caption" color="text.middle" className="block break-all">
+                                                {[buyer.email, buyer.phone].filter(Boolean).join("  ·  ")}
+                                            </Typography>
+                                        )}
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
+
                     <Box
                         sx={{
                             background: (theme) => theme.palette.primary.light,
@@ -240,16 +331,6 @@ export default function PurchaseSuccess() {
                         <Divider />
 
                         <div className="grid grid-cols-2">
-                            <Typography variant="subtitle1" color="text.middle">Date</Typography>
-                            <Typography variant="subtitle1" color="text.dark" fontWeight={600} className="text-end font-medium">
-                                {formatDateCustom(recipt?.created_at || "", { shortMonth: true })}
-                            </Typography>
-                        </div>
-                        <Divider />
-
-
-
-                        <div className="grid grid-cols-2">
                             <Typography variant="subtitle1" color="text.middle">Payment Method</Typography>
                             <Typography variant="subtitle1" color="text.dark" fontWeight={600} className="text-end font-medium">
                                 {recipt?.payment_method}
@@ -270,7 +351,7 @@ export default function PurchaseSuccess() {
                                 <div className="grid grid-cols-2">
                                     <Typography variant="subtitle1" color="text.middle">Base Price</Typography>
                                     <Typography variant="subtitle1" color="text.dark" fontWeight={600} className="text-end font-medium">
-                                        NRs. {recipt.original_amount}
+                                        NRs. {money(recipt.original_amount)}
                                     </Typography>
                                 </div>
                             </>
@@ -298,7 +379,7 @@ export default function PurchaseSuccess() {
                                         Coupon ({recipt.coupon_code})
                                     </Typography>
                                     <Typography variant="subtitle1" color="success.main" fontWeight={600} className="text-end">
-                                        − NRs. {recipt.coupon_discount}
+                                        − NRs. {money(recipt.coupon_discount)}
                                     </Typography>
                                 </div>
                             </>
@@ -311,17 +392,19 @@ export default function PurchaseSuccess() {
                                 borderStyle: "dashed"
                             }}
                         />
-                        <div className="grid grid-cols-2">
+                        <div className="grid grid-cols-2 items-center">
                             <Typography variant="subtitle1" color="text.dark" fontWeight={600}>Amount Paid</Typography>
-                            <Typography variant="subtitle1" color="text.dark" fontWeight={600} className="text-end font-medium">
-                                NRs. {recipt?.amount}
+                            <Typography variant="h5" color="text.dark" fontWeight={700} className="text-end">
+                                NRs. {money(recipt?.amount)}
                             </Typography>
                         </div>
-
-
-
                     </div>
 
+                    <Divider className="mt-4!" />
+                    <Typography variant="caption" color="text.middle" className="block text-center pt-3">
+                        This is a computer-generated receipt and does not require a signature.
+                        {issuerEmail ? ` For any queries, contact ${issuerEmail}.` : ""}
+                    </Typography>
                 </Box>
                 <div className="flex flex-col gap-4 w-full">
                     <Button
