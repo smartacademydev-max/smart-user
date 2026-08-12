@@ -186,7 +186,7 @@ export default function PurchaseSuccess() {
             window.print();
             dispatch(showToast({
                 message: "Recipt Downloaded Successfully",
-                severity: "error"
+                severity: "success"
             }))
         }
         catch (e: any) {
