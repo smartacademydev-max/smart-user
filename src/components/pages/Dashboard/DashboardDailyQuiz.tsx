@@ -297,6 +297,7 @@ export default function DashboardDailyQuiz() {
                     p: 2.5,
                     position: "relative",
                     overflow: "hidden",
+                    mt:2.5,
                     "&::before": {
                         content: '""',
                         position: "absolute",
