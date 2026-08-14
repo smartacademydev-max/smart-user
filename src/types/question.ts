@@ -65,10 +65,18 @@ export interface TestProps {
     selections: SelectionType;
     mega_categories?: string[];
     download_format_url?: string;
-    results: {
+    /**
+     * The student's own attempt. Sent as `result` (singular) by the list endpoints and
+     * only once the test has been taken — absent for tests never attempted.
+     */
+    result?: {
+        /** Marks obtained, out of `full_mark`. */
+        score: number;
+        /** 0–100. Already computed server-side. */
+        percentage: number;
         attempted: number;
-        score: number
-    }
+        total_questions: number;
+    };
 }
 export interface TestList {
     data: {

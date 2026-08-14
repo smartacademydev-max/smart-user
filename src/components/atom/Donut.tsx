@@ -62,7 +62,8 @@ export default function Donut({
                     color: theme.palette.success.main
                 }}
             >
-                {clampedProgress}%
+                {/* Arc stays exact; only the label is rounded so 66.666… doesn't render raw. */}
+                {Math.round(clampedProgress)}%
             </text>
             {label && (
                 <text

@@ -32,6 +32,14 @@ export default function TestCard({ test, havePurchased, status: testStatus }: { 
     ? "Expired"
     : !test?.has_taken_test ? "Not Started" : !test?.is_graded ? "Awaiting" : "Completed";
 
+  // Driven off the test itself rather than the `status` prop — three of the four call
+  // sites don't pass one, which used to hide the score on graded attempts.
+  const result = test?.result;
+  const showResult = !!result && !!test?.has_taken_test && !!test?.is_graded;
+  const outOf = test?.full_mark || result?.total_questions || 0;
+  // `percentage` comes from the API; derived only if an older payload omits it.
+  const scorePercent = result?.percentage ?? (outOf > 0 ? ((result?.score ?? 0) / outOf) * 100 : 0);
+
   return (
     <Box
       className="test__card rounded-md p-4 flex flex-col justify-between"
@@ -135,15 +143,18 @@ export default function TestCard({ test, havePurchased, status: testStatus }: { 
               id={resolvedCourseId}
               isExpired={isWindowClosed}
             />
-            {testStatus === "completed" ? <div className="flex items-center gap-2">
+            {showResult ? <div className="flex items-center gap-2">
               <Donut
-                progress={test?.results?.score || 0}
+                progress={scorePercent}
                 size={60}
                 thickness={6}
               />
               <div className="content">
                 <strong className="block text-[12px] leading-1">Your Score</strong>
-                <p className="text-[14px]"><strong>{test?.results?.attempted || 0}</strong>/{test?.total_questions}</p>
+                <p className="text-[14px]"><strong>{result?.score ?? 0}</strong>/{outOf}</p>
+                <Typography variant="caption" color="text.middle" className="block leading-none">
+                  {result?.attempted ?? 0}/{result?.total_questions ?? test?.total_questions} attempted
+                </Typography>
               </div>
             </div> : ""}
           </div>
