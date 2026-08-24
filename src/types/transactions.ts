@@ -78,6 +78,9 @@ export interface ReciptProps {
     vat_amount?: number | string | null;
     /** Rate applied at sale time, so old receipts survive a rate change. */
     vat_percentage?: number | string | null;
-    /** Backend-computed `amount + vat_amount`. Falls back to that sum when absent. */
-    total_amount?: number | string | null;
+    /**
+     * Deliberately absent. The receipt total is derived as `amount + vat_amount` —
+     * `total_amount` already means something else on the eSewa payload and the
+     * installment schedule, so it must not be read as a receipt total.
+     */
 }

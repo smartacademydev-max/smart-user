@@ -49,7 +49,9 @@ export default function PurchaseSuccess() {
     const vatAmount = Number(recipt?.vat_amount ?? 0) || 0;
     const vatPercentage = Number(recipt?.vat_percentage ?? 0) || 0;
     const hasVat = vatAmount > 0;
-    const totalAmount = recipt?.total_amount != null ? Number(recipt.total_amount) : taxable + vatAmount;
+    // Derived, never read off the payload — `total_amount` is already an eSewa/installment
+    // term elsewhere, and trusting a field by that name printed a zero total on the admin side.
+    const totalAmount = taxable + vatAmount;
 
     useEffect(() => {
         if (hasVerified.current) return;
@@ -448,7 +450,7 @@ export default function PurchaseSuccess() {
 
                     <Divider className="mt-4!" />
                     <Typography variant="caption" color="text.middle" className="block text-center pt-3">
-                        This is a computer-generated receipt and does not require a signature.
+                        This is a computer-generated invoice and does not require a signature.
                         {issuerEmail ? ` For any queries, contact ${issuerEmail}.` : ""}
                     </Typography>
                 </Box>
