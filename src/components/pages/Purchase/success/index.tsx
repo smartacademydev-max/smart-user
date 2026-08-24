@@ -34,13 +34,22 @@ export default function PurchaseSuccess() {
     const [verifyPaymentAPI] = usePurchaseCourseMutation();
 
     const isDark = theme.palette.mode === "dark";
-    const { companyName, brandName, tagline, logoUrl, logoDarkUrl } = useThemeSettings();
+    const { companyName, brandName, tagline, logoUrl, logoDarkUrl, tpin } = useThemeSettings();
     const { data: appSettings } = useGetAppSettingsQuery();
     const buyer = useAppSelector((state) => state.auth.user);
 
     const issuerName = companyName || brandName;
     const issuerPhone = appSettings?.data?.phones?.[0]?.value ?? "";
     const issuerEmail = appSettings?.data?.emails?.[0]?.value ?? "";
+
+    // VAT is exclusive - charged on top of the discounted price, the same basis
+    // PurchaseLayout uses for `finalPrice`. Figures come from the transaction so a
+    // future rate change never rewrites what an old receipt says was charged.
+    const taxable = Number(recipt?.amount ?? 0);
+    const vatAmount = Number(recipt?.vat_amount ?? 0) || 0;
+    const vatPercentage = Number(recipt?.vat_percentage ?? 0) || 0;
+    const hasVat = vatAmount > 0;
+    const totalAmount = recipt?.total_amount != null ? Number(recipt.total_amount) : taxable + vatAmount;
 
     useEffect(() => {
         if (hasVerified.current) return;
@@ -237,8 +246,10 @@ export default function PurchaseSuccess() {
                 }} >
                     {/* Issuer — who this receipt is from. Centered masthead. */}
                     <div className="text-center flex flex-col items-center gap-1 mb-4">
+                        {/* Dark surface takes the white mark, light surface the inked one —
+                            the same pairing every other layout uses. */}
                         <img
-                            src={isDark ? logoDarkUrl : logoUrl}
+                            src={isDark ? logoUrl : logoDarkUrl}
                             alt=""
                             style={{ height: 36, objectFit: "contain" }}
                         />
@@ -255,13 +266,18 @@ export default function PurchaseSuccess() {
                                 {[issuerPhone, issuerEmail].filter(Boolean).join("  ·  ")}
                             </Typography>
                         )}
+                        {tpin && (
+                            <Typography variant="caption" color="text.dark" fontWeight={600}>
+                                TPIN No.: {tpin}
+                            </Typography>
+                        )}
                     </div>
 
                     {/* Document title — a rule with the label sitting on it. */}
                     <div className="flex items-center gap-3 mb-4">
                         <Divider className="flex-1" />
                         <Typography variant="caption" fontWeight={700} color="text.middle" className="uppercase tracking-[0.2em]">
-                            Payment Receipt
+                            Tax Invoice
                         </Typography>
                         <Divider className="flex-1" />
                     </div>
@@ -297,6 +313,13 @@ export default function PurchaseSuccess() {
                                             </Typography>
                                         )}
                                     </div>
+                                </div>
+                                <Divider />
+                                <div className="grid grid-cols-2">
+                                    <Typography variant="subtitle1" color="text.middle">Customer PAN No.</Typography>
+                                    <Typography variant="subtitle1" color={buyer.pan_number ? "text.dark" : "text.middle"} fontWeight={600} className="text-end break-all">
+                                        {buyer.pan_number || "—"}
+                                    </Typography>
                                 </div>
                             </>
                         )}
@@ -385,6 +408,29 @@ export default function PurchaseSuccess() {
                             </>
                         )}
 
+                        {/* Only shown once VAT is actually charged - on a zero-VAT sale the
+                            taxable amount and the total are the same figure twice. */}
+                        {hasVat && (
+                            <>
+                                <Divider />
+                                <div className="grid grid-cols-2">
+                                    <Typography variant="subtitle1" color="text.middle">Taxable Amount</Typography>
+                                    <Typography variant="subtitle1" color="text.dark" fontWeight={600} className="text-end font-medium">
+                                        NRs. {money(taxable)}
+                                    </Typography>
+                                </div>
+                                <Divider />
+                                <div className="grid grid-cols-2">
+                                    <Typography variant="subtitle1" color="text.middle">
+                                        VAT @ {vatPercentage || 13}%
+                                    </Typography>
+                                    <Typography variant="subtitle1" color="text.dark" fontWeight={600} className="text-end font-medium">
+                                        NRs. {money(vatAmount)}
+                                    </Typography>
+                                </div>
+                            </>
+                        )}
+
                         <Divider
                             className=" mb-.5!"
                             sx={{
@@ -393,9 +439,9 @@ export default function PurchaseSuccess() {
                             }}
                         />
                         <div className="grid grid-cols-2 items-center">
-                            <Typography variant="subtitle1" color="text.dark" fontWeight={600}>Amount Paid</Typography>
+                            <Typography variant="subtitle1" color="text.dark" fontWeight={600}>Total Amount</Typography>
                             <Typography variant="h5" color="text.dark" fontWeight={700} className="text-end">
-                                NRs. {money(recipt?.amount)}
+                                NRs. {money(totalAmount)}
                             </Typography>
                         </div>
                     </div>

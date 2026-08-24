@@ -59,6 +59,8 @@ export interface User extends RegisterUserProps {
 	province: string;
 	city: string
 	dob: string | Dayjs
+	/** Buyer PAN, printed on their tax invoice. Optional. */
+	pan_number?: string | null;
 	// role: string[];
 }
 

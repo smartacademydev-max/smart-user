@@ -75,6 +75,7 @@ export default function ProfilePageRoot() {
             province: user?.province || "",
             dob: user?.dob ? dayjs(user.dob) : "",
             city: user?.city || "",
+            pan_number: user?.pan_number || "",
             thumbnail: null,
             thumbnail_url: user?.thumbnail_url || "",
         },
@@ -90,6 +91,9 @@ export default function ProfilePageRoot() {
 
                 if (values.city) {
                     formData.append("city", values.city);
+                }
+                if (values.pan_number) {
+                    formData.append("pan_number", values.pan_number);
                 }
                 if (values.dob) {
                     const dobString = typeof values.dob === "string" ? values.dob : values.dob.format('YYYY-MM-DD');
@@ -361,6 +365,25 @@ export default function ProfilePageRoot() {
                                 />
                                 <FormHelperText error>
                                     {formik.touched.city && formik.errors.city}
+                                </FormHelperText>
+                            </div>
+
+                            <div className="col-span-2">
+                                <InputLabel>PAN Number <Typography variant="caption" color="text.middle">(Optional)</Typography></InputLabel>
+                                <OutlinedInput
+                                    fullWidth
+                                    name="pan_number"
+                                    value={formik.values.pan_number}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    error={formik.touched.pan_number && Boolean(formik.errors.pan_number)}
+                                    placeholder="Enter your PAN number"
+                                />
+                                <FormHelperText error>
+                                    {formik.touched.pan_number && formik.errors.pan_number}
+                                </FormHelperText>
+                                <FormHelperText>
+                                    Printed on the tax invoice for your purchases.
                                 </FormHelperText>
                             </div>
 

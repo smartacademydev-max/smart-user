@@ -14,6 +14,7 @@ export function useThemeSettings() {
         brandName,
         companyName,
         tagline: s?.tagline ?? "",
+        tpin: s?.tpin ?? "",
         metaDescription: s?.meta_description ?? "",
         logoUrl,
         logoDarkUrl,

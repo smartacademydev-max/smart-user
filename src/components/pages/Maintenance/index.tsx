@@ -7,7 +7,7 @@ export default function MaintenancePage() {
   const isDark = theme.palette.mode === "dark";
   const { data: settingsData } = useGetAppSettingsQuery();
   const { companyName, logoUrl, logoDarkUrl } = useThemeSettings();
-  const logo = isDark ? logoDarkUrl : logoUrl;
+  const logo = isDark ? logoUrl : logoDarkUrl;
 
   const phones = settingsData?.data?.phones ?? [];
   const emails = settingsData?.data?.emails ?? [];

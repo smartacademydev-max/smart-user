@@ -74,4 +74,10 @@ export interface ReciptProps {
     points_amount?: number;
     coupon_code?: string;
     coupon_discount?: number;
+    /** VAT charged on top of the discounted price. Absent/zero on non-VAT sales. */
+    vat_amount?: number | string | null;
+    /** Rate applied at sale time, so old receipts survive a rate change. */
+    vat_percentage?: number | string | null;
+    /** Backend-computed `amount + vat_amount`. Falls back to that sum when absent. */
+    total_amount?: number | string | null;
 }
