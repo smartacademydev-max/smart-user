@@ -297,7 +297,10 @@ export default function PurchaseSuccess() {
                         <div className="grid grid-cols-2">
                             <Typography variant="subtitle1" color="text.middle">Issued On</Typography>
                             <Typography variant="subtitle1" color="text.dark" fontWeight={600} className="text-end">
-                                {formatDateCustom(recipt?.created_at || "", { shortMonth: true })}
+                                {/* Bikram Sambat, converted server-side. */}
+                                {recipt?.issued_on_bs
+                                    ? `${recipt.issued_on_bs} BS`
+                                    : formatDateCustom(recipt?.created_at || "", { shortMonth: true })}
                             </Typography>
                         </div>
                         {buyer?.name && (

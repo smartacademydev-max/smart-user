@@ -44,7 +44,16 @@ export const getTestStatus = statusMap<QuestionTypeProps>({
     "": "info",
     mcq: "success",
     subjective: "warning",
-    omr: "primary"
+    omr: "primary",
+    // NCLEX formats are all objective, so they share the MCQ treatment.
+    sata: "success",
+    select_n: "success",
+    matrix: "success",
+    cloze: "success",
+    highlight: "success",
+    drag_drop: "success",
+    bow_tie: "success",
+    drag_into_text: "success"
 });
 export const getTestProgressStatus = statusMap<ProgressStatusProps>({
     completed: "success",

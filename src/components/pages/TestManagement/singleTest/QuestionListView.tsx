@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { Timer1 } from "iconsax-reactjs";
 import { useRef, useState } from "react";
+import { isAnswered } from "../../../../types/question";
 import type { Answers, QuestionProps } from "../../../../types/question";
 
 interface Props {
@@ -57,7 +58,7 @@ export default function QuestionListView({
 
     const isAttended = (question: QuestionProps) => {
         return attendedQuestion.some(
-            (q) => q.question_id === question.id && q.option_id !== null
+            (q) => q.question_id === question.id && isAnswered(q)
         );
     };
 
