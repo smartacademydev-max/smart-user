@@ -42,13 +42,22 @@ export default function PurchaseSuccess() {
     const issuerPhone = appSettings?.data?.phones?.[0]?.value ?? "";
     const issuerEmail = appSettings?.data?.emails?.[0]?.value ?? "";
 
-    // VAT is exclusive - charged on top of the discounted price, the same basis
-    // PurchaseLayout uses for `finalPrice`. Figures come from the transaction so a
-    // future rate change never rewrites what an old receipt says was charged.
-    const taxable = Number(recipt?.amount ?? 0);
+    // Figures come from the transaction so a future rate or mode change never
+    // rewrites what an old receipt says was charged.
+    const soldAmount = Number(recipt?.amount ?? 0);
     const vatAmount = Number(recipt?.vat_amount ?? 0) || 0;
+    /**
+     * Under inclusive pricing the listed price is the total and the tax sits
+     * within it, so the taxable base is less than what was sold.
+     */
+    const taxable = recipt?.vat_inclusive ? soldAmount - vatAmount : soldAmount;
     const vatPercentage = Number(recipt?.vat_percentage ?? 0) || 0;
-    const hasVat = vatAmount > 0;
+    /**
+     * Shown whenever the sale recorded a VAT rate, including a zero one — a tax
+     * invoice that omits the line reads as if VAT was never considered. Only a
+     * sale predating VAT entirely hides it.
+     */
+    const hasVat = recipt?.vat_percentage !== null && recipt?.vat_percentage !== undefined;
     // Derived, never read off the payload — `total_amount` is already an eSewa/installment
     // term elsewhere, and trusting a field by that name printed a zero total on the admin side.
     const totalAmount = taxable + vatAmount;
@@ -178,8 +187,11 @@ export default function PurchaseSuccess() {
                 position: fixed !important;
                 top: 0 !important;
                 left: 0 !important;
-                width: 100% !important;
-                padding: 32px !important;
+                /* Printed at bill width, not stretched across the sheet. */
+                width: 148mm !important;
+                max-width: 148mm !important;
+                margin: 0 auto !important;
+                padding: 12mm !important;
                 border: none !important;
                 box-shadow: none !important;
             }
@@ -243,8 +255,17 @@ export default function PurchaseSuccess() {
                     </Typography>
                 </div>
 
-                <Box className="rounded-md py-6 px-4 w-full" id="receipt-print-area" sx={{
-                    border: (theme) => `1px solid ${theme.palette.separator.dark}`,
+                {/**
+                  * Sized and tinted as a bill rather than filling the page, so
+                  * what is on screen matches what comes out of the printer.
+                  * A5 is the usual Nepali sales-bill size.
+                  */}
+                <Box className="rounded-md py-6 px-5 w-full" id="receipt-print-area" sx={{
+                    border: "1px solid #E4DFC4",
+                    background: "#FEFCE8",
+                    color: "#111827",
+                    maxWidth: "148mm",
+                    mx: "auto",
                 }} >
                     {/* Issuer — who this receipt is from. Centered masthead. */}
                     <div className="text-center flex flex-col items-center gap-1 mb-4">
@@ -297,7 +318,10 @@ export default function PurchaseSuccess() {
                         <div className="grid grid-cols-2">
                             <Typography variant="subtitle1" color="text.middle">Issued On</Typography>
                             <Typography variant="subtitle1" color="text.dark" fontWeight={600} className="text-end">
-                                {formatDateCustom(recipt?.created_at || "", { shortMonth: true })}
+                                {/* Bikram Sambat, converted server-side. */}
+                                {recipt?.issued_on_bs
+                                    ? `${recipt.issued_on_bs} BS`
+                                    : formatDateCustom(recipt?.created_at || "", { shortMonth: true })}
                             </Typography>
                         </div>
                         {buyer?.name && (

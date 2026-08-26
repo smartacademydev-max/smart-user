@@ -1,5 +1,6 @@
 
 import { LocalOffer, Phone, Toll } from '@mui/icons-material';
+import { useThemeSettings } from "../../../hooks/useThemeSettings";
 import {
     Box,
     Button,
@@ -127,7 +128,16 @@ export default function PurchaseLayout() {
                 data = null;
         }
     }
-    const vat = 0;
+    /**
+     * VAT as the backend will charge it, so checkout and the receipt agree.
+     * Exclusive adds the rate on top of the price; inclusive means the price
+     * already contains it, so the customer pays the listed amount either way
+     * it is shown.
+     */
+    const { vatPercentage, vatInclusive } = useThemeSettings();
+    const vat = vatInclusive || vatPercentage <= 0
+        ? 0
+        : Math.round((price * vatPercentage) / 100 * 100) / 100;
 
     const selectedPointsDiscountRs = selectedPointsTier ? Math.floor(selectedPointsTier / conversionRate) : 0;
     const pointsDiscount = discountMode === "points" ? selectedPointsDiscountRs : 0;

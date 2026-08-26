@@ -15,6 +15,13 @@ export function useThemeSettings() {
         companyName,
         tagline: s?.tagline ?? "",
         tpin: s?.tpin ?? "",
+        /**
+         * VAT charged on new sales. Read from settings so checkout and the
+         * receipt agree with whatever the backend will actually charge.
+         */
+        vatPercentage: Number(s?.vat_percentage ?? 0) || 0,
+        /** True when the listed price already contains the VAT. */
+        vatInclusive: Boolean(s?.vat_inclusive),
         metaDescription: s?.meta_description ?? "",
         logoUrl,
         logoDarkUrl,

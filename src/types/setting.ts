@@ -87,6 +87,10 @@ export interface ThemeSettingProps {
     tagline: string;
     /** Issuer tax PIN, printed on the tax invoice masthead. */
     tpin?: string;
+    /** VAT charged on new sales, as a percentage. */
+    vat_percentage?: number;
+    /** True when the listed price already contains the VAT. */
+    vat_inclusive?: boolean;
     meta_description: string;
     logo_url?: string;
     logo_dark_url?: string;

@@ -76,6 +76,10 @@ export interface ReciptProps {
     coupon_discount?: number;
     /** VAT charged on top of the discounted price. Absent/zero on non-VAT sales. */
     vat_amount?: number | string | null;
+    /** Issue date in Bikram Sambat, converted server-side (e.g. "2083/05/09"). */
+    issued_on_bs?: string | null;
+    /** True when the sold price already contained the VAT recorded against it. */
+    vat_inclusive?: boolean | null;
     /** Rate applied at sale time, so old receipts survive a rate change. */
     vat_percentage?: number | string | null;
     /**
