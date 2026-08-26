@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, Divider, Typography, useTheme } from '@mui/material';
+import { Box, Button, CircularProgress, Divider, Typography } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -22,7 +22,6 @@ const money = (value?: number | string | null) => {
 
 export default function PurchaseSuccess() {
     const navigate = useNavigate();
-    const theme = useTheme();
     const { t } = useTranslation();
     const hasVerified = useRef(false);
     const dispatch = useAppDispatch();
@@ -33,7 +32,6 @@ export default function PurchaseSuccess() {
     const [recipt, setRecipt] = useState<ReciptProps | null>(null);
     const [verifyPaymentAPI] = usePurchaseCourseMutation();
 
-    const isDark = theme.palette.mode === "dark";
     const { companyName, brandName, tagline, logoUrl, logoDarkUrl, tpin } = useThemeSettings();
     const { data: appSettings } = useGetAppSettingsQuery();
     const buyer = useAppSelector((state) => state.auth.user);
@@ -269,10 +267,12 @@ export default function PurchaseSuccess() {
                 }} >
                     {/* Issuer — who this receipt is from. Centered masthead. */}
                     <div className="text-center flex flex-col items-center gap-1 mb-4">
-                        {/* Dark surface takes the white mark, light surface the inked one —
-                            the same pairing every other layout uses. */}
+                        {/* The receipt prints on pale paper whatever theme the
+                            viewer is in, so it always takes the inked mark. The
+                            light-surface logo is white artwork and vanished
+                            against the page. */}
                         <img
-                            src={isDark ? logoUrl : logoDarkUrl}
+                            src={logoDarkUrl || logoUrl}
                             alt=""
                             style={{ height: 36, objectFit: "contain" }}
                         />
