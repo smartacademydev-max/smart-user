@@ -148,6 +148,8 @@ export default function ReviewTestRoot() {
                         score={result?.data?.score || 0}
                         is_negative_marked={result?.data?.is_negative_marked || false}
                         negative_marks_deducted={result?.data?.negative_marks_deducted || 0}
+                        correct_score={result?.data?.correct_score || 0}
+                        full_mark={result?.data?.full_mark || 0}
                     />
                 </div>
             </div>

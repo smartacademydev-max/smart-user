@@ -19,6 +19,8 @@ export default function TestResultSummary({
     total_questions = 0,
     is_negative_marked = false,
     negative_marks_deducted = 0,
+    correct_score = 0,
+    full_mark = 0,
 
 }: Props) {
     const theme = useTheme();
@@ -35,18 +37,27 @@ export default function TestResultSummary({
         return "Congratulations on your excellent score! Your dedication and hard work are truly paying off.";
     };
 
-    const scoreMessage = getScoreMessage(Number(score));
+    /**
+     * The thresholds are percentage bands, so they take the percentage — fed
+     * raw marks, a 3.2/8 always fell into the lowest band.
+     */
+    const scoreMessage = getScoreMessage(Number(percentage));
 
     const stats = [
         {
             label: "Correct answers",
-            value: `${correct}/${total_questions}`,
+            /**
+             * The count with the marks it earned, so the score above is
+             * traceable: this is the figure negative marking is taken from.
+             */
+            value: `${correct}/${total_questions} (+${correct_score} marks)`,
             color: theme.palette.success,
         },
         {
             label: "Incorrect answers",
-            value:
-                `${incorrect}/${total_questions}`,
+            // Always shows what was lost, so a zero reads as "nothing deducted"
+            // rather than leaving the student to wonder.
+            value: `${incorrect}/${total_questions} (-${negative_marks_deducted} marks)`,
             color: theme.palette.error,
         },
         {
@@ -92,7 +103,12 @@ export default function TestResultSummary({
                         fontWeight: 700,
                         offsetY: 6,
                         color: theme.palette.primary.main,
-                        formatter: () => `${percentage}%`
+                        /**
+                         * The ring still fills by percentage, but the marks are
+                         * what a student is actually looking for. Out of the
+                         * paper's total when the API sends one.
+                         */
+                        formatter: () => full_mark > 0 ? `${score}/${full_mark}` : `${score}`
                     }
                 }
             }

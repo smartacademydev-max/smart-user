@@ -35,7 +35,13 @@ export default function TestResultDialog({ open, result, onReview, onClose, onBa
                         fontWeight: 700,
                         offsetY: 6,
                         color: theme.palette.primary.main,
-                        formatter: () => `${percentage}%`
+                        /**
+                         * The ring still fills by percentage, but the marks are
+                         * what a student is actually looking for.
+                         */
+                        formatter: () => (result?.full_mark ?? 0) > 0
+                            ? `${result?.score ?? 0}/${result?.full_mark}`
+                            : `${result?.score ?? 0}`
                     }
                 }
             }
@@ -75,7 +81,9 @@ export default function TestResultDialog({ open, result, onReview, onClose, onBa
                     color="text.middle"
                     variant="subtitle1"
                 >
-                    {result ? getScoreMessage(result.score) : ""}
+                    {/* Percentage bands, so they take the percentage — fed raw
+                        marks, a 3.2/8 always fell into the lowest band. */}
+                    {result ? getScoreMessage(result.percentage) : ""}
                 </Typography>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mt-2">
@@ -92,7 +100,7 @@ export default function TestResultDialog({ open, result, onReview, onClose, onBa
                             Correct answers
                         </Typography>
                         <Typography variant="body2" fontWeight={600} color="success.main">
-                            {result?.correct}/{result?.total_questions}
+                            {result?.correct}/{result?.total_questions} (+{result?.correct_score ?? 0} marks)
                         </Typography>
                     </Box>
 
@@ -108,7 +116,7 @@ export default function TestResultDialog({ open, result, onReview, onClose, onBa
                             Incorrect answers
                         </Typography>
                         <Typography variant="body2" fontWeight={600} color="error.main">
-                            {result?.incorrect}/{result?.total_questions}
+                            {result?.incorrect}/{result?.total_questions} (-{result?.negative_marks_deducted ?? 0} marks)
                         </Typography>
                     </Box>
 

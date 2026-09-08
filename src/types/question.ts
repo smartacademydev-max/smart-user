@@ -142,6 +142,10 @@ export interface McqSubmissionData {
     is_negative_marked?: boolean;
     /** Marks removed from this attempt by negative marking. */
     negative_marks_deducted?: number;
+    /** Marks earned from correct answers, before any deduction. */
+    correct_score?: number;
+    /** The paper's full marks. */
+    full_mark?: number;
 }
 
 export interface McqSubmissionResponse extends GlobalResponse {
