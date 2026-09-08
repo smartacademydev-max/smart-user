@@ -17,7 +17,6 @@ export default function TestResultSummary({
     time_taken = "",
     attempted = 0,
     total_questions = 0,
-    is_negative_marked = false,
     negative_marks_deducted = 0,
     correct_score = 0,
     full_mark = 0,
@@ -70,17 +69,6 @@ export default function TestResultSummary({
             value: `${attempted}/${total_questions}`,
             color: theme.palette.primary,
         },
-        /**
-         * Only shown when marks were actually lost — a test with the setting on
-         * but nothing deducted would otherwise read as a penalty that happened.
-         */
-        ...(is_negative_marked
-            ? [{
-                label: "Negative Marking",
-                value: `-${negative_marks_deducted} marks`,
-                color: theme.palette.error,
-            }]
-            : []),
     ];
 
     const chartOptions: any = {
