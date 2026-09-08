@@ -143,6 +143,28 @@ export default function TestResultDialog({ open, result, onReview, onClose, onBa
                             {result?.attempted}/{result?.total_questions}
                         </Typography>
                     </Box>
+
+                    {/*
+                      * Only when marks were actually lost: a test with the
+                      * setting on but nothing deducted would otherwise read as
+                      * a penalty that happened.
+                      */}
+                    {result?.is_negative_marked && (
+                        <Box
+                            className="rounded-xl p-4"
+                            sx={{
+                                border: `1px solid ${theme.palette.error.main}`,
+                                background: theme.palette.error.light,
+                            }}
+                        >
+                            <Typography color="error.main" variant="subtitle2">
+                                Negative Marking
+                            </Typography>
+                            <Typography variant="body2" fontWeight={600} color="error.main">
+                                -{result?.negative_marks_deducted}
+                            </Typography>
+                        </Box>
+                    )}
                 </div>
 
                 {/* Footer Buttons */}

@@ -144,6 +144,10 @@ export default function ReviewTestRoot() {
                         incorrect={result?.data?.incorrect || 0}
                         time_taken={result?.data?.time_taken || ""}
                         total_questions={result?.data?.total_questions || 0}
+                        attempted={result?.data?.attempted || 0}
+                        score={result?.data?.score || 0}
+                        is_negative_marked={result?.data?.is_negative_marked || false}
+                        negative_marks_deducted={result?.data?.negative_marks_deducted || 0}
                     />
                 </div>
             </div>
