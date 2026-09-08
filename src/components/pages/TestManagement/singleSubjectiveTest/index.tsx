@@ -8,6 +8,7 @@ import { showToast } from "../../../../slice/toastSlice";
 import { useAppDispatch } from "../../../../store/hook";
 import type { QuestionProps } from "../../../../types/question";
 import { renderHtml } from "../../../../utils/renderHtml";
+import { isTestNotStarted } from "../../../../utils/testSchedule";
 import FileDragDrop from "../../../molecules/FileDragDrop";
 import TestCancelDialog from "../../../organism/Dialog/TestCancelDialog";
 import type { SubmissionType } from "../../../organism/Dialog/TestSubmissionDialog";
@@ -91,7 +92,25 @@ export default function SingleSubjectiveTest() {
         localStorage.setItem(storageKey, JSON.stringify(dataToSave));
     }, [timeLeft, currentQuestionIndex, storageKey]);
 
+    // This route is reachable by URL, so the scheduled start window is enforced
+    // here as well as on the test card's Start button.
+    const notStarted = isTestNotStarted(data?.overview);
+
     useEffect(() => {
+        if (!notStarted) return;
+
+        dispatch(
+            showToast({
+                message: "This test has not started yet.",
+                severity: "error",
+            })
+        );
+        localStorage.removeItem(storageKey);
+        navigate(PATH.TEST.ROOT);
+    }, [notStarted, storageKey, dispatch, navigate]);
+
+    useEffect(() => {
+        if (notStarted) return;
         if (data?.overview?.time !== undefined && data?.overview?.end_datetime && initialTimeRef.current === undefined) {
             const endTime = new Date(data.overview.end_datetime).getTime();
             const currentTime = Date.now();
@@ -117,9 +136,10 @@ export default function SingleSubjectiveTest() {
                 setTimeLeft(actualTimeLeft);
             }
         }
-    }, [data?.overview?.time, data?.overview?.end_datetime, storageKey, dispatch, navigate]);
+    }, [notStarted, data?.overview?.time, data?.overview?.end_datetime, storageKey, dispatch, navigate]);
 
     useEffect(() => {
+        if (notStarted) return;
         if (data?.data?.length) {
             const savedData = localStorage.getItem(storageKey);
             if (savedData) {
