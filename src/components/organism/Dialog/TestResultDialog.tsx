@@ -161,7 +161,7 @@ export default function TestResultDialog({ open, result, onReview, onClose, onBa
                                 Negative Marking
                             </Typography>
                             <Typography variant="body2" fontWeight={600} color="error.main">
-                                -{result?.negative_marks_deducted}
+                                -{result?.negative_marks_deducted} marks
                             </Typography>
                         </Box>
                     )}

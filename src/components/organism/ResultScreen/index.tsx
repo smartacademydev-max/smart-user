@@ -66,7 +66,7 @@ export default function TestResultSummary({
         ...(is_negative_marked
             ? [{
                 label: "Negative Marking",
-                value: `-${negative_marks_deducted}`,
+                value: `-${negative_marks_deducted} marks`,
                 color: theme.palette.error,
             }]
             : []),
