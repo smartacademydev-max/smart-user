@@ -101,11 +101,6 @@ export default function TestResultDialog({ open, result, onReview, onClose, onBa
                         </Typography>
                         <Typography variant="body2" fontWeight={600} color="success.main">
                             {result?.correct}/{result?.total_questions}
-                            {/* Marks are only worth spelling out where they can
-                                be lost — see the same gate on the review aside. */}
-                            {result?.negative_marking_enabled
-                                ? ` (+${result?.correct_score ?? 0} marks)`
-                                : ""}
                         </Typography>
                     </Box>
 
@@ -122,9 +117,6 @@ export default function TestResultDialog({ open, result, onReview, onClose, onBa
                         </Typography>
                         <Typography variant="body2" fontWeight={600} color="error.main">
                             {result?.incorrect}/{result?.total_questions}
-                            {result?.negative_marking_enabled
-                                ? ` (-${result?.negative_marks_deducted ?? 0} marks)`
-                                : ""}
                         </Typography>
                     </Box>
 
@@ -160,28 +152,48 @@ export default function TestResultDialog({ open, result, onReview, onClose, onBa
                         </Typography>
                     </Box>
 
-                    {/*
-                      * Only when marks were actually lost: a test with the
-                      * setting on but nothing deducted would otherwise read as
-                      * a penalty that happened.
-                      */}
-                    {result?.is_negative_marked && (
+                </div>
+
+                {/* Marks — the same two rows the review aside shows, so the
+                    figures a student sees on submitting are the figures they
+                    find again when they come back to review. */}
+                {result?.negative_marking_enabled && (
+                    <div className="flex flex-col gap-4 w-full mt-4">
                         <Box
-                            className="rounded-xl p-4"
+                            className="rounded-xl p-4 flex items-center justify-between gap-4"
+                            sx={{
+                                border: `1px solid ${theme.palette.warning.main}`,
+                                background: theme.palette.warning.light,
+                            }}
+                        >
+                            <Typography color="warning.main" variant="subtitle2" fontWeight={600}>
+                                Negative marking
+                            </Typography>
+                            <Typography color="warning.main" variant="body2" fontWeight={700}>
+                                -{result?.negative_marks_deducted ?? 0}
+                            </Typography>
+                        </Box>
+
+                        <Box
+                            className="rounded-xl p-4 flex items-center justify-between gap-4"
                             sx={{
                                 border: `1px solid ${theme.palette.error.main}`,
                                 background: theme.palette.error.light,
                             }}
                         >
-                            <Typography color="error.main" variant="subtitle2">
-                                Negative Marking
+                            <Typography color="error.main" variant="subtitle2" fontWeight={600}>
+                                Net score
                             </Typography>
-                            <Typography variant="body2" fontWeight={600} color="error.main">
-                                -{result?.negative_marks_deducted} marks
+                            {/* The submit response carries no full marks, so the
+                                score stands alone rather than reading "x / 0". */}
+                            <Typography color="error.main" variant="body2" fontWeight={700}>
+                                {(result?.full_mark ?? 0) > 0
+                                    ? `${result?.score ?? 0} / ${result?.full_mark}`
+                                    : `${result?.score ?? 0}`}
                             </Typography>
                         </Box>
-                    )}
-                </div>
+                    </div>
+                )}
 
                 {/* Footer Buttons */}
                 <div className="w-full mt-6 flex gap-4">

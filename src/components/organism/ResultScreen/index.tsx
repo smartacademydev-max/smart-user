@@ -23,7 +23,6 @@ export default function TestResultSummary({
     total_questions = 0,
     negative_marking_enabled = false,
     negative_marks_deducted = 0,
-    correct_score = 0,
     full_mark = 0,
     onRetake,
     onBackToDashboard,
@@ -63,37 +62,49 @@ export default function TestResultSummary({
     const scoreMessage = getScoreMessage(scorePercentage);
 
     /**
-     * The marks beside each count only earn their place when marks can be lost.
-     * On a test without negative marking the counts already say everything —
-     * "(+4 marks)" next to 2/4 is noise, and "(-0 marks)" next to 1/4 reads as a
-     * penalty that never existed. Where the deduction is real, both halves are
-     * shown together so the score above stays traceable: this is the figure it
-     * was taken from, and that is what was taken.
+     * The counts stay counts. The marks they add up to are their own rows
+     * below, where a figure has room to be read — squeezed into "5/50 (+4.75
+     * marks)" the two numbers competed and neither landed.
      */
     const stats = [
         {
             label: "Correct answers",
-            value: negative_marking_enabled
-                ? `${correct}/${total_questions} (+${correct_score} marks)`
-                : `${correct}/${total_questions}`,
+            value: `${correct}/${total_questions}`,
             color: theme.palette.success,
         },
         {
             label: "Incorrect answers",
-            value: negative_marking_enabled
-                ? `${incorrect}/${total_questions} (-${negative_marks_deducted} marks)`
-                : `${incorrect}/${total_questions}`,
+            value: `${incorrect}/${total_questions}`,
             color: theme.palette.error,
         },
         {
-            label: "Total Time Taken",
+            label: "Total time taken",
             value: time_taken || "",
             color: theme.palette.warning,
         },
         {
-            label: "Questions Attempted",
+            label: "Questions attempted",
             value: `${attempted}/${total_questions}`,
             color: theme.palette.primary,
+        },
+    ];
+
+    /**
+     * What was taken, then what is left — in that order, because the net score
+     * only makes sense once the deduction behind it has been named. Out of the
+     * paper's total wherever the API sends one; the submit response does not,
+     * so there the marks stand alone rather than reading "0.25 / 0".
+     */
+    const marksRows = [
+        {
+            label: "Negative marking",
+            value: `-${negative_marks_deducted}`,
+            color: theme.palette.warning,
+        },
+        {
+            label: "Net score",
+            value: full_mark > 0 ? `${score} / ${full_mark}` : `${score}`,
+            color: theme.palette.error,
         },
     ];
 
@@ -127,26 +138,35 @@ export default function TestResultSummary({
 
     return (
         <Box
-            className="lg:py-14 px-8 rounded-lg"
+            className="py-6 px-6 rounded-lg"
             sx={{ border: `1px solid ${theme.palette.separator.dark}` }}
         >
             {/* Chart */}
-            <div className="relative w-40 mb-2 mx-auto">
+            <Typography
+                className="text-center"
+                variant="subtitle2"
+                color="text.middle"
+            >
+                Your score
+            </Typography>
+
+            <div className="relative w-36 mx-auto">
                 <ReactApexChart
                     type="radialBar"
                     series={[scorePercentage]}
                     options={chartOptions}
-                    height={180}
+                    height={150}
                 />
-                {/* The marks are what a student is actually looking for — out of
-                    the paper's total whenever the API sends one. */}
+                {/* The ring reads as a percentage; the marks behind it are the
+                    Net score row below, so putting them here too would print the
+                    same figure twice. */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                     <Typography
-                        fontSize={26}
+                        fontSize={24}
                         fontWeight={700}
                         color={theme.palette.primary.main}
                     >
-                        {full_mark > 0 ? `${score}/${full_mark}` : `${score}`}
+                        {scorePercentage}%
                     </Typography>
                 </div>
             </div>
@@ -154,14 +174,14 @@ export default function TestResultSummary({
             {/* Title & Message */}
             <div className="text-center">
                 {testName && (
-                    <Typography variant="h4" fontWeight={600} className="mt-2">
+                    <Typography variant="h5" fontWeight={600} className="mt-1">
                         {testName}
                     </Typography>
                 )}
 
                 {scoreMessage && (
                     <Typography
-                        className="mt-2 mb-4 px-4"
+                        className="mt-1 px-2"
                         color="text.middle"
                         variant="subtitle1"
                     >
@@ -171,12 +191,12 @@ export default function TestResultSummary({
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mt-8!">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full mt-5!">
                 {stats
                     .map((stat) => (
                         <Box
                             key={stat.label}
-                            className="rounded-xl p-4"
+                            className="rounded-xl p-3"
                             sx={{
                                 border: `1px solid ${stat.color.main}`,
                                 background: stat.color.light,
@@ -196,9 +216,34 @@ export default function TestResultSummary({
                     ))}
             </div>
 
+            {/* Marks — only where marks can be lost. Full width and with the
+                value set against the label, because these two are the figures a
+                student argues with and they need to be read at a glance. */}
+            {negative_marking_enabled && (
+                <div className="flex flex-col gap-3 w-full mt-3!">
+                    {marksRows.map((row) => (
+                        <Box
+                            key={row.label}
+                            className="rounded-xl p-3 flex items-center justify-between gap-4"
+                            sx={{
+                                border: `1px solid ${row.color.main}`,
+                                background: row.color.light,
+                            }}
+                        >
+                            <Typography color={row.color.main} variant="subtitle2" fontWeight={600}>
+                                {row.label}
+                            </Typography>
+                            <Typography color={row.color.main} variant="body2" fontWeight={700}>
+                                {row.value}
+                            </Typography>
+                        </Box>
+                    ))}
+                </div>
+            )}
+
             {/* Actions */}
             {(onRetake || onBackToDashboard) && (
-                <div className="flex flex-col gap-3 mt-6!">
+                <div className="flex flex-col gap-2 mt-4!">
                     {onRetake && (
                         <Button
                             fullWidth
@@ -206,7 +251,7 @@ export default function TestResultSummary({
                             color="primary"
                             onClick={onRetake}
                         >
-                            Retake Test
+                            Try Again
                         </Button>
                     )}
 
