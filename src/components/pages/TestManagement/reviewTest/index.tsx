@@ -1,7 +1,8 @@
 import { Box, Divider, Tab, Tabs, Typography, useTheme } from "@mui/material";
 import { Book1, Calendar1, Clock, CloseCircle, TickCircle, Timer1 } from "iconsax-reactjs";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { PATH } from "../../../../routes/PATH";
 import { useGetTestResultQuery, useReviewTestResultQuery } from "../../../../services/testApi";
 import { formatDateCustom, formatDateTime } from "../../../../utils/dateFormat";
 import { renderHtml } from "../../../../utils/renderHtml";
@@ -10,9 +11,27 @@ import TestResultSummary from "../../../organism/ResultScreen";
 
 export default function ReviewTestRoot() {
     const theme = useTheme();
+    const navigate = useNavigate();
     const { courseId, testId } = useParams();
     const { data, isLoading } = useReviewTestResultQuery({ courseId: Number(courseId), testId: Number(testId) });
     const [tabIndex, setTabIndex] = useState(0);
+
+    /**
+     * The same destination the test card's Retake button uses. Whether a retake
+     * is actually allowed stays with the test route, which runs its own
+     * start-window check — a closed or not-yet-open test lands on its lock
+     * screen there rather than being gated twice, differently, from here.
+     */
+    const handleRetake = () => {
+        navigate(
+            courseId
+                ? PATH.COURSE_MANAGEMENT.COURSES.VIEW_TEST.ROOT({
+                    courseId: Number(courseId),
+                    testId: Number(testId),
+                })
+                : PATH.TEST.VIEW_TEST.ROOT({ testId: Number(testId) })
+        );
+    };
 
     const handleTabChange = (_: any, newValue: number) => setTabIndex(newValue);
 
@@ -147,9 +166,12 @@ export default function ReviewTestRoot() {
                         attempted={result?.data?.attempted || 0}
                         score={result?.data?.score || 0}
                         is_negative_marked={result?.data?.is_negative_marked || false}
+                        negative_marking_enabled={result?.data?.negative_marking_enabled || false}
                         negative_marks_deducted={result?.data?.negative_marks_deducted || 0}
                         correct_score={result?.data?.correct_score || 0}
                         full_mark={result?.data?.full_mark || 0}
+                        onRetake={handleRetake}
+                        onBackToDashboard={() => navigate(PATH.DASHBOARD.ROOT)}
                     />
                 </div>
             </div>

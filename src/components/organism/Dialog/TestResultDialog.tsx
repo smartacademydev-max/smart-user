@@ -100,7 +100,12 @@ export default function TestResultDialog({ open, result, onReview, onClose, onBa
                             Correct answers
                         </Typography>
                         <Typography variant="body2" fontWeight={600} color="success.main">
-                            {result?.correct}/{result?.total_questions} (+{result?.correct_score ?? 0} marks)
+                            {result?.correct}/{result?.total_questions}
+                            {/* Marks are only worth spelling out where they can
+                                be lost — see the same gate on the review aside. */}
+                            {result?.negative_marking_enabled
+                                ? ` (+${result?.correct_score ?? 0} marks)`
+                                : ""}
                         </Typography>
                     </Box>
 
@@ -116,7 +121,10 @@ export default function TestResultDialog({ open, result, onReview, onClose, onBa
                             Incorrect answers
                         </Typography>
                         <Typography variant="body2" fontWeight={600} color="error.main">
-                            {result?.incorrect}/{result?.total_questions} (-{result?.negative_marks_deducted ?? 0} marks)
+                            {result?.incorrect}/{result?.total_questions}
+                            {result?.negative_marking_enabled
+                                ? ` (-${result?.negative_marks_deducted ?? 0} marks)`
+                                : ""}
                         </Typography>
                     </Box>
 
