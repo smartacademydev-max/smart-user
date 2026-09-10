@@ -109,7 +109,7 @@ export default function SingleCourseTest({ havePurchased }: Props) {
                             {[...Array(6)].map((_, idx) => <TestCardSkeleton key={idx} />)}
                         </div>
                     ) : mediaItems.length > 0 ? (
-                        <div className="flex flex-col gap-4 md:grid grid-cols-2 xl:grid-cols-3  lg:gap-6">
+                        <div className="flex flex-col gap-4 md:grid grid-cols-2 2xl:grid-cols-3  lg:gap-6">
                             {mediaItems.map((media) => (
                                 <TestCard
                                     havePurchased={havePurchased}
