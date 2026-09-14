@@ -258,9 +258,15 @@ export default function QuestionView({ currentQuestion, setAttendedQuestion, att
                     className={`items-center! ${currentQuestion?.has_image_in_option ? "flex-col! items-start! p-2" : "items-center!"} w-full `}
                     control={control as React.ReactElement}
                     label={
-                        <div className="general__content__box option_image">
+                        <Box
+                            className="general__content__box option_image"
+                            // general__content__box gives every <p> a 0.75rem vertical
+                            // margin; inside a one-line option that offsets the text
+                            // from the control's centre line.
+                            sx={{ "& p, & ul, & ol": { margin: 0 } }}
+                        >
                             <Typography color="text.dark" className="mt-0!">{renderHtml(option.option)}</Typography>
-                        </div>
+                        </Box>
                     }
                 />
             </Box>
@@ -1076,6 +1082,10 @@ export default function QuestionView({ currentQuestion, setAttendedQuestion, att
                             option.id !== null && selectedIds.includes(option.id),
                             <Checkbox
                                 color="primary"
+                                // Radio carries MUI's default 9px padding; the themed
+                                // Checkbox resets it to 0, so match it here or the box
+                                // sits flush against the option border.
+                                sx={{ p: "9px" }}
                                 checked={option.id !== null && selectedIds.includes(option.id)}
                                 onChange={() => option.id !== null && handleToggle(option.id)}
                             />
