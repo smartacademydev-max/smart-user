@@ -96,7 +96,6 @@ import MyIndividualTest from "../components/pages/TestManagement/myTests/MyIndiv
 import ReviewTestRoot from "../components/pages/TestManagement/reviewTest";
 import ReviewSubjectTestRoot from "../components/pages/TestManagement/reviewTest/subjective";
 import SingleSubjectiveTest from "../components/pages/TestManagement/singleSubjectiveTest";
-import SingleTestRoot from "../components/pages/TestManagement/singleTest";
 import TestCategoryInCourse from "../components/pages/TestManagement/testCategory";
 import SingleTestCategory from "../components/pages/TestManagement/testCategory/singeTestCategory";
 import TestsByCourseLanding from "../components/pages/TestManagement/TestsByCourseLanding";
@@ -233,7 +232,6 @@ const router = createBrowserRouter([
             children: [
               { path: PATH.COURSE_MANAGEMENT.COURSES.ROOT, element: <AllCourses /> },
               { path: PATH.COURSE_MANAGEMENT.COURSES.VIEW_COURSE.ROOT(), element: <SingleCourse /> },
-              { path: PATH.COURSE_MANAGEMENT.COURSES.VIEW_TEST.ROOT({}), element: <SingleTestRoot /> },
               { path: PATH.COURSE_MANAGEMENT.COURSES.VIEW_TEST.SUBJECTIVE_TEST.ROOT({}), element: <SingleSubjectiveTest /> },
               { path: PATH.COURSE_MANAGEMENT.COURSES.VIEW_TEST.REVIEW_TEST.ROOT({}), element: <ReviewTestRoot /> },
               { path: PATH.COURSE_MANAGEMENT.COURSES.VIEW_TEST.REVIEW_TEST.REVIEW_SUBJECTIVE_TEST.ROOT({}), element: <ReviewSubjectTestRoot /> },
@@ -251,7 +249,6 @@ const router = createBrowserRouter([
               { path: PATH.TEST.MY_TEST.BY_COURSE.ROOT(), element: <AllTestRoot /> },
               { path: PATH.TEST.MY_INDIVIDUAl_TEST.ROOT, element: <MyIndividualTest /> },
               { path: PATH.TEST.MY_BUNDLES.ROOT, element: <MyBundles /> },
-              { path: PATH.TEST.VIEW_TEST.ROOT({}), element: <SingleTestRoot /> },
               { path: PATH.TEST.VIEW_TEST.SUBJECTIVE_TEST.ROOT({}), element: <SingleSubjectiveTest /> },
               { path: PATH.TEST.VIEW_TEST.REVIEW_TEST.ROOT({}), element: <ReviewTestRoot /> },
               { path: PATH.TEST.VIEW_TEST.REVIEW_TEST.REVIEW_SUBJECTIVE_TEST.ROOT({}), element: <ReviewSubjectTestRoot /> },

@@ -2,8 +2,10 @@ import { Button, Stack } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { requestDocumentFullscreen } from "../../../hooks/useFullscreen";
 import { PATH } from "../../../routes/PATH";
 import { setPurchase } from "../../../slice/purchaseSlice";
+import { openTest } from "../../../slice/testRunnerSlice";
 import type { TestProps } from "../../../types/question";
 import { formatDateTime } from "../../../utils/dateFormat";
 import {
@@ -54,29 +56,30 @@ const TestActionButton = ({ test, havePurchased, id, isExpired: isExpiredProp }:
             return;
         }
 
+        if (test.test_type === "mcq") {
+            // This click is the only user gesture the browser will accept a
+            // full-screen request from, so it is spent here rather than a moment
+            // later on the test screen. Deliberately not awaited, so the request
+            // and the dispatch stay in the same tick as the gesture.
+            void requestDocumentFullscreen();
+            dispatch(openTest({
+                testId: Number(test?.id),
+                courseId: id ? Number(id) : undefined,
+            }));
+            return;
+        }
+
         let path;
 
         if (id) {
-            path =
-                test.test_type === "mcq"
-                    ? PATH.COURSE_MANAGEMENT.COURSES.VIEW_TEST.ROOT({
-                        courseId: Number(id),
-                        testId: Number(test?.id),
-                    })
-                    : PATH.COURSE_MANAGEMENT.COURSES.VIEW_TEST.SUBJECTIVE_TEST.ROOT({
-                        courseId: Number(id),
-                        testId: Number(test?.id),
-                    });
+            path = PATH.COURSE_MANAGEMENT.COURSES.VIEW_TEST.SUBJECTIVE_TEST.ROOT({
+                courseId: Number(id),
+                testId: Number(test?.id),
+            });
         } else {
-            // standalone test
-            path =
-                test.test_type === "mcq"
-                    ? PATH.TEST.VIEW_TEST.ROOT({
-                        testId: Number(test?.id),
-                    })
-                    : PATH.TEST.VIEW_TEST.SUBJECTIVE_TEST.ROOT({
-                        testId: Number(test?.id),
-                    });
+            path = PATH.TEST.VIEW_TEST.SUBJECTIVE_TEST.ROOT({
+                testId: Number(test?.id),
+            });
         }
 
         navigate(path);
@@ -139,12 +142,16 @@ const TestActionButton = ({ test, havePurchased, id, isExpired: isExpiredProp }:
 
     if (isExpired) {
         return (
-            <Button variant="outlined" color="primary" onClick={() => id ? navigate(PATH.COURSE_MANAGEMENT.COURSES.VIEW_TEST.ROOT({
-                courseId: Number(id),
-                testId: Number(test?.id),
-            })) : navigate(PATH.TEST.VIEW_TEST.ROOT({
-                testId: Number(test?.id),
-            }))}>
+            <Button
+                variant="outlined"
+                color="primary"
+                // Reading a closed paper is not sitting it, so this one opens the
+                // runner without taking the screen full.
+                onClick={() => dispatch(openTest({
+                    testId: Number(test?.id),
+                    courseId: id ? Number(id) : undefined,
+                }))}
+            >
                 View Questions
             </Button>
         )

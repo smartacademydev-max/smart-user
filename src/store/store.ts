@@ -23,6 +23,7 @@ import purchaseSlice from '../slice/purchaseSlice';
 import readingScreenReducer from '../slice/ReadingScreenSlice';
 import sessionReducer from "../slice/sessionSlice";
 import themeReducer from "../slice/themeSlice";
+import testRunnerReducer from "../slice/testRunnerSlice";
 import toastReducer from "../slice/toastSlice";
 export const store = configureStore({
     reducer: {
@@ -32,6 +33,7 @@ export const store = configureStore({
         readScreen: readingScreenReducer,
         purchase: purchaseSlice,
         session: sessionReducer,
+        testRunner: testRunnerReducer,
         [authApi.reducerPath]: authApi.reducer,
         [courseApi.reducerPath]: courseApi.reducer,
         [categoryApi.reducerPath]: categoryApi.reducer,

@@ -2,6 +2,7 @@ import { Box, Button, CircularProgress, Drawer, IconButton, LinearProgress, Typo
 import { ArrowLeft2, ArrowRight2, Bookmark, HamburgerMenu, Maximize4, TickCircle } from "iconsax-reactjs";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { requestDocumentFullscreen } from "../../../../hooks/useFullscreen";
 import { PATH } from "../../../../routes/PATH";
 import {
     useGetCanvasContentsProgressQuery,
@@ -10,6 +11,8 @@ import {
     useMarkCanvasContentCompleteMutation,
     useSaveCanvasContentProgressMutation,
 } from "../../../../services/courseApi";
+import { openTest } from "../../../../slice/testRunnerSlice";
+import { useAppDispatch } from "../../../../store/hook";
 import type { CanvasContent, CurriculumNode } from "../../../../types/learningCanvas";
 import { canMarkComplete, COMPLETION_THRESHOLD_PERCENT, computeCourseProgress, findProgress } from "../../../../utils/canvasProgress";
 import { renderHtml } from "../../../../utils/renderHtml";
@@ -62,7 +65,7 @@ function DescriptionBlock({ html }: { html: string }) {
 
 // ─── Test / Assignment cards ────────────────────────────────────────────────
 function TestInfoCard({ item, courseId }: { item: CanvasContent; courseId: number }) {
-    const navigate = useNavigate();
+    const dispatch = useAppDispatch();
     const theme = useTheme();
     const minutes = item.duration_minutes ?? 0;
     const hours = Math.floor(minutes / 60);
@@ -81,12 +84,15 @@ function TestInfoCard({ item, courseId }: { item: CanvasContent; courseId: numbe
                 <Box sx={{ ml: "auto" }}>
                     <Button
                         variant="contained" size="small"
-                        onClick={() => navigate(
-                            PATH.COURSE_MANAGEMENT.COURSES.VIEW_TEST.ROOT({
+                        onClick={() => {
+                            // The gesture that opens the test is the only one a
+                            // full-screen request will be granted from.
+                            void requestDocumentFullscreen();
+                            dispatch(openTest({
+                                testId: Number(item.reference_id),
                                 courseId,
-                                testId: item.reference_id,
-                            })
-                        )}
+                            }));
+                        }}
                         sx={{ textTransform: "none", borderRadius: 2, px: 3 }}
                     >
                         Start Test

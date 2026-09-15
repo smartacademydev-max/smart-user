@@ -1,14 +1,18 @@
-import { Box, Checkbox, Divider, Radio, Tab, Tabs, Typography, useTheme } from "@mui/material";
-import { Book1, Calendar1, Clock, CloseCircle, TickCircle, Timer1 } from "iconsax-reactjs";
+import { Box, Checkbox, Divider, IconButton, Radio, Tab, Tabs, Typography, useTheme } from "@mui/material";
+import { ArrowLeft, CloseCircle, TickCircle } from "iconsax-reactjs";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { requestDocumentFullscreen } from "../../../../hooks/useFullscreen";
 import { PATH } from "../../../../routes/PATH";
 import { useGetTestResultQuery, useReviewTestResultQuery } from "../../../../services/testApi";
+import { openTest } from "../../../../slice/testRunnerSlice";
+import { useAppDispatch } from "../../../../store/hook";
 import { formatDateCustom, formatDateTime } from "../../../../utils/dateFormat";
 import { renderHtml } from "../../../../utils/renderHtml";
 import { gapsAsBlanks, splitOnGaps } from "../../../../utils/questionText";
 import { EmptyList } from "../../../molecules/EmptyList";
 import TestResultSummary from "../../../organism/ResultScreen";
+import { useQuizTokens } from "../singleTest/quizTokens";
 
 /** Formats answered by filling gaps in the passage. */
 const isGapFormat = (q: any) => q?.question_type === "drag_into_text";
@@ -23,7 +27,9 @@ const hasGroups = (q: any) =>
 
 export default function ReviewTestRoot() {
     const theme = useTheme();
+    const t = useQuizTokens();
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
     const { courseId, testId } = useParams();
     const { data, isLoading } = useReviewTestResultQuery({ courseId: Number(courseId), testId: Number(testId) });
     const [tabIndex, setTabIndex] = useState(0);
@@ -35,14 +41,11 @@ export default function ReviewTestRoot() {
      * screen there rather than being gated twice, differently, from here.
      */
     const handleRetake = () => {
-        navigate(
-            courseId
-                ? PATH.COURSE_MANAGEMENT.COURSES.VIEW_TEST.ROOT({
-                    courseId: Number(courseId),
-                    testId: Number(testId),
-                })
-                : PATH.TEST.VIEW_TEST.ROOT({ testId: Number(testId) })
-        );
+        void requestDocumentFullscreen();
+        dispatch(openTest({
+            testId: Number(testId),
+            courseId: courseId ? Number(courseId) : undefined,
+        }));
     };
 
     const handleTabChange = (_: any, newValue: number) => setTabIndex(newValue);
@@ -54,37 +57,64 @@ export default function ReviewTestRoot() {
         localStorage.removeItem(STORAGE_KEY);
     }, [courseId, testId]);
 
+    /**
+     * The paper's particulars. A row of icon-and-label pairs gave each of these
+     * the weight of a heading; under the test's name they are a single quiet
+     * line, which is all any of them is worth.
+     */
     const items = [
-        { icon: Book1, label: "Total Questions:", value: `${data?.data?.total_questions} Questions` },
-        { icon: Timer1, label: "Timer:", value: data?.data?.timer },
-        { icon: Calendar1, label: "Start Date:", value: formatDateCustom(data?.data?.start_date || "", { shortMonth: true }) },
-        { icon: Clock, label: "Start Time:", value: formatDateTime(data?.data?.start_time) },
-        { icon: Clock, label: "End Time:", value: formatDateTime(data?.data?.end_time) },
+        { label: "Questions", value: data?.data?.total_questions ? String(data.data.total_questions) : "" },
+        { label: "Duration", value: data?.data?.timer },
+        { label: "Date", value: formatDateCustom(data?.data?.start_date || "", { shortMonth: true }) },
+        { label: "Opened", value: formatDateTime(data?.data?.start_time) },
+        { label: "Closed", value: formatDateTime(data?.data?.end_time) },
     ];
 
-    const renderOption = (option: any, isCorrect: boolean, isUserWrong?: boolean) => {
-        const bgColor = isCorrect
-            ? theme.palette.success.light
-            : isUserWrong
-                ? theme.palette.error.light
-                : "transparent";
-
-        const borderColor = isCorrect
-            ? theme.palette.success.main
-            : isUserWrong
-                ? theme.palette.error.main
-                : theme.palette.separator.dark;
-
+    /**
+     * The same row the paper was sat with, carrying its verdict instead of its
+     * selection: the lettered circle becomes a tick or a cross, and the row
+     * takes the matching tone. An option that is neither stays plain, so a
+     * reviewed question reads as one right answer among the rest rather than as
+     * a wall of colour.
+     */
+    const renderOption = (option: any, isCorrect: boolean, isUserWrong?: boolean, index = 0) => {
+        const tone = isCorrect ? t.success : isUserWrong ? t.danger : null;
+        const fill = isCorrect ? t.successSoft : isUserWrong ? t.dangerSoft : t.surface;
         const Icon = isCorrect ? TickCircle : isUserWrong ? CloseCircle : undefined;
 
         return (
             <Box
                 key={option.option + option.id}
-                className="rounded-lg p-3 col-span-1 flex items-center gap-1"
-                sx={{ border: `1px solid ${borderColor}`, backgroundColor: bgColor }}
+                className="flex items-start gap-3.5 rounded-xl px-4 py-3.5"
+                sx={{
+                    border: "1px solid",
+                    borderColor: tone ?? t.border,
+                    backgroundColor: fill,
+                }}
             >
-                {Icon && <Icon variant="Bold" color={isCorrect ? theme.palette.success.main : theme.palette.error.main} />}
-                <Typography variant="body2">{renderHtml(option.option)}</Typography>
+                <Box
+                    aria-hidden
+                    className="flex shrink-0 items-center justify-center rounded-full"
+                    sx={{
+                        mt: "2px",
+                        width: 22,
+                        height: 22,
+                        fontSize: 10.5,
+                        fontWeight: 700,
+                        border: "1px solid",
+                        borderColor: tone ?? t.borderStrong,
+                        backgroundColor: tone ?? t.surface,
+                        color: tone ? t.primaryForeground : t.muted,
+                    }}
+                >
+                    {Icon ? <Icon size={13} variant="Bold" color={t.primaryForeground} /> : String.fromCharCode(65 + index)}
+                </Box>
+
+                <Box className="general__content__box min-w-0 flex-1" sx={{ "& p, & ul, & ol": { margin: 0 } }}>
+                    <Typography fontSize={14.5} lineHeight={1.65} sx={{ color: t.foreground }}>
+                        {renderHtml(option.option)}
+                    </Typography>
+                </Box>
             </Box>
         );
     };
@@ -614,7 +644,7 @@ export default function ReviewTestRoot() {
                 description=""
             />;
         }
-        return questions.map((q) => {
+        return questions.map((q, questionIndex) => {
             /**
              * Multi-select answers arrive as `your_answer_ids`; the scalar
              * `your_answer_id` is only the first selection and is all that
@@ -626,11 +656,44 @@ export default function ReviewTestRoot() {
                     ? [q.your_answer_id]
                     : [];
 
+            const verdict = {
+                correct: { label: "Correct", tone: t.success },
+                incorrect: { label: "Incorrect", tone: t.danger },
+                skipped: { label: "Not answered", tone: t.muted },
+            }[type];
+
             return (
-                <div className="question__box" key={q.question}>
-                    <Typography className="mb-4!" variant="h6">
-                        {renderHtml(gapsAsBlanks(q.question ?? ""))}
-                    </Typography>
+                <Box
+                    className="question__box rounded-2xl p-4 md:p-5"
+                    key={q.question}
+                    sx={{ backgroundColor: t.surface, border: "1px solid", borderColor: t.border }}
+                >
+                    <Box className="mb-3 flex flex-wrap items-center gap-x-2.5 gap-y-1">
+                        <Typography
+                            className="tabular-nums"
+                            fontSize={12.5}
+                            fontWeight={700}
+                            sx={{ color: t.foreground }}
+                        >
+                            Question {questionIndex + 1}
+                        </Typography>
+                        <Typography aria-hidden fontSize={12.5} sx={{ color: t.muted }}>·</Typography>
+                        <Typography fontSize={12.5} fontWeight={600} sx={{ color: verdict.tone }}>
+                            {verdict.label}
+                        </Typography>
+                    </Box>
+
+                    <Box className="general__content__box mb-5" sx={{ "& p:first-of-type": { marginTop: 0 } }}>
+                        <Typography
+                            component="div"
+                            fontSize={17}
+                            fontWeight={500}
+                            lineHeight={1.7}
+                            sx={{ color: t.foreground }}
+                        >
+                            {renderHtml(gapsAsBlanks(q.question ?? ""))}
+                        </Typography>
+                    </Box>
 
                     {isHighlightFormat(q) ? (
                         renderHighlight(q)
@@ -639,72 +702,84 @@ export default function ReviewTestRoot() {
                     ) : hasGroups(q) ? (
                         renderGrouped(q, yourAnswerIds)
                     ) : (
-                        <div className="flex flex-col gap-4 md:grid md:grid-cols-2">
-                            {q.options.map((option: any) => {
+                        <div className="flex flex-col gap-2.5">
+                            {q.options.map((option: any, optionIndex: number) => {
                                 if (type === "correct") {
-                                    return option.is_correct ? renderOption(option, true) : null;
+                                    return option.is_correct ? renderOption(option, true, false, optionIndex) : null;
                                 } else if (type === "incorrect") {
-                                    return renderOption(option, option.is_correct, yourAnswerIds.includes(option.id));
+                                    return renderOption(option, option.is_correct, yourAnswerIds.includes(option.id), optionIndex);
                                 } else if (type === "skipped") {
-                                    return renderOption(option, option.is_correct);
+                                    return renderOption(option, option.is_correct, false, optionIndex);
                                 }
                                 return null;
                             })}
                         </div>
                     )}
-                </div>
+                </Box>
             );
         });
     };
 
     const { data: result } = useGetTestResultQuery({ courseId: Number(courseId), testId: Number(testId) });
 
+    const tabSx = {
+        minHeight: 40,
+        px: 0,
+        mr: 3,
+        fontSize: 13.5,
+        fontWeight: 600,
+        textTransform: "none" as const,
+        color: t.muted,
+        "&.Mui-selected": { color: t.foreground },
+    };
+
     return (
         <div className="test__review__root h-full overflow-auto">
-            <Typography className="text2Xl mb-4!">{data?.data?.test_name}</Typography>
+            <Box className="flex items-start gap-1.5">
+                <IconButton
+                    aria-label="Back"
+                    size="small"
+                    onClick={() => navigate(-1)}
+                    sx={{ mt: "2px" }}
+                >
+                    <ArrowLeft size={19} color={t.muted} />
+                </IconButton>
 
-            <ul className="flex flex-wrap items-center gap-4">
-                {items
-                    .filter(item => item.value !== null && item.value !== undefined && item.value !== "")
-                    .map((item, index, filteredItems) => {
-                        const Icon = item.icon;
+                <Box className="min-w-0">
+                    <Typography fontSize={19} fontWeight={700} sx={{ color: t.foreground }}>
+                        {data?.data?.test_name}
+                    </Typography>
 
-                        return (
-                            <li
-                                key={index}
-                                className="flex items-center gap-1 pr-4"
-                                style={{
-                                    borderRight:
-                                        index !== filteredItems.length - 1
-                                            ? `1px solid ${theme.palette.separator.dark}`
-                                            : "none",
-                                }}
-                            >
-                                <Icon variant="Linear" />
-                                <Typography variant="subtitle2" color="text.middle">
-                                    {item.label}
-                                </Typography>
-                                <Typography variant="subtitle2" color="text.dark">
-                                    {item.value}
-                                </Typography>
-                            </li>
-                        );
-                    })}
-            </ul>
+                    <Typography fontSize={12.5} sx={{ color: t.muted, mt: 0.25 }}>
+                        {items
+                            .filter(item => item.value !== null && item.value !== undefined && item.value !== "")
+                            .map(item => `${item.label} ${item.value}`)
+                            .join("  ·  ")}
+                    </Typography>
+                </Box>
+            </Box>
 
-
-            <Divider className="mt-2! mb-6!" />
+            <Divider className="mt-4! mb-6!" />
 
             <div className="flex flex-col gap-4 lg:grid lg:grid-cols-12 lg:gap-6">
                 <div className="col-span-7 2xl:col-span-8">
-                    {/* Tabs */}
-                    <Tabs value={tabIndex} onChange={handleTabChange} aria-label="answer categories">
-                        <Tab label={`Correct (${data?.data?.correct_answers?.length || 0})`} />
-                        <Tab label={`Incorrect (${data?.data?.incorrect_answers?.length || 0})`} />
-                        <Tab label={`Skipped (${data?.data?.skipped_answers?.length || 0})`} />
+                    <Tabs
+                        value={tabIndex}
+                        onChange={handleTabChange}
+                        aria-label="answer categories"
+                        sx={{
+                            minHeight: 40,
+                            borderBottom: "1px solid",
+                            borderColor: t.border,
+                            "& .MuiTabs-indicator": { backgroundColor: t.primary, height: 2 },
+                        }}
+                    >
+                        <Tab sx={tabSx} label={`Correct (${data?.data?.correct_answers?.length || 0})`} />
+                        <Tab sx={tabSx} label={`Incorrect (${data?.data?.incorrect_answers?.length || 0})`} />
+                        <Tab sx={tabSx} label={`Skipped (${data?.data?.skipped_answers?.length || 0})`} />
                     </Tabs>
 
-                    <Box className="mt-4 space-y-4">
+                    <Box className="mt-5 space-y-4">
                         {tabIndex === 0 && renderQuestions(data?.data?.correct_answers || [], "correct")}
                         {tabIndex === 1 && renderQuestions(data?.data?.incorrect_answers || [], "incorrect")}
                         {tabIndex === 2 && renderQuestions(data?.data?.skipped_answers || [], "skipped")}

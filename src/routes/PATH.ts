@@ -78,10 +78,9 @@ export const PATH = {
                 ROOT: `/courses/:id/plans`
             },
             VIEW_TEST: {
-                ROOT: ({ courseId, testId }: { courseId?: number; testId?: number }) =>
-                    courseId && testId
-                        ? `/courses/${courseId}/test/${testId}`
-                        : `/courses/:courseId/test/:testId`,
+                // No ROOT here: sitting a test has one route, PATH.TEST.VIEW_TEST,
+                // which carries the course as a query param. Review and subjective
+                // still have course-scoped routes of their own.
                 REVIEW_TEST: {
                     ROOT: ({ courseId, testId }: { courseId?: number; testId?: number }) =>
                         courseId && testId
@@ -133,10 +132,9 @@ export const PATH = {
             }
         },
         VIEW_TEST: {
-            ROOT: ({ testId }: { testId?: number }) =>
-                testId
-                    ? `/test/${testId}`
-                    : `/test/:testId`,
+            // No ROOT: sitting a test is not a route. It opens as an overlay over
+            // whatever the student was on — dispatch `openTest` from testRunnerSlice.
+            // Reviewing a finished attempt is still a page, and keeps its route.
             REVIEW_TEST: {
                 ROOT: ({ testId }: { testId?: number }) =>
                     testId

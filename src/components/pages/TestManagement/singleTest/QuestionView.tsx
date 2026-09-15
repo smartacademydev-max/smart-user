@@ -1,24 +1,30 @@
-import { useRef, useState } from "react";
-import { Autocomplete, Box, Button, Checkbox, Divider, FormControlLabel, IconButton, Radio, RadioGroup, TextField, Tooltip, Typography, useTheme, type Theme } from "@mui/material";
+import { useId, useRef, useState } from "react";
+import { Autocomplete, Box, Button, Divider, IconButton, TextField, Tooltip, Typography, useTheme, type Theme } from "@mui/material";
 import { CHOICE_GROUP_COLORS, GROUPED_TYPES, MULTI_SELECT_TYPES, type Answers, type OptionProps, type QuestionProps } from "../../../../types/question";
 import { renderHtml } from "../../../../utils/renderHtml";
 import { splitOnGaps } from "../../../../utils/questionText";
+import { useQuizTokens } from "./quizTokens";
 
 interface Props {
     currentQuestion: QuestionProps | null;
+    /** Zero-based position in the paper, for the "Question 4" meta line. */
+    questionIndex?: number;
     setAttendedQuestion: (newValue: Answers) => void;
     attendedQuestion: Answers[];
     disabled?: boolean;
 }
 
-export default function QuestionView({ currentQuestion, setAttendedQuestion, attendedQuestion, disabled = false }: Props) {
+export default function QuestionView({ currentQuestion, questionIndex = 0, setAttendedQuestion, attendedQuestion, disabled = false }: Props) {
     const theme = useTheme();
+    const t = useQuizTokens();
+    /** One radio group per question, so moving between questions never leaves
+     *  two options sharing a name and cancelling each other out. */
+    const fieldName = useId();
 
-    // Highlight tool state: which coloured type is active, and whether the
-    // next selection erases rather than marks.
+    // Highlight tool state: which coloured category the next selection marks
+    // with. Only asked for when a question offers more than one.
     const passageRef = useRef<HTMLDivElement>(null);
     const [activeHighlightType, setActiveHighlightType] = useState("");
-    const [eraseMode, setEraseMode] = useState(false);
     /** Drag into text: the gap awaiting a choice, when answering by tapping. */
     const [activeGap, setActiveGap] = useState<number | null>(null);
     /** The choice currently being dragged, and the gap hovered under it. */
@@ -241,37 +247,91 @@ export default function QuestionView({ currentQuestion, setAttendedQuestion, att
         emit({ ordered_option_ids: next });
     };
 
-    const optionBox = (option: OptionProps, isSelected: boolean, control: React.ReactNode) => (
-        <div className="col-span-1" key={option.id}>
+    /**
+     * One answer row, in whichever shape the format needs it. The lettered
+     * circle doubles as the control: it becomes a filled tick when chosen, so
+     * the row reads the same whether the format takes one answer or several.
+     *
+     * The real input is still in the DOM, only visually hidden — it is what
+     * makes arrow keys, the space bar and screen readers behave the way a
+     * student expects, which a styled `div` alone would not.
+     */
+    const optionBox = (
+        option: OptionProps,
+        isSelected: boolean,
+        onPick: () => void,
+        index: number,
+        multiple: boolean,
+        groupName: string = fieldName
+    ) => (
+        <Box
+            component="label"
+            key={option.id}
+            className="flex items-start gap-3.5 rounded-xl px-4 py-3.5"
+            sx={{
+                cursor: disabled ? "not-allowed" : "pointer",
+                border: "1px solid",
+                borderColor: isSelected ? t.primary : t.border,
+                backgroundColor: isSelected ? t.primarySoft : t.surface,
+                transition: "border-color .15s ease, background-color .15s ease",
+                opacity: disabled ? 0.6 : 1,
+                pointerEvents: disabled ? "none" : "auto",
+                "&:hover": { borderColor: isSelected ? t.primary : t.borderStrong }
+            }}
+        >
+            <input
+                type={multiple ? "checkbox" : "radio"}
+                name={groupName}
+                className="sr-only"
+                checked={isSelected}
+                disabled={disabled}
+                onChange={onPick}
+            />
+
             <Box
-                className="rounded-lg"
+                aria-hidden
+                className="flex shrink-0 items-center justify-center rounded-full"
                 sx={{
-                    border: `1px solid `,
-                    borderColor: isSelected ? theme.palette.primary.main : theme.palette.separator.dark,
-                    backgroundColor: isSelected ? theme.palette.primary.light : "",
-                    opacity: disabled ? 0.6 : 1,
-                    pointerEvents: disabled ? "none" : "auto"
+                    mt: "2px",
+                    width: 22,
+                    height: 22,
+                    fontSize: 10.5,
+                    fontWeight: 700,
+                    border: "1px solid",
+                    borderColor: isSelected ? t.primary : t.borderStrong,
+                    backgroundColor: isSelected ? t.primary : t.surface,
+                    color: isSelected ? t.primaryForeground : t.muted,
+                    transition: "border-color .15s ease, background-color .15s ease, color .15s ease"
                 }}
             >
-                <FormControlLabel
-                    value={option.id}
-                    className={`items-center! ${currentQuestion?.has_image_in_option ? "flex-col! items-start! p-2" : "items-center!"} w-full `}
-                    control={control as React.ReactElement}
-                    label={
-                        <Box
-                            className="general__content__box option_image"
-                            // general__content__box gives every <p> a 0.75rem vertical
-                            // margin; inside a one-line option that offsets the text
-                            // from the control's centre line.
-                            sx={{ "& p, & ul, & ol": { margin: 0 } }}
-                        >
-                            <Typography color="text.dark" className="mt-0!">{renderHtml(option.option)}</Typography>
-                        </Box>
-                    }
-                />
+                {isSelected ? (
+                    <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden>
+                        <path d="M2.5 6.3 4.8 8.6 9.5 3.9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                ) : (
+                    String.fromCharCode(65 + index)
+                )}
             </Box>
-        </div>
+
+            <Box
+                className="general__content__box option_image min-w-0 flex-1"
+                // general__content__box gives every <p> a 0.75rem vertical margin;
+                // inside a one-line option that pushes the text off the circle's
+                // centre line.
+                sx={{ "& p, & ul, & ol": { margin: 0 } }}
+            >
+                <Typography fontSize={14.5} lineHeight={1.65} color="text.dark" className="mt-0!">
+                    {renderHtml(option.option)}
+                </Typography>
+            </Box>
+        </Box>
     );
+
+    /** Images need room to breathe, so they pair up; text answers read better
+     *  as one full-width column. */
+    const optionListClass = currentQuestion?.has_image_in_option
+        ? "grid gap-3 md:grid-cols-2"
+        : "flex flex-col gap-2.5";
 
     const renderBody = () => {
         if (!currentQuestion?.options) return null;
@@ -305,13 +365,20 @@ export default function QuestionView({ currentQuestion, setAttendedQuestion, att
                 const end = start + range.toString().length;
                 if (end <= start) return;
 
-                // Erase mode removes whatever the selection touches; otherwise
-                // the new mark replaces anything it overlaps, so the same words
-                // never carry two conflicting highlights.
+                /**
+                 * Dragging back across a mark of the type being applied takes it
+                 * off again — which is the whole of what an eraser mode did, so
+                 * there is no eraser to switch into. Anything the selection
+                 * overlaps is dropped either way, so the same words never end up
+                 * carrying two conflicting highlights.
+                 */
+                const overlapping = spans.filter((sp) => sp.end > start && sp.start < end);
+                const undoing =
+                    overlapping.length > 0 && overlapping.every((sp) => sp.type === activeType);
                 const kept = spans.filter((sp) => sp.end <= start || sp.start >= end);
 
                 emit({
-                    spans: eraseMode
+                    spans: undoing
                         ? kept
                         : [...kept, { type: activeType, start, end }].sort((a, b) => a.start - b.start)
                 });
@@ -340,52 +407,92 @@ export default function QuestionView({ currentQuestion, setAttendedQuestion, att
 
             return (
                 <div className="flex flex-col gap-3">
-                    <div className="flex items-center gap-2 flex-wrap">
-                        {types.map((type) => (
-                            <Button
-                                key={type.key}
-                                size="small"
-                                variant={!eraseMode && activeType === type.key ? "contained" : "outlined"}
-                                disabled={disabled}
-                                onClick={() => {
-                                    setEraseMode(false);
-                                    setActiveHighlightType(type.key);
-                                }}
-                                sx={{
-                                    background: !eraseMode && activeType === type.key ? type.color : undefined,
-                                    borderColor: type.color,
-                                    color: !eraseMode && activeType === type.key ? "#111" : undefined
-                                }}
-                            >
-                                {type.label || type.key}
-                            </Button>
-                        ))}
-                        <Button
-                            size="small"
-                            variant={eraseMode ? "contained" : "outlined"}
-                            disabled={disabled}
-                            onClick={() => setEraseMode((v) => !v)}
-                        >
-                            Erase
-                        </Button>
-                        <Button size="small" color="error" disabled={disabled} onClick={() => emit({ spans: [] })}>
-                            Clear
-                        </Button>
-                    </div>
+                    {/* One category is no choice at all, so it is not offered as
+                        one — these only appear when there is something to pick
+                        between. */}
+                    {types.length > 1 && (
+                        <div className="flex items-center gap-2 flex-wrap">
+                            {types.map((type) => (
+                                <Button
+                                    key={type.key}
+                                    size="small"
+                                    variant={activeType === type.key ? "contained" : "outlined"}
+                                    disabled={disabled}
+                                    onClick={() => setActiveHighlightType(type.key)}
+                                    sx={{
+                                        background: activeType === type.key ? type.color : undefined,
+                                        borderColor: type.color,
+                                        color: activeType === type.key ? "#111" : undefined
+                                    }}
+                                >
+                                    {type.label || type.key}
+                                </Button>
+                            ))}
+                        </div>
+                    )}
 
                     <Box
-                        ref={passageRef}
-                        onMouseUp={markSelection}
-                        className="rounded-lg p-3 leading-relaxed"
+                        className="overflow-hidden rounded-xl"
                         sx={{
-                            border: 1,
-                            borderColor: theme.palette.separator.dark,
-                            whiteSpace: "pre-wrap",
-                            userSelect: disabled ? "none" : "text",
+                            border: "1px solid",
+                            borderColor: t.border,
+                            backgroundColor: t.surface,
                             opacity: disabled ? 0.6 : 1
                         }}
                     >
-                        {pieces}
+                        {/* Only the passage may be inside this ref: the character
+                            offsets a highlight is saved as are counted from its
+                            text content, so a stray label would shift every span. */}
+                        <Box
+                            ref={passageRef}
+                            onMouseUp={markSelection}
+                            className="p-3.5 leading-relaxed"
+                            sx={{
+                                whiteSpace: "pre-wrap",
+                                userSelect: disabled ? "none" : "text"
+                            }}
+                        >
+                            {pieces}
+                        </Box>
+
+                        {/* Clear belongs to the passage, so it sits on it rather
+                            than floating above the question. The strip is always
+                            rendered and the button only hidden within it — kept
+                            conditional, it appeared on the first highlight and
+                            pushed the whole passage down the page. */}
+                        <Box
+                            className="flex items-center justify-between gap-3 px-3.5 py-1.5"
+                            sx={{
+                                borderTop: "1px solid",
+                                borderColor: t.border,
+                                backgroundColor: t.surfaceMuted
+                            }}
+                        >
+                            <Typography fontSize={11.5} sx={{ color: t.muted }}>
+                                {spans.length
+                                    ? `${spans.length} highlighted`
+                                    : "Select text to highlight it"}
+                            </Typography>
+
+                            <Button
+                                size="small"
+                                color="error"
+                                disabled={disabled}
+                                onClick={() => emit({ spans: [] })}
+                                tabIndex={spans.length ? 0 : -1}
+                                aria-hidden={spans.length ? undefined : true}
+                                sx={{
+                                    minWidth: 0,
+                                    px: 1,
+                                    py: 0.25,
+                                    fontSize: 12.5,
+                                    fontWeight: 600,
+                                    visibility: spans.length ? "visible" : "hidden"
+                                }}
+                            >
+                                Clear all
+                            </Button>
+                        </Box>
                     </Box>
                 </div>
             );
@@ -401,67 +508,157 @@ export default function QuestionView({ currentQuestion, setAttendedQuestion, att
             const columns = currentQuestion.columns ?? [];
             const multiplePerRow = Boolean(currentQuestion.multiple_per_row);
 
+            const pickCell = (rowKey: string, optionId: number) =>
+                multiplePerRow ? toggleCell(rowKey, optionId) : handleGroupPick(rowKey, optionId);
+
             return (
-                <div className="overflow-x-auto w-full">
-                    <table className="w-full border-collapse">
-                        <thead>
+                <Box
+                    className="w-full overflow-x-auto rounded-xl"
+                    sx={{ border: "1px solid", borderColor: t.border }}
+                >
+                    <Box component="table" className="w-full border-collapse" sx={{ minWidth: 520 }}>
+                        <Box component="thead" sx={{ backgroundColor: t.surfaceMuted }}>
                             <tr>
-                                <th className="p-3 text-left" />
+                                <Box
+                                    component="th"
+                                    className="p-3 text-left"
+                                    sx={{ minWidth: 180, borderBottom: "1px solid", borderColor: t.border }}
+                                />
                                 {columns.map((column) => (
-                                    <th key={column.key} className="p-3 text-center min-w-[110px]">
-                                        <Typography variant="subtitle2" color="text.dark" className="font-semibold">
+                                    <Box
+                                        component="th"
+                                        key={column.key}
+                                        className="p-3 text-center"
+                                        sx={{
+                                            minWidth: 110,
+                                            borderBottom: "1px solid",
+                                            borderLeft: "1px solid",
+                                            borderColor: t.border
+                                        }}
+                                    >
+                                        <Typography fontSize={12.5} fontWeight={700} sx={{ color: t.foreground }}>
                                             {column.label || column.key}
                                         </Typography>
-                                    </th>
+                                    </Box>
                                 ))}
                             </tr>
-                        </thead>
+                        </Box>
                         <tbody>
                             {rows.map((row, index) => {
                                 const picked = groupAnswers[row.key] ?? [];
 
                                 return (
-                                    <tr
+                                    <Box
+                                        component="tr"
                                         key={row.key}
                                         // Zebra striping, as in a printed answer grid, so the
                                         // eye can follow a row across to the right column.
-                                        style={{
-                                            background: index % 2 === 0 ? theme.palette.action.hover : "transparent"
+                                        sx={{
+                                            backgroundColor: index % 2 === 0 ? "transparent" : t.surfaceMuted
                                         }}
                                     >
-                                        <td className="p-3">
-                                            <Typography color="text.dark">{row.label || row.key}</Typography>
-                                        </td>
+                                        <Box
+                                            component="td"
+                                            className="p-3"
+                                            sx={{ borderTop: "1px solid", borderColor: t.border }}
+                                        >
+                                            <Typography fontSize={14} sx={{ color: t.foreground }}>
+                                                {row.label || row.key}
+                                            </Typography>
+                                        </Box>
                                         {columns.map((column) => {
                                             const optionId = optionIdFor(row.key, column);
                                             const checked = optionId !== null && picked.includes(optionId);
+                                            const selectable = !disabled && optionId !== null;
 
+                                            /**
+                                             * The whole cell is the target, not just the
+                                             * control sitting in it — a grid of small radios
+                                             * is a miserable thing to hit, especially on a
+                                             * phone. The control stays as the state's
+                                             * visual, and the cell carries the role and the
+                                             * keyboard handling in its place.
+                                             */
                                             return (
-                                                <td key={column.key} className="p-3 text-center">
-                                                    {multiplePerRow ? (
-                                                        <Checkbox
-                                                            color="primary"
-                                                            checked={checked}
-                                                            disabled={disabled || optionId === null}
-                                                            onChange={() => optionId !== null && toggleCell(row.key, optionId)}
-                                                        />
-                                                    ) : (
-                                                        <Radio
-                                                            color="primary"
-                                                            checked={checked}
-                                                            disabled={disabled || optionId === null}
-                                                            onChange={() => optionId !== null && handleGroupPick(row.key, optionId)}
-                                                        />
-                                                    )}
-                                                </td>
+                                                <Box
+                                                    component="td"
+                                                    key={column.key}
+                                                    role={multiplePerRow ? "checkbox" : "radio"}
+                                                    aria-checked={checked}
+                                                    aria-label={`${row.label || row.key}: ${column.label || column.key}`}
+                                                    aria-disabled={!selectable}
+                                                    tabIndex={selectable ? 0 : -1}
+                                                    onClick={() => selectable && optionId !== null && pickCell(row.key, optionId)}
+                                                    onKeyDown={(event: React.KeyboardEvent) => {
+                                                        if (!selectable || optionId === null) return;
+                                                        if (event.key !== " " && event.key !== "Enter") return;
+                                                        // Space would otherwise scroll the page out
+                                                        // from under the student mid-answer.
+                                                        event.preventDefault();
+                                                        pickCell(row.key, optionId);
+                                                    }}
+                                                    className="p-3 text-center"
+                                                    sx={{
+                                                        borderTop: "1px solid",
+                                                        borderLeft: "1px solid",
+                                                        borderColor: t.border,
+                                                        cursor: selectable ? "pointer" : "not-allowed",
+                                                        backgroundColor: checked ? t.primarySoft : "transparent",
+                                                        transition: "background-color .15s ease",
+                                                        opacity: disabled ? 0.6 : 1,
+                                                        outlineOffset: "-2px",
+                                                        "&:hover": {
+                                                            backgroundColor: checked
+                                                                ? t.primarySoft
+                                                                : selectable ? theme.palette.action.hover : "transparent"
+                                                        },
+                                                        "&:focus-visible": { outline: `2px solid ${t.primary}` }
+                                                    }}
+                                                >
+                                                    {/*
+                                                      * The same filled circle and tick an option row
+                                                      * uses when it is chosen, so one answer looks
+                                                      * like an answer wherever it is given. Always
+                                                      * laid out and only filled when checked, so
+                                                      * working down a column never changes the row
+                                                      * heights under the cursor. The cell carries the
+                                                      * click and the ARIA state; this is the picture
+                                                      * of it.
+                                                      */}
+                                                    <Box
+                                                        aria-hidden
+                                                        className="mx-auto flex items-center justify-center rounded-full"
+                                                        sx={{
+                                                            width: 22,
+                                                            height: 22,
+                                                            border: "1px solid",
+                                                            borderColor: checked ? t.primary : t.border,
+                                                            backgroundColor: checked ? t.primary : t.surface,
+                                                            color: t.primaryForeground,
+                                                            transition: "background-color .15s ease, border-color .15s ease"
+                                                        }}
+                                                    >
+                                                        {checked && (
+                                                            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden>
+                                                                <path
+                                                                    d="M2.5 6.3 4.8 8.6 9.5 3.9"
+                                                                    stroke="currentColor"
+                                                                    strokeWidth="1.8"
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                />
+                                                            </svg>
+                                                        )}
+                                                    </Box>
+                                                </Box>
                                             );
                                         })}
-                                    </tr>
+                                    </Box>
                                 );
                             })}
                         </tbody>
-                    </table>
-                </div>
+                    </Box>
+                </Box>
             );
         }
 
@@ -1012,16 +1209,18 @@ export default function QuestionView({ currentQuestion, setAttendedQuestion, att
                                 <Typography variant="subtitle2" color="text.dark" className="font-semibold">
                                     {group.label || group.key}
                                 </Typography>
-                                <RadioGroup
-                                    value={picked ?? ""}
-                                    onChange={(e) => handleGroupPick(group.key, Number(e.target.value))}
-                                >
-                                    <div className="flex flex-col gap-3 md:grid md:grid-cols-2">
-                                        {groupOptions.map((option) =>
-                                            optionBox(option, picked === option.id, <Radio color="primary" />)
-                                        )}
-                                    </div>
-                                </RadioGroup>
+                                <div className={optionListClass}>
+                                    {groupOptions.map((option, index) =>
+                                        optionBox(
+                                            option,
+                                            picked === option.id,
+                                            () => option.id !== null && handleGroupPick(group.key, option.id),
+                                            index,
+                                            false,
+                                            `${fieldName}-${group.key}`
+                                        )
+                                    )}
+                                </div>
                             </div>
                         );
                     })}
@@ -1075,20 +1274,14 @@ export default function QuestionView({ currentQuestion, setAttendedQuestion, att
 
         if (isMultiSelect) {
             return (
-                <div className="flex flex-col gap-4 md:gap-6 md:grid md:grid-cols-2">
-                    {currentQuestion.options.map((option) =>
+                <div className={optionListClass}>
+                    {currentQuestion.options.map((option, index) =>
                         optionBox(
                             option,
                             option.id !== null && selectedIds.includes(option.id),
-                            <Checkbox
-                                color="primary"
-                                // Radio carries MUI's default 9px padding; the themed
-                                // Checkbox resets it to 0, so match it here or the box
-                                // sits flush against the option border.
-                                sx={{ p: "9px" }}
-                                checked={option.id !== null && selectedIds.includes(option.id)}
-                                onChange={() => option.id !== null && handleToggle(option.id)}
-                            />
+                            () => option.id !== null && handleToggle(option.id),
+                            index,
+                            true
                         )
                     )}
                 </div>
@@ -1096,16 +1289,17 @@ export default function QuestionView({ currentQuestion, setAttendedQuestion, att
         }
 
         return (
-            <RadioGroup
-                value={selectedOptionId || ""}
-                onChange={(e) => handleSingle(Number(e.target.value))}
-            >
-                <div className="flex flex-col gap-4 md:gap-6 md:grid md:grid-cols-2">
-                    {currentQuestion.options.map((option) =>
-                        optionBox(option, selectedOptionId === option.id, <Radio color="primary" />)
-                    )}
-                </div>
-            </RadioGroup>
+            <div className={optionListClass} role="radiogroup">
+                {currentQuestion.options.map((option, index) =>
+                    optionBox(
+                        option,
+                        selectedOptionId === option.id,
+                        () => option.id !== null && handleSingle(option.id),
+                        index,
+                        false
+                    )
+                )}
+            </div>
         );
     };
 
@@ -1128,45 +1322,81 @@ export default function QuestionView({ currentQuestion, setAttendedQuestion, att
         return null;
     })();
 
+    const marks = currentQuestion?.points ?? 0;
+
     return (
-        <div className="question__wrapper">
-            <div className="question flex flex-col gap-3">
+        <Box
+            // Re-keying on the question restarts the entrance animation, which is
+            // what tells the student the paper moved — the layout around it does
+            // not change between questions.
+            key={currentQuestion?.id ?? "question"}
+            className="question__wrapper"
+            sx={{
+                animation: "quizFadeUp .2s ease-out",
+                "@keyframes quizFadeUp": {
+                    from: { opacity: 0, transform: "translateY(4px)" },
+                    to: { opacity: 1, transform: "translateY(0)" }
+                }
+            }}
+        >
+            <Box className="flex flex-wrap items-center gap-x-2.5 gap-y-2">
                 <Typography
-                    variant="subtitle2"
-                    sx={{
-                        background: theme.palette.primary.light,
-                        color: theme.palette.primary.main
-                    }}
-                    className="py-1.5 px-4.5 rounded-4xl font-bold max-w-fit"
+                    fontSize={12.5}
+                    fontWeight={700}
+                    className="tabular-nums"
+                    sx={{ color: t.foreground }}
                 >
-                    Question:
+                    Question {questionIndex + 1}
                 </Typography>
-                {!hidesQuestionText && (
-                    <Typography className={currentQuestion?.has_image_in_option ? "max-w-[50%]" : ""}>
+
+                <Typography aria-hidden fontSize={12.5} sx={{ color: t.muted }}>
+                    ·
+                </Typography>
+
+                {/* Plain multiple choice states no rule of its own, and a student
+                    still needs telling that only one answer is taken. */}
+                <Typography fontSize={12.5} sx={{ color: t.muted }}>
+                    {instruction ?? "Choose one"}
+                </Typography>
+
+                {marks > 0 && (
+                    <Box
+                        className="ml-auto rounded-lg tabular-nums"
+                        sx={{
+                            px: 1.25,
+                            py: 0.375,
+                            fontSize: 11.5,
+                            fontWeight: 700,
+                            color: t.muted,
+                            border: "1px solid",
+                            borderColor: t.border,
+                            backgroundColor: t.surfaceMuted
+                        }}
+                    >
+                        {marks} {marks === 1 ? "mark" : "marks"}
+                    </Box>
+                )}
+            </Box>
+
+            {!hidesQuestionText && (
+                <Box
+                    className={`general__content__box mt-4 ${currentQuestion?.has_image_in_option ? "md:max-w-[70%]" : ""}`}
+                    sx={{ "& p:first-of-type": { marginTop: 0 } }}
+                >
+                    <Typography
+                        component="div"
+                        fontSize={17}
+                        fontWeight={500}
+                        lineHeight={1.7}
+                        sx={{ color: t.foreground }}
+                    >
                         {renderHtml(currentQuestion?.question || "")}
                     </Typography>
-                )}
-            </div>
-            <Divider className="my-4!" />
-            <div className="flex items-center gap-3 flex-wrap mb-3">
-                <Typography
-                    variant="subtitle2"
-                    sx={{
-                        background: theme.palette.success.light,
-                        color: theme.palette.success.main
-                    }}
-                    className="py-1.5 px-4.5 rounded-4xl font-bold max-w-fit block"
-                >
-                    Options:
-                </Typography>
-                {instruction && (
-                    <Typography variant="caption" color="text.secondary">
-                        {instruction}
-                    </Typography>
-                )}
-            </div>
-            {renderBody()}
-        </div>
+                </Box>
+            )}
+
+            <Box className="mt-6">{renderBody()}</Box>
+        </Box>
     );
 }
 

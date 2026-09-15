@@ -3,10 +3,13 @@ import { t } from "i18next";
 import type { JSX } from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { requestDocumentFullscreen } from "../../../hooks/useFullscreen";
 import { PATH } from "../../../routes/PATH";
 import { useGetAllLiveClassesQuery } from "../../../services/liveApi";
 import { useGetAllNotificationsQuery } from "../../../services/notificationApi";
 import { useGetUserAllTestQuery } from "../../../services/testApi";
+import { openTest } from "../../../slice/testRunnerSlice";
+import { useAppDispatch } from "../../../store/hook";
 import type { LiveClassProps } from "../../../types/liveClass";
 import type { NotificationProps } from "../../../types/notification";
 import type { TestProps } from "../../../types/question";
@@ -38,6 +41,7 @@ function CalendarEventPanel({
 }) {
     const theme = useTheme();
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
 
     if (!selectedDate) return null;
 
@@ -50,7 +54,11 @@ function CalendarEventPanel({
     };
 
     const handleViewTest = (tc: TestProps) => {
-        if (tc.id) navigate(PATH.TEST.VIEW_TEST.ROOT({ testId: Number(tc.id) }));
+        if (!tc.id) return;
+        // The click has to carry the full-screen request; the runner cannot ask
+        // for one of its own once the gesture is over.
+        void requestDocumentFullscreen();
+        dispatch(openTest({ testId: Number(tc.id) }));
     };
 
     const allEmpty = liveList.length === 0 && testList.length === 0;

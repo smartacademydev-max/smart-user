@@ -1,8 +1,9 @@
 import { Box, Divider, Typography, useTheme } from '@mui/material';
 import { Clock, DocumentText, TaskSquare } from 'iconsax-reactjs';
-import { useNavigate, useParams } from 'react-router-dom';
-import { PATH } from '../../../routes/PATH';
+import { useParams } from 'react-router-dom';
+import { requestDocumentFullscreen } from '../../../hooks/useFullscreen';
 import { setPurchase } from '../../../slice/purchaseSlice';
+import { openTest } from '../../../slice/testRunnerSlice';
 import { useAppDispatch } from '../../../store/hook';
 import type { CurriculumTestProps, DurationProps } from '../../../types/course';
 
@@ -23,19 +24,20 @@ function formatDuration(d: DurationProps | undefined | null): string {
 
 export default function CurriculumTestCard({ test, havePurchased, courseId }: Props) {
     const theme = useTheme();
-    const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const { id: routeCourseId } = useParams();
     const resolvedCourseId = courseId ?? Number(routeCourseId);
 
     const handleClick = () => {
         if (havePurchased) {
-            navigate(
-                PATH.COURSE_MANAGEMENT.COURSES.VIEW_TEST.ROOT({
-                    courseId: Number(resolvedCourseId),
-                    testId: test.id,
-                })
-            );
+            // Spend the click's gesture on full screen before opening the
+            // runner — it cannot ask for itself once the click is over. See
+            // requestDocumentFullscreen.
+            void requestDocumentFullscreen();
+            dispatch(openTest({
+                testId: Number(test.id),
+                courseId: Number(resolvedCourseId),
+            }));
         } else {
             dispatch(setPurchase({ courseId: Number(resolvedCourseId), open: true }));
         }
