@@ -6,6 +6,7 @@ import type { TestProps } from "../../../types/question";
 import { formatDateTime } from "../../../utils/dateFormat";
 import { getStatus } from "../../../utils/getStatus";
 import { getTestProgressStatus, type StatusVariant } from "../../../utils/statusMap";
+import { isTestNotStarted } from "../../../utils/testSchedule";
 import Donut from "../../atom/Donut";
 import StatusPillWithBorder from "../../atom/StatusPillWithBorder";
 import type { TestStatus } from "../../pages/TestManagement/allTest/AllTestList";
@@ -24,6 +25,8 @@ export default function TestCard({ test, havePurchased, status: testStatus }: { 
   // Completed/Awaiting — only an unattempted one is surfaced as "Expired".
   const isWindowClosed = !!test?.has_expired || testStatus === "expired";
   const isExpired = isWindowClosed && !test?.has_taken_test;
+  // OMR skips TestActionButton entirely, so its own start gate lives here.
+  const notStarted = isTestNotStarted(test);
 
   const variant: StatusVariant = isExpired
     ? "error"
@@ -132,7 +135,9 @@ export default function TestCard({ test, havePurchased, status: testStatus }: { 
           >
             Download Format
           </Button>
-          <Button variant="contained" color="primary" onClick={() => setOmrOpen(true)}>Start Now</Button>
+          <Button variant="contained" color="primary" disabled={notStarted} onClick={() => setOmrOpen(true)}>
+            {notStarted ? `Starts ${formatDateTime(test.start_datetime)}` : "Start Now"}
+          </Button>
           <OmrInstructionModal open={omrOpen} onClose={() => setOmrOpen(false)} test={test} />
         </div> :
           <div className="flex items-center justify-between">

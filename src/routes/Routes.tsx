@@ -1,3 +1,4 @@
+import RouteErrorBoundary from "../components/organism/ErrorBoundary/RouteErrorBoundary";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "../App";
 import AuthRoot from "../components/pages/auth";
@@ -108,6 +109,14 @@ import Private from "./Private";
 import RootLayout from "./RootLayout";
 
 const router = createBrowserRouter([
+    {
+        /**
+         * Pathless root. Its errorElement covers every route below it; without
+         * one React Router falls back to DefaultErrorComponent, which prints the
+         * error message and a full stack trace in production.
+         */
+        errorElement: <RouteErrorBoundary />,
+        children: [
   {
     path: PATH.AUTH.CHOOSE_PLATFORM.ROOT,
     element: <ChoosePlatform />
@@ -435,6 +444,8 @@ const router = createBrowserRouter([
     path: "*",
     element: <NotFound />,
   },
+        ],
+    },
 ]);
 export default function GlobalRoutes() {
   return <RouterProvider router={router} />;

@@ -1,3 +1,4 @@
+import AppErrorBoundary from "./components/organism/ErrorBoundary/AppErrorBoundary.tsx";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import i18n from "i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
@@ -47,7 +48,9 @@ createRoot(document.getElementById("root")!).render(
 
             <GoogleOAuthProvider clientId='361289665406-npg48sokjoqcdepd1qov5dq4l6meipri.apps.googleusercontent.com'>
               <AppController>
-                <GlobalRoutes />
+                <AppErrorBoundary>
+                  <GlobalRoutes />
+                </AppErrorBoundary>
                 <Toast />
                 <SessionExpiredPopup />
                 <ReadingDialog />

@@ -35,7 +35,13 @@ export default function TestResultDialog({ open, result, onReview, onClose, onBa
                         fontWeight: 700,
                         offsetY: 6,
                         color: theme.palette.primary.main,
-                        formatter: () => `${percentage}%`
+                        /**
+                         * The ring still fills by percentage, but the marks are
+                         * what a student is actually looking for.
+                         */
+                        formatter: () => (result?.full_mark ?? 0) > 0
+                            ? `${result?.score ?? 0}/${result?.full_mark}`
+                            : `${result?.score ?? 0}`
                     }
                 }
             }
@@ -75,7 +81,9 @@ export default function TestResultDialog({ open, result, onReview, onClose, onBa
                     color="text.middle"
                     variant="subtitle1"
                 >
-                    {result ? getScoreMessage(result.score) : ""}
+                    {/* Percentage bands, so they take the percentage — fed raw
+                        marks, a 3.2/8 always fell into the lowest band. */}
+                    {result ? getScoreMessage(result.percentage) : ""}
                 </Typography>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mt-2">
@@ -143,7 +151,49 @@ export default function TestResultDialog({ open, result, onReview, onClose, onBa
                             {result?.attempted}/{result?.total_questions}
                         </Typography>
                     </Box>
+
                 </div>
+
+                {/* Marks — the same two rows the review aside shows, so the
+                    figures a student sees on submitting are the figures they
+                    find again when they come back to review. */}
+                {result?.negative_marking_enabled && (
+                    <div className="flex flex-col gap-4 w-full mt-4">
+                        <Box
+                            className="rounded-xl p-4 flex items-center justify-between gap-4"
+                            sx={{
+                                border: `1px solid ${theme.palette.warning.main}`,
+                                background: theme.palette.warning.light,
+                            }}
+                        >
+                            <Typography color="warning.main" variant="subtitle2" fontWeight={600}>
+                                Negative marking
+                            </Typography>
+                            <Typography color="warning.main" variant="body2" fontWeight={700}>
+                                -{result?.negative_marks_deducted ?? 0}
+                            </Typography>
+                        </Box>
+
+                        <Box
+                            className="rounded-xl p-4 flex items-center justify-between gap-4"
+                            sx={{
+                                border: `1px solid ${theme.palette.error.main}`,
+                                background: theme.palette.error.light,
+                            }}
+                        >
+                            <Typography color="error.main" variant="subtitle2" fontWeight={600}>
+                                Net score
+                            </Typography>
+                            {/* The submit response carries no full marks, so the
+                                score stands alone rather than reading "x / 0". */}
+                            <Typography color="error.main" variant="body2" fontWeight={700}>
+                                {(result?.full_mark ?? 0) > 0
+                                    ? `${result?.score ?? 0} / ${result?.full_mark}`
+                                    : `${result?.score ?? 0}`}
+                            </Typography>
+                        </Box>
+                    </div>
+                )}
 
                 {/* Footer Buttons */}
                 <div className="w-full mt-6 flex gap-4">

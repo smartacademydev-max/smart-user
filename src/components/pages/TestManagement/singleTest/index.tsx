@@ -19,6 +19,7 @@ import type {
 
 import { formatDateTime } from "../../../../utils/dateFormat";
 import { renderHtml } from "../../../../utils/renderHtml";
+import { isTestNotStarted } from "../../../../utils/testSchedule";
 
 import TestCancelDialog from "../../../organism/Dialog/TestCancelDialog";
 import TestResultDialog from "../../../organism/Dialog/TestResultDialog";
@@ -144,6 +145,9 @@ export default function SingleTestRoot() {
 
     useEffect(() => {
         if (!data || data.overview?.test_type !== "mcq") return;
+        // Window has not opened. Seed nothing — no timer, no saved progress —
+        // so a direct URL visit cannot start an attempt early.
+        if (isTestNotStarted(data.overview)) return;
 
         const endTime = data.overview.end_datetime ? new Date(data.overview.end_datetime).getTime() : null;
         const currentTime = Date.now();
@@ -313,6 +317,9 @@ export default function SingleTestRoot() {
 
     const isReady = !!data && !isLoading && !isFetching;
     const isMCQ = data?.overview?.test_type === "mcq";
+    // The card gates the Start button, but this route is reachable by URL, so the
+    // start window has to be enforced here too.
+    const notStarted = isReady && isTestNotStarted(data?.overview);
     const questions = data?.data ?? [];
     // Answering is locked either because the test window closed before the
     // attempt started (viewOnly) or because the timer just ran out.
@@ -331,6 +338,42 @@ export default function SingleTestRoot() {
                     <SidebarSkeleton />
                     <QuestionSkeleton />
                 </div>
+            </div>
+        );
+    }
+
+    if (notStarted) {
+        return (
+            <div className="single__test__wrapper">
+                <Button startIcon={<ArrowLeft />} onClick={() => navigate(exitPath)}>
+                    Back to Test
+                </Button>
+
+                <Divider className="my-4!" />
+
+                <Box
+                    className="flex items-start gap-2 rounded-lg p-3"
+                    sx={{
+                        bgcolor: "warning.light",
+                        border: "1px solid",
+                        borderColor: "warning.main",
+                        color: "warning.main",
+                    }}
+                >
+                    <Lock variant="Bold" size={18} />
+                    <div>
+                        <Typography variant="subtitle2" fontWeight={600} color="warning.main">
+                            This test has not started yet
+                            {data?.overview?.start_datetime
+                                ? ` — it opens on ${formatDateTime(data.overview.start_datetime)}`
+                                : ""}
+                        </Typography>
+                        <Typography variant="caption" color="warning.main">
+                            The questions become available once the scheduled start time
+                            arrives. Please come back then.
+                        </Typography>
+                    </div>
+                </Box>
             </div>
         );
     }

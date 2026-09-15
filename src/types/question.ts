@@ -261,6 +261,16 @@ export interface McqSubmissionData {
     percentage: number;
     test_type: "mcq" | string;
     test_name: string;
+    /** Whether the test was set up to deduct marks for wrong answers. */
+    negative_marking_enabled?: boolean;
+    /** Whether this attempt actually lost marks to negative marking. */
+    is_negative_marked?: boolean;
+    /** Marks removed from this attempt by negative marking. */
+    negative_marks_deducted?: number;
+    /** Marks earned from correct answers, before any deduction. */
+    correct_score?: number;
+    /** The paper's full marks. */
+    full_mark?: number;
 }
 
 export interface McqSubmissionResponse extends GlobalResponse {

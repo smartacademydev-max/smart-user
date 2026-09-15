@@ -6,48 +6,47 @@ import { PATH } from "../../../routes/PATH";
 import { setPurchase } from "../../../slice/purchaseSlice";
 import type { TestProps } from "../../../types/question";
 import { formatDateTime } from "../../../utils/dateFormat";
+import {
+    COUNTDOWN_WINDOW_MS,
+    formatCountdown,
+    msUntilTestStart,
+} from "../../../utils/testSchedule";
 
 
 const TestActionButton = ({ test, havePurchased, id, isExpired: isExpiredProp }: { test: TestProps, status?: any; havePurchased: boolean; id?: number; isExpired?: boolean }) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const [timeLeft, setTimeLeft] = useState<number | null>(null);
+    // Milliseconds until the test opens; null once it is open (or unscheduled).
+    // Seeded synchronously so the very first paint is already gated — deriving
+    // it in the effect alone left the enabled button clickable for one frame.
+    const [msToStart, setMsToStart] = useState<number | null>(() =>
+        msUntilTestStart(test)
+    );
 
     useEffect(() => {
-        if (!test.is_scheduled) return;
+        let timer: ReturnType<typeof setTimeout>;
 
-        const startTime = new Date(test.start_datetime).getTime();
-        const now = Date.now();
-        const diff = startTime - now;
+        // Ticks once a second while the countdown is on screen; further out it
+        // just naps until the countdown window opens, so a page full of cards
+        // scheduled weeks ahead does not re-render every second. Either way the
+        // button unlocks on its own the moment the start time passes.
+        const schedule = () => {
+            const diff = msUntilTestStart(test);
+            setMsToStart(diff);
+            if (diff === null) return;
 
-        
-        if (diff > 0 && diff <= 24 * 60 * 60 * 1000) {
-            setTimeLeft(diff);
+            const delay =
+                diff <= COUNTDOWN_WINDOW_MS
+                    ? 1000
+                    : Math.min(diff - COUNTDOWN_WINDOW_MS, 60 * 60 * 1000);
 
-            const interval = setInterval(() => {
-                const newDiff = startTime - Date.now();
+            timer = setTimeout(schedule, delay);
+        };
 
-                if (newDiff <= 0) {
-                    clearInterval(interval);
-                    setTimeLeft(null);
-                } else {
-                    setTimeLeft(newDiff);
-                }
-            }, 1000);
+        schedule();
 
-            return () => clearInterval(interval);
-        }
+        return () => clearTimeout(timer);
     }, [test.start_datetime, test.is_scheduled]);
-
-    const formatCountdown = (ms: number) => {
-        const totalSeconds = Math.floor(ms / 1000);
-        const hours = Math.floor(totalSeconds / 3600);
-        const minutes = Math.floor((totalSeconds % 3600) / 60);
-        const seconds = totalSeconds % 60;
-
-        return `${hours}h ${minutes}m ${seconds}s`;
-    };
-
 
     const handleStartOrRetake = () => {
         if (!havePurchased) {
@@ -151,25 +150,16 @@ const TestActionButton = ({ test, havePurchased, id, isExpired: isExpiredProp }:
         )
     }
 
-    if (test.is_scheduled) {
-        const startTime = new Date(test.start_datetime).getTime();
-        const initialDiff = startTime - Date.now();
-
-        const shouldShowCountdown =
-            initialDiff > 0 && initialDiff <= 24 * 60 * 60 * 1000;
-
-        const hasStarted = !shouldShowCountdown || timeLeft === null || timeLeft <= 0;
-
-        if (!hasStarted) {
-            return (
-                <Button variant="contained" color="primary" disabled >
-                    {timeLeft
-                        ? `Starts in ${formatCountdown(timeLeft)}`
-                        : `Test Starts at ${formatDateTime(test.start_datetime)}`
-                    }
-                </Button>
-            );
-        }
+    // Scheduled and not open yet. Gate on the clock alone — the countdown window
+    // only decides which label to show, never whether the test can be started.
+    if (msToStart !== null) {
+        return (
+            <Button variant="contained" color="primary" disabled>
+                {msToStart <= COUNTDOWN_WINDOW_MS
+                    ? `Starts in ${formatCountdown(msToStart)}`
+                    : `Test Starts at ${formatDateTime(test.start_datetime)}`}
+            </Button>
+        );
     }
 
     return <Button variant="contained" color="primary" onClick={handleStartOrRetake}>
