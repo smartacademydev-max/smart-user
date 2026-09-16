@@ -37,6 +37,17 @@ export function ScoreRing({ percentage, score, fullMark = 0, size = 132, animate
         return () => cancelAnimationFrame(id);
     }, [animateKey]);
 
+    const label = fullMark > 0 ? `${score}/${fullMark}` : `${score}`;
+
+    /**
+     * The middle of the ring is a fixed circle but the label is not: a paper
+     * marked out of ten reads "9/10", one whose questions carry their own marks
+     * reads "12.25/16". A single size set for the short case crowds the ring on
+     * the long one, so it steps down as the label grows.
+     */
+    const base = size >= 120 ? 26 : 21;
+    const labelSize = label.length <= 5 ? base : label.length <= 7 ? base - 5 : base - 8;
+
     return (
         <Box sx={{ position: "relative", width: size, height: size, mx: "auto" }}>
             <Box
@@ -66,11 +77,11 @@ export function ScoreRing({ percentage, score, fullMark = 0, size = 132, animate
             >
                 <Typography
                     className="tabular-nums"
-                    fontSize={size >= 120 ? 26 : 21}
+                    fontSize={labelSize}
                     fontWeight={700}
                     sx={{ color: t.foreground }}
                 >
-                    {fullMark > 0 ? `${score}/${fullMark}` : score}
+                    {label}
                 </Typography>
                 <Typography
                     className="tabular-nums"
