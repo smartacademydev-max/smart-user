@@ -567,6 +567,7 @@ function TestScreen({ testId, courseId }: { testId: number; courseId?: number })
                         answered={answeredIds.size}
                         remainingMs={timeLeft}
                         locked={isLocked}
+                        fullscreen={isFullscreen}
                         onOpenNavigator={() => setNavigatorOpen(true)}
                         onSubmit={() => setSubmitModal({ open: true, type: "submit" })}
                         onExit={() => (viewOnly ? dismiss() : setCancelModal(true))}

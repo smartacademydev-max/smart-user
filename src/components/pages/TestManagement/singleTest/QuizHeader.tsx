@@ -4,6 +4,20 @@ import { ArrowLeft, Element3, Send2 } from "iconsax-reactjs";
 import QuizTimer from "./QuizTimer";
 import { useQuizTokens } from "./quizTokens";
 
+/**
+ * macOS slides its own chrome — the menu bar and the window's traffic-light
+ * buttons — over the top edge of a full-screen page whenever the pointer
+ * reaches it, and that strip lands straight on this header. On a Mac in full
+ * screen the bar therefore grows by the height of that overlay so its row sits
+ * clear of it; every other platform draws nothing over the page and keeps the
+ * normal height.
+ */
+const APPLE_FULLSCREEN_INSET = 36;
+
+const isApple =
+    typeof navigator !== "undefined" &&
+    /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
+
 interface Props {
     title: string;
     questionCount: number;
@@ -13,6 +27,8 @@ interface Props {
     /** Hides the submit control once the paper can no longer be submitted. */
     locked?: boolean;
     submitLabel?: string;
+    /** Whether the document is in full screen right now. */
+    fullscreen?: boolean;
     onOpenNavigator: () => void;
     onSubmit: () => void;
     onExit: () => void;
@@ -33,6 +49,7 @@ export default function QuizHeader({
     remainingMs,
     locked = false,
     submitLabel = "Submit",
+    fullscreen = false,
     onOpenNavigator,
     onSubmit,
     onExit
@@ -52,7 +69,8 @@ export default function QuizHeader({
                 // of the same surface instead of a second app on top.
                 backgroundColor: alpha(t.surface, 0.72),
                 backdropFilter: "blur(14px) saturate(180%)",
-                WebkitBackdropFilter: "blur(14px) saturate(180%)"
+                WebkitBackdropFilter: "blur(14px) saturate(180%)",
+                pt: fullscreen && isApple ? `${APPLE_FULLSCREEN_INSET}px` : 0
             }}
         >
             <Box className="flex h-14 items-center gap-2 px-3 sm:gap-3 md:px-5">
