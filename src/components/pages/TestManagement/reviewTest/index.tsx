@@ -662,6 +662,26 @@ export default function ReviewTestRoot() {
                 skipped: { label: "Not answered", tone: t.muted },
             }[type];
 
+            /**
+             * Questions are not worth the same — a five-zone bow-tie carries five
+             * marks beside an MCQ's one — and a wrong answer can still hold
+             * partial credit. Without both figures on the card, five correct out
+             * of ten reading as ten marks earned in the summary has nothing to
+             * explain it.
+             *
+             * `earned` is stored net of the answer's own penalty, so the penalty
+             * is added back: what the answer gained and what it cost are two
+             * separate figures, the same way the summary splits them.
+             */
+            const marks = Number(q.marks ?? 0);
+            const penalty = Number(q.penalty ?? 0);
+            const gained = Math.max(0, Number(q.earned ?? 0) + penalty);
+            const marksTone = marks > 0 && gained >= marks
+                ? t.success
+                : gained > 0
+                    ? t.warning
+                    : t.muted;
+
             return (
                 <Box
                     className="question__box rounded-2xl p-4 md:p-5"
@@ -681,6 +701,31 @@ export default function ReviewTestRoot() {
                         <Typography fontSize={12.5} fontWeight={600} sx={{ color: verdict.tone }}>
                             {verdict.label}
                         </Typography>
+
+                        {marks > 0 && (
+                            <>
+                                <Typography aria-hidden fontSize={12.5} sx={{ color: t.muted }}>·</Typography>
+                                <Typography
+                                    className="tabular-nums"
+                                    fontSize={12.5}
+                                    fontWeight={600}
+                                    sx={{ color: marksTone }}
+                                >
+                                    {gained} of {marks} mark{marks === 1 ? "" : "s"}
+                                </Typography>
+
+                                {penalty > 0 && (
+                                    <Typography
+                                        className="tabular-nums"
+                                        fontSize={12.5}
+                                        fontWeight={600}
+                                        sx={{ color: t.danger }}
+                                    >
+                                        −{penalty} penalty
+                                    </Typography>
+                                )}
+                            </>
+                        )}
                     </Box>
 
                     <Box className="general__content__box mb-5" sx={{ "& p:first-of-type": { marginTop: 0 } }}>

@@ -315,6 +315,14 @@ export interface McqReportAnswerItem {
         /** True when the gap has no answer key, so it cannot be judged. */
         ungraded?: boolean;
     }>;
+    /**
+     * What the question was worth, and what the answer took from it. Absent on
+     * results served by an API that predates them, where the card simply shows
+     * no marks rather than a wrong zero.
+     */
+    marks?: number;
+    earned?: number;
+    penalty?: number;
 }
 export interface McqReportData {
     test_name: string;
