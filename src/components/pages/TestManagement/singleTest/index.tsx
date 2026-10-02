@@ -20,6 +20,7 @@ import type {
 } from "../../../../types/question";
 
 import { useFullscreen } from "../../../../hooks/useFullscreen";
+import { useLeaderboardUrl } from "../../../../hooks/useLeaderboardUrl";
 import { formatDateTime } from "../../../../utils/dateFormat";
 import { renderHtml } from "../../../../utils/renderHtml";
 import { isTestNotStarted } from "../../../../utils/testSchedule";
@@ -89,6 +90,8 @@ function TestScreen({ testId, courseId }: { testId: number; courseId?: number })
     const exitPath = numericCourseId
         ? PATH.COURSE_MANAGEMENT.COURSES.VIEW_COURSE.ROOT(numericCourseId)
         : PATH.TEST.MY_TEST.ROOT;
+
+    const leaderboardUrl = useLeaderboardUrl(numericCourseId, numericTestId);
 
     const STORAGE_KEY = `mcq_test_progress_${courseId}_${testId}`;
     const RESULT_KEY = `mcq_test_result_${courseId}_${testId}`;
@@ -734,6 +737,11 @@ function TestScreen({ testId, courseId }: { testId: number; courseId?: number })
                     dismiss();
                     navigate(exitPath);
                 }}
+                onViewLeaderboard={leaderboardUrl ? () => {
+                    localStorage.removeItem(RESULT_KEY);
+                    dismiss();
+                    window.location.assign(leaderboardUrl);
+                } : undefined}
             />
         </Overlay>
     );

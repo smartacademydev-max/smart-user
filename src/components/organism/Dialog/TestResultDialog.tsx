@@ -10,6 +10,8 @@ interface Props {
     onReview?: () => void;
     onClose?: () => void;
     onBack?: () => void;
+    // Shown only when an external leaderboard is configured for this test
+    onViewLeaderboard?: () => void;
 }
 
 /**
@@ -17,7 +19,7 @@ interface Props {
  * pieces as the summary beside the review, so the figures a student sees here
  * are the figures they find again when they come back to it.
  */
-export default function TestResultDialog({ open, result, onReview, onClose, onBack }: Props) {
+export default function TestResultDialog({ open, result, onReview, onClose, onBack, onViewLeaderboard }: Props) {
     const t = useQuizTokens();
 
     const fullMark = result?.full_mark ?? 0;
@@ -86,10 +88,22 @@ export default function TestResultDialog({ open, result, onReview, onClose, onBa
                 </Box>
 
                 <Box className="mt-6 flex flex-col gap-2">
+                    {onViewLeaderboard && (
+                        <Button
+                            fullWidth
+                            size="large"
+                            variant="contained"
+                            color="primary"
+                            onClick={onViewLeaderboard}
+                            sx={{ fontWeight: 600 }}
+                        >
+                            View Leaderboard
+                        </Button>
+                    )}
                     <Button
                         fullWidth
                         size="large"
-                        variant="contained"
+                        variant={onViewLeaderboard ? "outlined" : "contained"}
                         color="primary"
                         onClick={onReview}
                         sx={{ fontWeight: 600 }}

@@ -9,6 +9,7 @@ import { useRegisterMutation } from "../../../services/authApi";
 import { showToast } from "../../../slice/toastSlice";
 import { useAppDispatch, useAppSelector } from "../../../store/hook";
 import { captureAttribution, clearAttribution, getAttribution } from "../../../utils/attribution";
+import { getPendingRedirectUrl, withRedirectUrl } from "../../../utils/authRedirect";
 import Password from "../../atom/Password";
 
 export default function RegisterForm() {
@@ -28,24 +29,14 @@ export default function RegisterForm() {
     // Redirect if user is already logged in
     useEffect(() => {
         if (user) {
-            const redirectUrl = getPendingRedirectUrl();
+            const redirectUrl = getPendingRedirectUrl(searchParams);
             if (redirectUrl) {
                 navigate(redirectUrl);
             } else {
                 navigate(PATH.DASHBOARD.ROOT);
             }
         }
-    }, [user, navigate]);
-
-    const getPendingRedirectUrl = (): string => {
-        const courseId = searchParams.get("course");
-        const testId = searchParams.get("test");
-        const bundleId = searchParams.get("bundle");
-        if (courseId) return PATH.COURSE_MANAGEMENT.COURSES.VIEW_COURSE.ROOT(Number(courseId));
-        if (testId) return PATH.TEST.ROOT;
-        if (bundleId) return PATH.TEST.EXPLORE_TEST.BUNDLE_TEST.VIEW_BUNDLE.ROOT(Number(bundleId));
-        return "";
-    };
+    }, [user, navigate, searchParams]);
 
     const validationSchema = Yup.object({
         name: Yup.string().required("Full name is required"),
@@ -96,9 +87,11 @@ export default function RegisterForm() {
                         severity: "success",
                     }),
                 );
-                const redirectUrl = getPendingRedirectUrl();
-                const otpPath = isPasswordBased ? PATH.AUTH.LOGIN.ROOT : `${PATH.AUTH.VERIFY_OTP.ROOT}?phone=${values.phone}${redirectUrl ? `&redirect_url=${encodeURIComponent(redirectUrl)}` : ""}`;
-                navigate(otpPath);
+                // Password mode logs in on the next screen, so hand it the same deep-link params
+                const nextPath = isPasswordBased
+                    ? `${PATH.AUTH.LOGIN.ROOT}${window.location.search}`
+                    : withRedirectUrl(`${PATH.AUTH.VERIFY_OTP.ROOT}?phone=${values.phone}`, getPendingRedirectUrl(searchParams));
+                navigate(nextPath);
             } catch (e: any) {
                 dispatch(
                     showToast({

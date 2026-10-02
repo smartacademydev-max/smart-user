@@ -9,8 +9,8 @@ import {
 } from "@mui/material";
 import { useFormik } from "formik";
 import { Eye, EyeSlash } from "iconsax-reactjs";
-import { useMemo, useState } from "react";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { Link as RouterLink, useNavigate, useSearchParams } from "react-router-dom";
 import * as Yup from "yup";
 import { useLoginType } from "../../../hooks/useLoginType";
 import { PATH } from "../../../routes/PATH";
@@ -20,13 +20,22 @@ import {
 } from "../../../services/authApi";
 import { setCredentials } from "../../../slice/authSlice";
 import { showToast } from "../../../slice/toastSlice";
-import { useAppDispatch } from "../../../store/hook";
+import { useAppDispatch, useAppSelector } from "../../../store/hook";
+import { getPendingRedirectUrl, withRedirectUrl } from "../../../utils/authRedirect";
 import NewDeviceDetectedDialog from "../Dialog/NewDeviceDetectedDialog";
 
 export default function LoginForm() {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const user = useAppSelector((state) => state.auth.user);
     const { loginType } = useLoginType();
+    const redirectUrl = getPendingRedirectUrl(searchParams);
+
+    // Already signed in and arriving from a deep link (e.g. ?course=48) — go straight there
+    useEffect(() => {
+        if (user && redirectUrl) navigate(redirectUrl, { replace: true });
+    }, [user, redirectUrl, navigate]);
 
     const [useOtp, setUseOtp] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -64,7 +73,7 @@ export default function LoginForm() {
             if (!isPasswordMode) {
                 try {
                     await validateUser({ data: values.phone }).unwrap();
-                    navigate(`${PATH.AUTH.VERIFY_OTP.ROOT}?phone=${values.phone}`);
+                    navigate(withRedirectUrl(`${PATH.AUTH.VERIFY_OTP.ROOT}?phone=${values.phone}`, redirectUrl));
                 } catch (error: any) {
                     dispatch(
                         showToast({
@@ -87,7 +96,7 @@ export default function LoginForm() {
                         }),
                     );
 
-                    navigate(PATH.AUTH.INTEREST.ROOT, { replace: true });
+                    navigate(redirectUrl || PATH.AUTH.INTEREST.ROOT, { replace: true });
                 } catch (e: any) {
                     const d = e?.data?.data;
                     const hasDeviceInfo =
