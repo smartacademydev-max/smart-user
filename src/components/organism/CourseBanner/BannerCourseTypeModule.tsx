@@ -244,7 +244,8 @@ export default function BannerCourseTypeModule({ courseType, courseExpiry, cours
     };
 
     return (
-        <div className="rounded-md p-4 bg-[rgba(255,255,255,0.12)] flex flex-col gap-4 relative">
+        // id is the scroll target for PurchaseCourseDialog's "Explore Plans"
+        <div id="course-enrollment" className="rounded-md p-4 bg-[rgba(255,255,255,0.12)] flex flex-col gap-4 relative">
             {renderContent()}
         </div>
     );

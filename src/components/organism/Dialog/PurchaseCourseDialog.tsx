@@ -3,68 +3,11 @@ import { CloseCircle } from "iconsax-reactjs";
 import { useNavigate, useParams } from "react-router-dom";
 import { usePaymentGateways } from "../../../hooks/usePaymentGateways";
 import { PATH } from "../../../routes/PATH";
+import { usePurchaseCourseMutation } from "../../../services/courseApi";
 import { resetPurchase } from "../../../slice/purchaseSlice";
+import { showToast } from "../../../slice/toastSlice";
 import { useAppDispatch, useAppSelector } from "../../../store/hook";
-import type { AppDispatch } from "../../../store/store";
 import type { CourseTypeProps } from "../../../types/course";
-const renderButton = (
-    type: CourseTypeProps,
-    id: string | undefined,
-    navigate: (url: string) => void,
-    dispatch: AppDispatch,
-    canPurchase: boolean
-) => {
-    switch (type) {
-        case "expiry":
-            return canPurchase ? (
-                <Button
-                    variant="contained"
-                    size="small"
-                    fullWidth
-                    className="primary__btn"
-                    onClick={() => {
-                        navigate(PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.ROOT(Number(id), "course"));
-                        dispatch(resetPurchase())
-                    }}
-                >
-                    Purchase Course
-                </Button>
-            ) : null;
-
-        case "subscription":
-            return (
-                <Button
-                    variant="contained"
-                    size="small"
-                    fullWidth
-                    className="primary__btn"
-                    onClick={() => {
-                        navigate(PATH.COURSE_MANAGEMENT.COURSES.PLANS.ROOT);
-                        dispatch(resetPurchase())
-                    }}
-                >
-                    Explore Plans
-                </Button>
-            );
-
-        case "free":
-            return (
-                <Button
-                    variant="contained"
-                    size="small"
-                    fullWidth
-                    className="primary__btn"
-                    onClick={
-                        () => {
-                            navigate("/purchase");
-                            dispatch(resetPurchase())
-                        }
-                    }  >
-                    Enroll Now
-                </Button >
-            );
-    }
-};
 
 export default function PurchaseCourseDialog({ type }: { type?: CourseTypeProps }) {
     const theme = useTheme();
@@ -72,11 +15,94 @@ export default function PurchaseCourseDialog({ type }: { type?: CourseTypeProps 
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const purchase = useAppSelector((state) => state.purchase);
+    const user = useAppSelector((state) => state.auth.user);
     const { anyActive, isLoading: gatewaysLoading } = usePaymentGateways();
     const canPurchase = gatewaysLoading || anyActive;
+    const [purchaseCourse, { isLoading: enrolling }] = usePurchaseCourseMutation();
 
     const handlePurchaseClose = () => {
         dispatch(resetPurchase());
+    };
+
+    // Subscription plans are picked in the course banner (BannerCourseTypeModule) — there is
+    // no standalone plans route. Scroll to it, or open the course page when it isn't on screen.
+    const goToPlans = () => {
+        dispatch(resetPurchase());
+        const enrollment = document.getElementById("course-enrollment");
+        if (enrollment) {
+            enrollment.scrollIntoView({ behavior: "smooth", block: "center" });
+        } else {
+            navigate(PATH.COURSE_MANAGEMENT.COURSES.VIEW_COURSE.ROOT(Number(id)));
+        }
+    };
+
+    // Same request as the free course's button in BannerCourseTypeModule
+    const enrollFree = async () => {
+        try {
+            const response = await purchaseCourse({
+                body: {
+                    payment_method: "free",
+                    transaction_amount: "0",
+                    transaction_status: "success",
+                    transaction_id: `SMART-TXN-${new Date()}-${user?.id}-${id}`,
+                    reference_id: `SMART-INVOICE-${new Date()}-${user?.id}-${id}`,
+                    is_trial: false,
+                },
+                id: Number(id),
+                moduleType: "course",
+            }).unwrap();
+            dispatch(showToast({ message: response?.message || "Enrolled Successfully", severity: "success" }));
+            dispatch(resetPurchase());
+        } catch (e: any) {
+            dispatch(showToast({ message: e?.data?.message || "Something went wrong. Try again Later.", severity: "error" }));
+        }
+    };
+
+    const renderButton = () => {
+        switch (type) {
+            case "expiry":
+                return canPurchase ? (
+                    <Button
+                        variant="contained"
+                        size="small"
+                        fullWidth
+                        className="primary__btn"
+                        onClick={() => {
+                            navigate(PATH.COURSE_MANAGEMENT.COURSES.PURCHASE.ROOT(Number(id), "course"));
+                            dispatch(resetPurchase())
+                        }}
+                    >
+                        Purchase Course
+                    </Button>
+                ) : null;
+
+            case "subscription":
+                return (
+                    <Button
+                        variant="contained"
+                        size="small"
+                        fullWidth
+                        className="primary__btn"
+                        onClick={goToPlans}
+                    >
+                        Explore Plans
+                    </Button>
+                );
+
+            case "free":
+                return (
+                    <Button
+                        variant="contained"
+                        size="small"
+                        fullWidth
+                        className="primary__btn"
+                        disabled={enrolling}
+                        onClick={enrollFree}
+                    >
+                        {enrolling ? "Enrolling..." : "Enroll Now"}
+                    </Button>
+                );
+        }
     };
 
     return (
@@ -125,7 +151,7 @@ export default function PurchaseCourseDialog({ type }: { type?: CourseTypeProps 
                 </Typography>
 
                 <div className="action__group flex gap-4 mt-8">
-                    {type && renderButton(type, id, navigate, dispatch, canPurchase)}
+                    {renderButton()}
                     <Button
                         variant="contained"
                         size="small"

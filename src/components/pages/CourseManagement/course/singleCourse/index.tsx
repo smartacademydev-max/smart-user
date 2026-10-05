@@ -1,7 +1,7 @@
 import { CircularProgress } from "@mui/material";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import { useGetCourseByIdQuery, useGetCourseCurriculumByIdQuery, useGetCourseLiveClassQuery, useGetCourseMediaPlaylistQuery, useGetCourseOverviewByIdQuery } from "../../../../../services/courseApi";
 import type { QueryParams } from "../../../../../types";
 import TabController from "../../../../molecules/TabController";
@@ -21,7 +21,18 @@ export default function SingleCourse() {
     const location = useLocation();
     const isMyCourseView = location.pathname.startsWith("/my-course/");
 
-    const [activeTab, setActiveTab] = useState<string>("");
+    // The open tab lives in the URL (?tab=tests) so a refresh or a deep link from the
+    // WordPress site lands on it; an unavailable tab falls back to the first one.
+    const [searchParams, setSearchParams] = useSearchParams();
+    const requestedTab = searchParams.get("tab") ?? "";
+    const setActiveTab = (tab: string) => {
+        setSearchParams((prev) => {
+            const next = new URLSearchParams(prev);
+            next.set("tab", tab);
+            next.delete("category"); // tab-specific selections don't carry across tabs
+            return next;
+        }, { replace: true });
+    };
 
     const [qpNotes, setQpNotes] = useState<QueryParams>({ pageIndex: 1, pageSize: 12 });
     const [qpAudios, setQpAudios] = useState<QueryParams>({ pageIndex: 1, pageSize: 12 });
@@ -30,7 +41,7 @@ export default function SingleCourse() {
 
     const { data: courseBasic, isLoading: loadingBasic } = useGetCourseByIdQuery({ id: Number(id) });
     const { data: overviewData, isLoading: loadingOverview } = useGetCourseOverviewByIdQuery({ id: Number(id) });
-    const { data: curriculumData } = useGetCourseCurriculumByIdQuery({ id: Number(id), pageIndex: 1, pageSize: 50 }, { skip: !id });
+    const { data: curriculumData, isLoading: loadingCurriculum } = useGetCourseCurriculumByIdQuery({ id: Number(id), pageIndex: 1, pageSize: 50 }, { skip: !id });
 
     const { data: notesPlaylist, isLoading: loadingNotes } = useGetCourseMediaPlaylistQuery({ id: Number(id), type: "notes", qp: qpNotes }, { skip: !id });
     const { data: audiosPlaylist, isLoading: loadingAudios } = useGetCourseMediaPlaylistQuery({ id: Number(id), type: "audios", qp: qpAudios }, { skip: !id });
@@ -61,11 +72,15 @@ export default function SingleCourse() {
         return tabs;
     }, [hasOverview, hasCurriculum, videosPlaylist, notesPlaylist, audiosPlaylist, courseBasic, liveClasses, t]);
 
-    useEffect(() => {
-        if (availableTabs.length > 0 && !availableTabs.find((tab) => tab.value === activeTab)) {
-            setActiveTab(availableTabs[0].value);
-        }
-    }, [availableTabs]);
+    // Tabs appear as their queries resolve, so a requested tab that isn't listed yet may
+    // still be coming — only fall back once every tab-deciding query has settled.
+    const tabsSettled = !loadingCurriculum && !loadingVideos && !loadingNotes && !loadingAudios && !loadingLiveClass;
+    const isRequestedAvailable = availableTabs.some((tab) => tab.value === requestedTab);
+    const activeTab = isRequestedAvailable
+        ? requestedTab
+        : requestedTab && !tabsSettled
+            ? ""
+            : availableTabs[0]?.value ?? "";
 
 
     if (loadingBasic || loadingOverview) {

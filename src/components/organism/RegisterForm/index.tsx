@@ -73,10 +73,13 @@ export default function RegisterForm() {
                     : { name: values.name, email: values.email, phone: values.phone };
 
                 const attribution = getAttribution();
+                // A campaign link can deep-link a course (?course=48); the backend enrolls the
+                // new student in it straight away when that course is free.
+                const courseId = Number(searchParams.get("course")) || undefined;
                 const payload = {
                     ...basePayload,
                     ...(attribution?.type === "referral" && { referral_code: attribution.code }),
-                    ...(attribution?.type === "marketing" && { campaign_code: attribution.code }),
+                    ...(attribution?.type === "marketing" && { campaign_code: attribution.code, course_id: courseId }),
                 };
 
                 const response = await registerUser(payload).unwrap();

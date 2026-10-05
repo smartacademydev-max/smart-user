@@ -1,7 +1,7 @@
 import { ArrowBack } from "@mui/icons-material";
 import { Box, Button, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useGetSelectedTestBasedOnTestCategoryAndCourseIdQuery, useUseGetAllTestCategoryInACourseQuery } from "../../../../../../services/courseApi";
 import type { QueryParams } from "../../../../../../types";
 import type { TestCategory } from "../../../../../../types/question";
@@ -26,7 +26,17 @@ export default function SingleCourseTest({ havePurchased }: Props) {
 
     const [mediaQp, setMediaQp] = useState<QueryParams>({ pageIndex: 1, pageSize: 20 });
 
-    const [selectedPlaylist, setSelectedPlaylist] = useState<TestCategory | null>(null);
+    // The opened test category lives in the URL (?category=12) so a refresh stays inside it
+    const [searchParams, setSearchParams] = useSearchParams();
+    const categoryId = Number(searchParams.get("category")) || null;
+    const setCategoryId = (value: number | null) => {
+        setSearchParams((prev) => {
+            const next = new URLSearchParams(prev);
+            if (value) next.set("category", String(value));
+            else next.delete("category");
+            return next;
+        }, { replace: true });
+    };
     const [search, setSearch] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
     const [alphabeticOrder, setAlphabeticOrder] = useState<"a-z" | "z-a">("a-z");
@@ -43,30 +53,36 @@ export default function SingleCourseTest({ havePurchased }: Props) {
     );
 
 
+    // The category's name comes from the loaded list; a category on another page of that
+    // list (after a refresh) still opens, just with a generic heading.
+    const selectedPlaylist = categoryId
+        ? data?.data?.data?.find((category) => Number(category.id) === categoryId) ?? { id: categoryId, name: "Tests" } as TestCategory
+        : null;
+
     const { data: media, isLoading: loadingMedia } = useGetSelectedTestBasedOnTestCategoryAndCourseIdQuery(
         {
             pageIndex: mediaQp.pageIndex,
             pageSize: mediaQp.pageSize,
             search: debouncedSearch,
             course_id: Number(id),
-            test_category_id: Number(selectedPlaylist?.id),
+            test_category_id: Number(categoryId),
             alphabetic_order: alphabeticOrder,
         },
-        { skip: !id || !selectedPlaylist?.id }
+        { skip: !id || !categoryId }
     );
 
     const mediaItems = media?.data?.data || [];
     const mediaTotalPages = media?.data?.pagination?.total_pages || 0;
 
     const handleSelectPlaylist = (category: TestCategory) => {
-        setSelectedPlaylist(category);
+        setCategoryId(Number(category.id));
         setSearch("");
         setDebouncedSearch("");
         setMediaQp({ pageIndex: 1, pageSize: 20 });
     };
 
     const handleBack = () => {
-        setSelectedPlaylist(null);
+        setCategoryId(null);
         setSearch("");
         setDebouncedSearch("");
         setMediaQp({ pageIndex: 1, pageSize: 20 });
