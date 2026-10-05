@@ -191,6 +191,8 @@ export interface TestCategory {
     image: File | null;
     image_url: string | null;
     description?: string;
+    /** Tests in this category for the course; only on course/{id}/test-category */
+    tests_count?: number;
 }
 
 export interface TestCategoryListing {

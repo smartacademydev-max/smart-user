@@ -18,6 +18,11 @@ export default function TestCategoryCard({ data, onClick }: { data: TestCategory
                 <div className="content__wrapper max-w-[80%] text-center mx-auto my-2">
                     <Typography variant='h5' fontWeight={500} className='block'>{data?.name}</Typography>
                     <Typography variant='subtitle2'>{data?.description}</Typography>
+                    {data?.tests_count !== undefined && (
+                        <Typography variant='caption' color='text.middle' className='block mt-1'>
+                            {data.tests_count} {data.tests_count === 1 ? "Test" : "Tests"}
+                        </Typography>
+                    )}
                 </div>
             </div>
             <Button variant='contained' color='primary' fullWidth onClick={onClick}>View Tests</Button>

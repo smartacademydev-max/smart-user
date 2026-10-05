@@ -1,8 +1,10 @@
 import { CircularProgress } from "@mui/material";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useParams, useSearchParams } from "react-router-dom";
-import { useGetCourseByIdQuery, useGetCourseCurriculumByIdQuery, useGetCourseLiveClassQuery, useGetCourseMediaPlaylistQuery, useGetCourseOverviewByIdQuery } from "../../../../../services/courseApi";
+import { useGetCourseByIdQuery, useGetCourseCurriculumByIdQuery, useGetCourseLiveClassQuery, useGetCourseMediaPlaylistQuery, useGetCourseOverviewByIdQuery, usePurchaseCourseMutation } from "../../../../../services/courseApi";
+import { showToast } from "../../../../../slice/toastSlice";
+import { useAppDispatch, useAppSelector } from "../../../../../store/hook";
 import type { QueryParams } from "../../../../../types";
 import TabController from "../../../../molecules/TabController";
 import CourseBanner from "../../../../organism/CourseBanner";
@@ -51,6 +53,48 @@ export default function SingleCourse() {
     const havePurchased = courseBasic?.data?.user?.has_purchased ||
         courseBasic?.data?.user?.is_free_trial_valid ||
         false;
+
+    // Arriving from a campaign link (?campaign=CODE) on a free course the student doesn't own
+    // yet: enroll them. Brand-new sign-ups are enrolled by the backend at registration; this
+    // covers students who were already registered or signed in. The code is dropped from the
+    // URL afterwards so a refresh doesn't retry.
+    const campaign = searchParams.get("campaign");
+    const user = useAppSelector((state) => state.auth.user);
+    const dispatch = useAppDispatch();
+    const [purchaseCourse] = usePurchaseCourseMutation();
+    const campaignEnrollTried = useRef(false);
+    useEffect(() => {
+        const course = courseBasic?.data;
+        if (!campaign || !user || !course || campaignEnrollTried.current) return;
+        campaignEnrollTried.current = true;
+
+        const dropCampaign = () => setSearchParams((prev) => {
+            const next = new URLSearchParams(prev);
+            next.delete("campaign");
+            return next;
+        }, { replace: true });
+
+        if (course.course_type !== "free" || course.user?.has_purchased) {
+            dropCampaign();
+            return;
+        }
+
+        purchaseCourse({
+            body: {
+                payment_method: "free",
+                transaction_amount: "0",
+                transaction_status: "success",
+                transaction_id: `CAMPAIGN-${campaign}-${user.id}-${id}`,
+                reference_id: `CAMPAIGN-${campaign}-${user.id}-${id}`,
+                is_trial: false,
+            },
+            id: Number(id),
+            moduleType: "course",
+        }).unwrap()
+            .then((response) => dispatch(showToast({ message: response?.message || "Enrolled Successfully", severity: "success" })))
+            .catch(() => { /* already enrolled or not assignable: the page shows its normal state */ })
+            .finally(dropCampaign);
+    }, [campaign, user, courseBasic, id, purchaseCourse, dispatch, setSearchParams]);
 
     const hasOverview = !!(overviewData?.data?.about_this_course || overviewData?.data?.teachers?.length);
     const hasCurriculum = !!(curriculumData?.data?.data?.length);
